@@ -1,31 +1,57 @@
+[![npm version](https://badge.fury.io/js/usb-backup.svg)](https://badge.fury.io/js/usb-backup)
+
 # usb-backup
+Provides a solution to backup files that change infrequently such
+as (images/video/audio) from PC's and NAS devices to cheap and affordable usb drives for offline local or remote storage.
 
-# Description
-Provides a solution to backup media content that changes infrequently (images/video/audio) from NAS devices to multiple cheap and affordable usb drives
-where backups are stored in a format that can be restored with without the use of tools or software.
+This is a port of a .net project i developed and have been using since 2010 that no longer runs on modern hardware.
 
-USB storage is optimised by only backing upone copy of a file with certain contents (deduplication).
+## Getting started
+There are two methods of running the application.
 
-File hashes are captured on source device, backup device, and app db so we can determine bit rott occuring in one of the 3 locations.
+### Latest Bundled Package (Simple method)
+- Create an empty directory for where to run and store your backup database
+  eg (c:\usb-backup)
 
-I used it to backup my multi terrabyte NAS to multiple usb storage devices.
+- From that directory run `npx usb-backup`
 
-This is a port of a .net solution i developed back in the .net 2.0 days that no longer runs on modern hardware.
+Your database will be setup in a data sub folder and scripts will be created so
+you can run the application at any time from a shortcut.
 
-## Known issues
-- unix allows characters that are not allowed in windows
-- Ive seen drift in file modified timestamps. not sure if its an issue anymore
-- path delimiter is different between win and linux
-- How to handle updates to files even though its not supported. Ie if we copy structure onto backup device and file contents change the original structure on the backup device can only hold one file
-- max file path lengths on windows uuuggghhh
+###  Run from source (For the technically inclined)
+- Clone the repository from https://github.com/danyo1399/usb-backup.git
+- run npm install
+- run npm start
 
-## Limitations
-- Multiple files with the same hash will only be stored onec on backup devices. Which file is indeterminate
-- Two files with different hashes with the same path on different devices will force the second file to have a unique suffix added to ensure
-  we backup both files
+The application will create the a data directory where the database will be stored.
+
+## Goals
+- Backups are stored as plain copies of files that can be restored without the need of tools or software
+
+- USB storage is optimised by backing up only one copy of a files content (deduplication)
+
+- File hashes and metadata are stored in three locations source device, backup device, and application DB for redundancy
+
+## Known Limitations
+- Supporting unix allowed characters in file names that are not valid on windows when backing up linux filesystems on to windows formmated usb drives
+
+- Max file path lengths that exist in windows that dont on unix storage devices
+
+- Multiple files with the same hash will only be stored onec on backup devices. Which file path is stored on the usb drive is indeterminate
+
+- Two files with different hashes with the same path on different devices will force the second file to have a unique suffix added to ensure we backup both files
+
+## Troubleshooting
 
 
+`Error: listen EADDRINUSE: address already in use`
+
+This means you either have the application already running or something else is listening on the same port. Either shutdown the other instance of the running application or running the application on another port by providing a different port number eg `npx usb-backup 6000`
+
+-
 ## TODO
 - reattach existing device on create importing meta file.
 - add github star
-- copy readme to root folder
+- highlight selected page in side nav
+- create checkbox component
+- dialog shouldnt load
