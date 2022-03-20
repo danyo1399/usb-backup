@@ -70,33 +70,6 @@ module.exports = new GraphQLObjectType({
           }
         }
       }
-    },
-    greetings: {
-      type: GraphQLString,
-      // subscribe: async function* () {
-      //   for (const hi of ['Hi', 'Bonjour', 'Hola', 'Ciao', 'Zdravo']) {
-      //     yield { greetings: hi }
-      //   }
-      // },
-
-      subscribe: async function () {
-        return {
-          [Symbol.asyncIterator] () {
-            return this
-          },
-          list: ['hello', 'world'],
-          index: 0,
-          next: async function next () {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            if (this.index < this.list.length) {
-              const value = this.list[this.index]
-              this.index++
-              return { done: false, value: { greetings: value } }
-            }
-            return { done: true }
-          }
-        }
-      }
     }
   }
 })
