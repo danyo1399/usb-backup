@@ -5,6 +5,7 @@ import './graphql.js'
 import * as globals from './globals.js'
 import Jobs from './features/Jobs/index.js'
 import JobLog from './features/Jobs/components/JobLog.js'
+import LicenceDialog from './components/Licence.js'
 const { Router } = globals.preactRouter
 const html = globals.html
 
@@ -14,6 +15,7 @@ const BackupDevices = (props) => html`<${Devices} ...${props} variant="backup"/>
 export default function App () {
   return html`
         <div class="layout">
+        <${LicenceDialog}/>
             <${ToastProvider}>
                 <${Toast} />
                 <${SideNav} />
