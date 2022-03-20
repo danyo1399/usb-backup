@@ -1,12 +1,11 @@
-[![npm version](https://badge.fury.io/js/usb-backup.svg)](https://badge.fury.io/js/usb-backup)
-
-[![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 # usb-backup
 Provides a solution to backup files that change infrequently such
 as (images/video/audio) from PC's and NAS devices to cheap and affordable usb drives for offline local or remote storage.
 
 This is a port of a .net project i developed and have been using since 2010 that no longer runs on modern hardware.
+
+[![npm version](https://badge.fury.io/js/usb-backup.svg)](https://badge.fury.io/js/usb-backup)
+[![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Getting started
 There are two methods of running the application.
