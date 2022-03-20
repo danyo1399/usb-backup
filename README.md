@@ -1,5 +1,7 @@
 [![npm version](https://badge.fury.io/js/usb-backup.svg)](https://badge.fury.io/js/usb-backup)
 
+[![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # usb-backup
 Provides a solution to backup files that change infrequently such
 as (images/video/audio) from PC's and NAS devices to cheap and affordable usb drives for offline local or remote storage.
