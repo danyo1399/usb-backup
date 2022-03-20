@@ -125,7 +125,7 @@ export async function getBackupDevicesAsync () {
     query: `
                 query {
                     backupDevices {
-                    id, name, description, path
+                    id, name, description, path, lastScanDate
                     }
                 }
             `
