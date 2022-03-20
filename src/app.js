@@ -52,8 +52,15 @@ exports.removeDeviceAsync = async (id) => {
 }
 
 exports.updateDeviceAsync = async ({ id, name, description, path }) => {
-  if (!await isDeviceOnlineAsync({ id, path })) {
-    raiseError(errorCodes.devicePathDoesNotExist)
+  const device = await repo.getDeviceByIdAsync(id)
+  if (!device) {
+    raiseError(errorCodes.deviceDoesNotExist)
+  }
+  const hasPathChanged = path !== device.path
+  if (hasPathChanged) {
+    const isDeviceOnline = await isDeviceOnlineAsync({ id, path })
+
+    if (!isDeviceOnline) raiseError(errorCodes.pathDoesNotMatchDevice)
   }
   await repo.updateDeviceAsync({ id, name, description, path })
 }

@@ -134,8 +134,9 @@ exports.errorCodes = {
   existingSource: { code: 'existingSource', message: 'existingSource' },
   pathNotSupported: { code: 'pathNotSupported', message: 'The backup device path must look similar to x:\\path\\pathtobackup' },
   devicePathDoesNotExist: { code: 'devicePathDoesNotExist', message: 'devicePathDoesNotExist' },
-  deviceDoesNotExist: { code: 'deviceDoesNotExist', message: 'deviceDoesNotExist' },
-  pathDoesNotMatchDevice: { code: 'pathDoesNotMatchDevice', message: 'pathDoesNotMatchDevice' }
+  deviceIsNotOnline: { code: 'deviceIsNotOnline', message: 'Device is not online' },
+  deviceDoesNotExist: { code: 'deviceDoesNotExist', message: 'Device does not exist' },
+  pathDoesNotMatchDevice: { code: 'pathDoesNotMatchDevice', message: 'Path does not match device' }
 }
 
 exports.logArg = (msg, arg) => {
