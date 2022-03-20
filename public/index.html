@@ -5,13 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://unpkg.com/preact@10.6.6/dist/preact.umd.js"></script>
+    <script src="https://unpkg.com/preact@10.6.6/hooks/dist/hooks.umd.js"></script>
     <script src="https://unpkg.com/preact@10.6.6/devtools/dist/devtools.umd.js"></script>
     <script src="https://unpkg.com/preact@10.6.6/debug/dist/debug.umd.js"></script>
     <script src="https://unpkg.com/htm@3.1.0/dist/htm.umd.js"></script>
     <!-- <script src="https://unpkg.com/history/umd/history.production.min.js"></script> -->
+    <script>
+    // preact router expects preact hooks to be mounted at window.hooks
+    window.hooks = window.preactHooks
+    </script>
     <script src="https://unpkg.com/preact-router@4.0.1/dist/preact-router.umd.js"></script>
     <script src="https://unpkg.com/classnames@2.3.1/index.js"></script>
-    <script src="https://unpkg.com/preact@10.6.6/hooks/dist/hooks.umd.js"></script>
+
     <script type="text/javascript" src="https://unpkg.com/graphql-ws@5.6.2/umd/graphql-ws.min.js"></script>
 
     <script>

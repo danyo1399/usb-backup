@@ -3,6 +3,7 @@
 */
 body {
   --color-black: #000;
+  --color-gray-100: #222;
   --color-gray-200: rgb(64, 64, 64);
 
   --font-weight-bold: 700;
@@ -87,10 +88,15 @@ Component classes
   padding: 0.5rem;
   text-decoration: none;
 }
+.sidenav__menuitem--active {
+  background-color: var(--color-gray-100);
+}
 .sidenav__menuitem:hover {
   background-color: var(--color-gray-200);
   color: white;
 }
+
+
 .sidenav__menuitem-icon {
   font-size: 1.8rem;
 }

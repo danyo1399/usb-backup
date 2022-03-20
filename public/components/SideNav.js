@@ -2,8 +2,9 @@ import { Icon } from './Icon.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
 import { JobsMenuItem } from '../features/Jobs/index.js'
+import Link from './Link.js'
 
-const { Link } = globals.preactRouter
+
 const html = globals.html
 
 export function SideNav () {
@@ -29,7 +30,7 @@ export function SideNav () {
 }
 
 export function SideNavMenuItem ({ icon, children, href }) {
-  return html`<${Link} activeClassName="boo" className="sidenav__menuitem" href="${href}"
+  return html`<${Link} activeClassName="sidenav__menuitem--active" class="sidenav__menuitem" href="${href}"
     ><${Icon} className="sidenav__menuitem-icon" name="${icon}" /> ${children}<//
   >`
 }
