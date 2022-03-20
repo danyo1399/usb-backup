@@ -49,18 +49,6 @@ const index = (indexFn, list) => {
 exports.index = index
 
 /*
-Delegates
-==================================================================================
-*/
-exports.tryActionAsync = async (fn) => {
-  try {
-    return await fn()
-  } catch (error) {
-    // noop
-  }
-}
-
-/*
 List utilities
 ==================================================================================
 */
