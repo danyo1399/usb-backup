@@ -1,5 +1,7 @@
 # usb-backup
 
+[![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # Description
 Provides a solution to backup media content that changes infrequently (images/video/audio) from NAS devices to multiple cheap and affordable usb drives
 where backups are stored in a format that can be restored with without the use of tools or software.
