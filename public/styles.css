@@ -51,8 +51,10 @@ Component classes
 }
 
 .sidenav-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 3rem auto;
   align-items: center;
+  gap: 0.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--color-gray-200);
 }

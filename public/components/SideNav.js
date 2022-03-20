@@ -11,7 +11,10 @@ export function SideNav () {
               <div class="sidenav-header">
                   <${Icon} name="hdd" className="sidenav-header__icon"/>
                  <span class="sidenav-header__title"> USB Backup</span>
+                 <iframe class="sidenav-header__github"
+                 src="https://ghbtns.com/github-btn.html?user=danyo1399&repo=usb-backup&type=star&count=true&size=small" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
               </div>
+
 
               <div class="sidenav-main">
                   <div class="sidenav__menu">
