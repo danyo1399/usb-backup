@@ -54,7 +54,7 @@ exports.BackupDevice = new GraphQLObjectType({
   })
 })
 
-exports.Error = new GraphQLObjectType({
+const Error = exports.Error = new GraphQLObjectType({
   name: 'Error',
   fields: {
     code: { type: GraphQLString },
