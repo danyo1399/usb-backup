@@ -108,3 +108,19 @@ Component classes
   background-color: var(--bs-success) !important;
   color: white;
 }
+
+.device-actions {
+  height: 3.5rem;
+  display:flex;
+  align-items:center;
+  border: 1px solid #dbdbdb;
+  padding:1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+}
+
+.device-actions__label {
+  font-weight: var(--font-weight-light);
+  font-size: 1.2rem;
+  margin-right: 1.5rem;
+}

@@ -101,9 +101,11 @@ export default function Devices ({ variant }) {
             Create ${label}
         </button>
         </div>
-        <div class="btn-group mt-3 mb-3" data-hidden=${!anyDevicesSelected} role="group" aria-label="Action Bar">
+        <div class="device-actions">
+        <span class="device-actions__label">Actions:</span> <div class="btn-group mt-3 mb-3" data-hidden=${!anyDevicesSelected} role="group" aria-label="Action Bar">
           <button type="button" class="btn btn-outline-primary" onClick=${onScanDevicesJobAsync}>Scan Devices</button>
           <button type="button" class="btn btn-outline-primary" data-hidden=${variant === 'backup'} onClick=${onCreateBackupJob}>Perform Backup</button>
+        </div>
         </div>
 
         <${DevicesTable}
