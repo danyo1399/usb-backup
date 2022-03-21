@@ -101,3 +101,9 @@ export function useIdentityTrackedIteratorState (getIterator, getId = x => x.id,
 
   return createEntityAdapter(state).items()
 }
+
+let lastId = 1
+export function useUniqueId (prefix) {
+  const [state] = useState(lastId++)
+  return `${prefix || 'uniqueid'}-${state}`
+}

@@ -1,5 +1,5 @@
 import { useFetching } from '../../../hooks.js'
-import { useToast, Dialog, Alert, Button } from '../../../components/index.js'
+import { useToast, Dialog, Alert, Button, Checkbox } from '../../../components/index.js'
 import * as globals from '../../../globals.js'
 import { createBackupDevicesJobAsync, getBackupDevicesAsync } from '../queries.js'
 const { html, preactHooks } = globals
@@ -45,13 +45,6 @@ export default function StartBackupDevicesJobDialog ({
     })
   }
 
-  function selectDevice (evt, id) {
-    evt.preventDefault()
-    setTimeout(() => {
-      setSelectedBackupDeviceId(existing => existing === id ? null : id)
-    }, 0)
-  }
-
   function _onClose () {
     setShow(false)
     onClose && onClose()
@@ -74,7 +67,7 @@ export default function StartBackupDevicesJobDialog ({
         >Something went wrong (${error.message})<//
     >`}
 
-    <h5>Select Target Backup Device</h5>
+    <h6>Select Target Backup Device</h6>
     <table class="table table-striped">
     <thead>
         <tr>
@@ -87,10 +80,8 @@ export default function StartBackupDevicesJobDialog ({
       ${(backupDevices || []).map(dev => html`
       <tr key=${dev.id}>
         <td>
-          <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="backup-${dev.id}" checked=${selectedBackupDeviceId === dev.id} onClick=${(evt) => selectDevice(evt, dev.id)} />
-          <label class="form-check-label" for="backup-${dev.id}"></label>
-          </div>
+          <${Checkbox} checked=${selectedBackupDeviceId === dev.id}
+          onClick=${() => setSelectedBackupDeviceId(dev.id)}/>
         </td>
         <td>
           ${dev.name}
