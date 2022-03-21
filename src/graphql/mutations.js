@@ -6,7 +6,7 @@ const {
   GraphQLNonNull
 } = require('graphql')
 
-const { SourceDevice, BackupDevice } = require('./types')
+const { SourceDevice, BackupDevice, GenericErrorResponse, Error } = require('./types')
 const app = require('../app')
 const { createScanDeviceJobAsync } = require('../jobs/scanDeviceJob')
 const { runJobAsync } = require('../jobs/jobManager')
@@ -14,21 +14,6 @@ const { createBackupDevicesJobAsync } = require('../jobs/backupDeviceJob')
 const { defaultLogger } = require('../logging')
 const { toGraphqlErrorSection } = require('./utils')
 const { emptyError } = require('../errors')
-
-const Error = new GraphQLObjectType({
-  name: 'Error',
-  fields: {
-    code: { type: GraphQLString },
-    message: { type: GraphQLString }
-  }
-})
-
-const GenericErrorResponse = new GraphQLObjectType({
-  name: 'ErrorResponse',
-  fields: {
-    error: { type: Error }
-  }
-})
 
 function sourceDeviceMutations () {
   const CreateSourceDeviceRequest = new GraphQLInputObjectType({

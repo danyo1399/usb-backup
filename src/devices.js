@@ -21,13 +21,22 @@ exports.isDeviceOnlineAsync = async ({ path, id }) => {
   return exists
 }
 
+/**
+ * Writes the device and files to a json file at the root of the device
+ * @param {*} device
+ * @param {*} files
+ *
+ * @description
+ * We store a copy of the device details and its files on the backup device
+ * Could be used in future to restore a lost database from the meta data files
+ */
 exports.createDeviceMetaFileAsync = async (device, files = []) => {
   const file = _path.join(device.path, `${device.id}${FILE_SUFFIX}`)
 
   await fs.writeJson(file, { ...device, files })
 }
 
-exports.loadDeviceMtafileAsync = async (device) => {
+exports.loadDeviceMetafileAsync = async (device) => {
   const metafilePath = getMetaFilePath(device)
   return await fs.readJSON(metafilePath)
 }

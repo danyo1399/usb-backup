@@ -3,6 +3,9 @@ const path = require('path')
 
 const currentPath = exports.currentPath = path.resolve(process.cwd())
 
+/**
+ * Appends a suffix to a filename before the extension
+ */
 const appendSuffixToFilename = exports.appendSuffixToFilename = (filename, suffix) => {
   const ext = path.extname(filename)
   const seperator = filename.includes('/') ? '/' : filename.includes('\\') ? '\\' : path.sep
@@ -16,6 +19,15 @@ const appendSuffixToFilename = exports.appendSuffixToFilename = (filename, suffi
   return `${dirName}${basenameWithoutPrefix}${suffix}${ext}`
 }
 
+/**
+ * Given a specific path for a file, if a file with the same name exists append a incrementing suffix
+ * till we find a filename that doesnt exist.
+ *
+ * This is useful when we are writing to a backup device and there could already be a file at the path
+ * @param {*} filename
+ * @returns {string} unique filename with path
+ *
+ */
 exports.findUniqueFilenameAsync = async (filename) => {
   if ((await fs.pathExists(filename)) === false) {
     return filename
@@ -29,6 +41,10 @@ exports.findUniqueFilenameAsync = async (filename) => {
   }
 }
 
+/**
+ * Given a path for a file, ensure the file directory path exists creating it if necessary
+ * @param {*} fullFilePath
+ */
 exports.ensureFilePathExistsAsync = async (fullFilePath) => {
   const dirPath = path.dirname(fullFilePath)
   const pathExists = await fs.pathExists(dirPath)
@@ -37,7 +53,13 @@ exports.ensureFilePathExistsAsync = async (fullFilePath) => {
   }
 }
 
-exports.getRelativePath = function ({ basePath, filePath }) {
+/**
+ * Determines the relative path for the file from the root directory
+ * @param {*} basePath the root directory for the file
+ * @param {*} filePath the full path of the file
+ * @returns the relative path of the file from the root directory
+ */
+exports.getRelativePath = function (basePath, filePath) {
   const rpath = path.resolve(basePath.replaceAll('\\', '/'))
   const fpath = path.resolve(filePath.replaceAll('\\', '/'))
   if (fpath.startsWith(rpath) === false) {
@@ -50,6 +72,11 @@ exports.getRelativePath = function ({ basePath, filePath }) {
   return result
 }
 
+/**
+ * Appends n number of paths the the current working directory
+ * @param  {...string} subpaths
+ * @returns the combined full path
+ */
 exports.appendRelativePath = (...subpaths) => {
   return path.join(currentPath, ...subpaths)
 }

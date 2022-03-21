@@ -4,18 +4,53 @@ this module contains the application apis
 const repo = require('./repo')
 const fs = require('fs-extra')
 
-const { createFileId, newId, createFile } = require('./utils')
+const { newId } = require('./utils')
 const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync, isMetafile } = require('./devices')
 const { getRelativePath } = require('./path')
 const { hashFileAsync } = require('./crypto')
 const { raiseError, errorCodes } = require('./errors')
+
+/**
+ * Creates a composite primary key that uniquly identifies a file.
+ * @param {*} param0
+ * @returns {string} the id of the file
+ */
+const createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
+  return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])
+}
+
+/**
+ * Creates a file object from a list of required fields and destructuring a file stat object
+ * @param {*} param0
+ * @returns
+ */
+const createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
+  mtimeMs = Math.floor(mtimeMs)
+  birthtimeMs = Math.floor(birthtimeMs)
+  const id = createFileId({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } })
+  const deleted = false
+  const addDate = Date.now()
+
+  return {
+    id,
+    deviceType,
+    deviceId,
+    relativePath,
+    mtimeMs,
+    birthtimeMs,
+    size,
+    hash,
+    deleted,
+    addDate
+  }
+}
 
 /*
 Files
 ==================================================================================
 */
 exports.addFileAsync = async (device, filename, hash) => {
-  const relativePath = getRelativePath({ basePath: device.path, filePath: filename })
+  const relativePath = getRelativePath(device.path, filename)
   const stat = await fs.stat(filename)
   const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
   await repo.addFileAsync(newFile)
@@ -28,7 +63,7 @@ Source Devices
 
 exports.scanFileHoc = ({ device, existsAsync, addAsync, onNewFile }) => {
   return async ({ filename, stat }) => {
-    const relativePath = getRelativePath({ basePath: device.path, filePath: filename })
+    const relativePath = getRelativePath(device.path, filename)
 
     if (isMetafile(relativePath) === false) {
       const fileId = createFileId({ deviceId: device.id, relativePath, stat })

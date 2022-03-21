@@ -55,7 +55,7 @@ List utilities
 */
 
 /**
- * Creates a lookup function to check if exists.
+ * Creates a lookup function for a list of items to check if exists.
  * @param {*} indexFn
  * @param {*} list
  * @returns
@@ -66,6 +66,13 @@ const index = (indexFn, list) => {
 }
 exports.index = index
 
+/**
+ * Creates a long running async iterator that receives updates via callbacks
+ * @param {*} getNewItems function that returns new items to publish
+ * @param {*} onNewItems function to set event callback on new items available
+ * @param {*} offNewItems function to set event callback to destroy
+ * @returns {AsyncIterator}
+ */
 exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
   let _resolve
   const retrieveContext = {}
@@ -98,35 +105,5 @@ exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
       offNewItems(handleNewItems)
       return { done: true }
     }
-  }
-}
-
-/*
- Backup File Utils
-=======================================================================================
-*/
-
-const createFileId = exports.createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
-  return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])
-}
-
-exports.createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
-  mtimeMs = Math.floor(mtimeMs)
-  birthtimeMs = Math.floor(birthtimeMs)
-  const id = createFileId({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } })
-  const deleted = false
-  const addDate = Date.now()
-
-  return {
-    id,
-    deviceType,
-    deviceId,
-    relativePath,
-    mtimeMs,
-    birthtimeMs,
-    size,
-    hash,
-    deleted,
-    addDate
   }
 }

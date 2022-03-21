@@ -1,6 +1,4 @@
-const logLevels = exports.logLevels = { debug: 'debug', info: 'info', warn: 'warn', error: 'error' }
-
-const orderedLogLevels = [logLevels.debug, logLevels.info, logLevels.warn, logLevels.error]
+exports.logLevels = { debug: 'debug', info: 'info', warn: 'warn', error: 'error' }
 
 exports.createLogger = ({ debug, info, warn, error }) => {
   return { debug, info, warn, error }

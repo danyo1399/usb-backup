@@ -2,6 +2,11 @@
 const crypto = require('crypto')
 const fs = require('fs-extra')
 
+/**
+ * Generates an MD5 hash of the file contents
+ * @param {string} filePath  the path to the file
+ * @returns
+ */
 exports.hashFileAsync = (filePath) => {
   return new Promise((resolve, reject) => {
     // Algorithm depends on availability of OpenSSL on platform
@@ -31,8 +36,17 @@ exports.hashFileAsync = (filePath) => {
   })
 }
 
-// the file could have been updated after scanned before copy.
-// The only way to be sure is to to hash while we copy
+/**
+ * Copies a file and generates an MD5 hash of the contents as its copying
+ * @param {*} src the source file path
+ * @param {*} dest the destination file path
+ * @returns md5 hash
+ *
+ * @description
+ * the file could have been updated after it was  scanned before it is copied.
+ * By generating the hash of the file as its being copied when we create the file record,
+ * we know we have the hash of the file contents copied.
+ */
 exports.copyAndHashAsync = function (src, dest) {
   // Algorithm depends on availability of OpenSSL on platform
   // Another algorithms: 'sha1', 'md5', 'sha256', 'sha512' ...

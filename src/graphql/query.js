@@ -1,6 +1,5 @@
 const {
   GraphQLObjectType,
-  GraphQLString,
   GraphQLList
 } = require('graphql')
 const repo = require('../repo')
@@ -22,10 +21,6 @@ module.exports = new GraphQLObjectType({
         const data = await repo.getDevicesAsync('backup')
         return data
       }
-    },
-    hello: {
-      type: GraphQLString,
-      resolve: () => 'world'
     }
   }
 })

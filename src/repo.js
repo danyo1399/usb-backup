@@ -1,5 +1,5 @@
 /*
-this module contains the database api for the application
+this module contains the database queries for the application
 
  */
 const db = require('./db')
@@ -9,6 +9,11 @@ Common
 ==================================================================================
 */
 
+/**
+ * Returns a list of files that have not been backed up to a backup device.
+ * @param {string} sourceDeviceId
+ * @returns files that have not been backed up
+ */
 exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
   return await db.allAsync(`
     select s.*
@@ -85,11 +90,6 @@ exports.setDeviceScanDateAsync = async function (id) {
         where id = ?
     `, Date.now(), id)
 }
-
-/*
-Backup Devices
-=====================================================================================================
-*/
 
 /*
 Files

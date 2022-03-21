@@ -1,6 +1,7 @@
 /*
-this module contains generic database access utils and db migrations
+this module contains generic database access functions and db migrations
 for integrating with sqlite
+
  */
 const sqlite3 = require('sqlite3')
 const { defaultLogger } = require('./logging')

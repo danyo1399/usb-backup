@@ -1,6 +1,5 @@
 const testUtils = require('./common')
 const path = require('path')
-const { currentPath, getRelativePath } = require('../src/path')
 const { hashFileAsync, copyAndHashAsync } = require('../src/crypto')
 
 describe('crypto tests', () => {

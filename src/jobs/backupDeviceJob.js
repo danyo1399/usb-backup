@@ -14,6 +14,7 @@ const { copyAndHashAsync } = require('../crypto')
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
   const id = newIdNumber()
   let _abort = false
+
   async function executeAsync (log) {
     const context = { log, sourceDevice: null, freeSpace: null, addedHashes: {}, backupDevice: null, tempFilename: null, sourceFile: null }
 

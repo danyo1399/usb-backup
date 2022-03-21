@@ -100,44 +100,6 @@ exports.getJobChangeIterator = () => {
   return createAsyncIterator(getNewItems, cb => { callback = cb }, dispose)
 }
 
-exports.getJobChangeIteratorObsolete = () => {
-  let _jobs = jobIds.map(getJobInfo)
-  let _resolve
-
-  function getJobs () {
-    const value = [..._jobs]
-    _jobs = []
-    return value
-  }
-
-  const cb = id => {
-    _jobs.push(getJobInfo(id))
-    if (_resolve) {
-      _resolve(getJobs())
-      _resolve = null
-    }
-  }
-  jobEmitter.on(JOB_EVENTS.jobUpdated, cb)
-
-  return {
-    [Symbol.asyncIterator]: this,
-    async next () {
-      const value = getJobs()
-      if (value.length) {
-        return { value, done: false }
-      }
-      return await new Promise((resolve, reject) => {
-        _resolve = value => { resolve({ value, done: false }) }
-      })
-    },
-    return () {
-      // This will be reached if the consumer called 'break' or 'return' early in the loop.
-      jobEmitter.off(JOB_EVENTS.jobUpdated, cb)
-      return { done: true }
-    }
-  }
-}
-
 exports.getJobState = ({ id }) => {
   const state = jobStates[id]
   return { ...state, logs: [...state.logs], context: { ...state.context } }

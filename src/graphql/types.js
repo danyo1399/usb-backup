@@ -53,3 +53,18 @@ exports.BackupDevice = new GraphQLObjectType({
     }
   })
 })
+
+exports.Error = new GraphQLObjectType({
+  name: 'Error',
+  fields: {
+    code: { type: GraphQLString },
+    message: { type: GraphQLString }
+  }
+})
+
+exports.GenericErrorResponse = new GraphQLObjectType({
+  name: 'ErrorResponse',
+  fields: {
+    error: { type: Error }
+  }
+})

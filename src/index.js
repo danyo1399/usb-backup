@@ -22,21 +22,6 @@ const initApi = async () => {
 
   useServer({
     schema
-    // onConnect: (ctx) => {
-    //   console.log('Connect', ctx)
-    // },
-    // onSubscribe: (ctx, msg) => {
-    //   console.log('Subscribe', { ctx, msg })
-    // },
-    // onNext: (ctx, msg, args, result) => {
-    //   console.debug('Next', { ctx, msg, args, result })
-    // },
-    // onError: (ctx, msg, errors) => {
-    //   console.error('Error', { ctx, msg, errors })
-    // },
-    // onComplete: (ctx, msg) => {
-    //   console.log('Complete', { ctx, msg })
-    // }
   }, server)
 
   console.log('API listening to port ' + serverPort)
@@ -75,15 +60,6 @@ const initSpa = async () => {
     return h.continue
   })
 
-  // const server = new ApolloServer({
-  //   typeDefs,
-  //   resolvers,
-  //   plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })],
-  // })
-
-  // await server.start()
-  // await server.applyMiddleware({ app })
-
   await app.start()
   console.log('Server running on %s', app.info.uri)
   await open('http://localhost:' + port)
@@ -97,9 +73,9 @@ process.on('unhandledRejection', (err) => {
 console.log('usb-backup version ' + packageJson.version)
 initSpa().then(() => {
   initApi()
-}).then(() => copyArtifacts())
+}).then(() => copyApplicationFilesToRootDirectory())
 
-async function copyArtifacts () {
+async function copyApplicationFilesToRootDirectory () {
   if (process.env.NODE_ENV !== 'DEV') {
     const cwd = process.cwd()
     await fs.copyFile(path.resolve(__dirname, '../README.md'), path.join(cwd, 'README.md'))
