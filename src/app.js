@@ -4,10 +4,11 @@ this module contains the application apis
 const repo = require('./repo')
 const fs = require('fs-extra')
 
-const { raiseError, errorCodes, createFileId, newId, createFile } = require('./fns')
+const { createFileId, newId, createFile } = require('./utils')
 const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync, isMetafile } = require('./devices')
 const { getRelativePath } = require('./path')
 const { hashFileAsync } = require('./crypto')
+const { raiseError, errorCodes } = require('./errors')
 
 /*
 Files

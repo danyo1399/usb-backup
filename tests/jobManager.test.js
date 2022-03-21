@@ -1,7 +1,7 @@
 const jobManager = require('../src/jobs/jobManager')
 const testUtils = require('./common')
 
-const { newIdNumber } = require('../src/fns')
+const { newIdNumber } = require('../src/utils')
 
 function testJob (name, id = newIdNumber()) {
   async function executeAsync (log) {

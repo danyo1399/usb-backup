@@ -4,7 +4,6 @@ import * as globals from '../globals.js'
 import { JobsMenuItem } from '../features/Jobs/index.js'
 import Link from './Link.js'
 
-
 const html = globals.html
 
 export function SideNav () {

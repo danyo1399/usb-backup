@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 /*
- Functional Utils
+ Common Utils
  =======================================================================================
 */
 
@@ -36,8 +36,26 @@ exports.curry = function (func) {
   }
 }
 
+exports.newId = function () {
+  return crypto.randomBytes(16).toString('hex')
+}
+
+let currentIndex = 1
+exports._resetNumberRange = () => {
+  currentIndex = 1
+}
+
+exports.newIdNumber = () => {
+  return currentIndex++
+}
+
+/*
+List utilities
+==================================================================================
+*/
+
 /**
- * Creates a key value map that can be queried efficiently for key existance.
+ * Creates a lookup function to check if exists.
  * @param {*} indexFn
  * @param {*} list
  * @returns
@@ -47,11 +65,6 @@ const index = (indexFn, list) => {
   return (key) => !!map[key]
 }
 exports.index = index
-
-/*
-List utilities
-==================================================================================
-*/
 
 exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
   let _resolve
@@ -89,78 +102,9 @@ exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
 }
 
 /*
-Graphql
+ Backup File Utils
 =======================================================================================
 */
-
-exports.toGraphQlEnum = function toGraphQlEnum (obj) {
-  return Object.keys(obj).reduce(
-    (previous, current) => (
-      {
-        ...previous,
-        [current]: { value: obj[current] }
-      }), {})
-}
-
-class CustomError extends Error {
-  constructor (code, message) {
-    super(message)
-    this.code = code
-  }
-}
-exports.CustomError = CustomError
-
-exports.raiseError = ({ code, message }) => {
-  throw new CustomError(code, message)
-}
-
-exports.isCustomError = (error) => {
-  return !!(error.code && error.message)
-}
-
-exports.toGraphqlErrorSection = (error) => {
-  console.error(error)
-  return exports.isCustomError(error)
-    ? { error }
-    : {
-        error: exports.errorCodes.unexpectedError
-      }
-}
-
-exports.emptyError = () => ({ error: null })
-
-exports.errorCodes = {
-  unexpectedError: { code: 'unexpectedError', message: 'An unexpected error occured' },
-  existingSource: { code: 'existingSource', message: 'existingSource' },
-  pathNotSupported: { code: 'pathNotSupported', message: 'The backup device path must look similar to x:\\path\\pathtobackup' },
-  devicePathDoesNotExist: { code: 'devicePathDoesNotExist', message: 'devicePathDoesNotExist' },
-  deviceIsNotOnline: { code: 'deviceIsNotOnline', message: 'Device is not online' },
-  deviceDoesNotExist: { code: 'deviceDoesNotExist', message: 'Device does not exist' },
-  pathDoesNotMatchDevice: { code: 'pathDoesNotMatchDevice', message: 'Path does not match device' }
-}
-
-exports.logArg = (msg, arg) => {
-  console.log(msg, arg)
-  return arg
-}
-
-/*
-Domain
-=======================================================================================
-*/
-
-exports.newId = function () {
-  return crypto.randomBytes(16).toString('hex')
-}
-
-let currentIndex = 1
-exports._resetNumberRange = () => {
-  currentIndex = 1
-}
-
-exports.newIdNumber = () => {
-  return currentIndex++
-}
 
 const createFileId = exports.createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
   return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])

@@ -6,7 +6,7 @@ describe('app tests', () => {
   env.setupDb()
 
   it('throws an error when path is invalid', function () {
-    expect(app.createSourceDeviceAsync({ name: 'name', path: '' })).rejects.toMatchInlineSnapshot('[Error: devicePathDoesNotExist]')
+    expect(app.createSourceDeviceAsync({ name: 'name', path: '' })).rejects.toMatchInlineSnapshot('[Error: Device path does not exist]')
   })
 
   it('throws an error when path already is a source device', async function () {

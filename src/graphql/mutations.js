@@ -6,17 +6,14 @@ const {
   GraphQLNonNull
 } = require('graphql')
 
-const {
-  toGraphqlErrorSection: toErrorSection,
-  logArg,
-  emptyError
-} = require('../fns')
-
 const { SourceDevice, BackupDevice } = require('./types')
 const app = require('../app')
 const { createScanDeviceJobAsync } = require('../jobs/scanDeviceJob')
 const { runJobAsync } = require('../jobs/jobManager')
 const { createBackupDevicesJobAsync } = require('../jobs/backupDeviceJob')
+const { defaultLogger } = require('../logging')
+const { toGraphqlErrorSection } = require('./utils')
+const { emptyError } = require('../errors')
 
 const Error = new GraphQLObjectType({
   name: 'Error',
@@ -76,7 +73,8 @@ function sourceDeviceMutations () {
         try {
           await app.updateDeviceAsync({ id, name, description, path })
         } catch (err) {
-          response = logArg('edit source device', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('edit source device', response)
         }
         return response || { error: null }
       }
@@ -93,8 +91,8 @@ function sourceDeviceMutations () {
           const device = await app.createSourceDeviceAsync(input)
           response = { device: device, error: response }
         } catch (err) {
-          console.error(err)
-          response = logArg('add source device error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('add source device error', response)
         }
         return response
       }
@@ -110,7 +108,8 @@ function sourceDeviceMutations () {
           await app.removeDeviceAsync(id)
           response = { error: null }
         } catch (err) {
-          response = logArg('remove backup source error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('remove backup source error', response)
         }
 
         return response
@@ -161,7 +160,8 @@ function backupDeviceMutations () {
         try {
           await app.updateDeviceAsync({ id, name, description, path })
         } catch (err) {
-          response = logArg('edit backup device error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('edit backup device error', response)
         }
         return response || { error: null }
       }
@@ -178,8 +178,8 @@ function backupDeviceMutations () {
           const device = await app.createBackupDeviceAsync(input)
           response = { device: device, error: response }
         } catch (err) {
-          console.error(err)
-          response = logArg('add backup error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('add backup error', response)
         }
         return response
       }
@@ -195,7 +195,8 @@ function backupDeviceMutations () {
           await app.removeDeviceAsync(id)
           response = { error: null }
         } catch (err) {
-          response = logArg('remove backup device error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('remove backup device error', response)
         }
 
         return response
@@ -239,7 +240,8 @@ function jobMutations () {
           const job = await createBackupDevicesJobAsync(sourceDeviceIds, backupDeviceId)
           runJobAsync(job)
         } catch (err) {
-          response = logArg('edit backup device error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('edit backup device error', response)
         }
         return response || emptyError()
       }
@@ -258,7 +260,8 @@ function jobMutations () {
           const job = await createScanDeviceJobAsync({ sourceDeviceIds })
           runJobAsync(job)
         } catch (err) {
-          response = logArg('scan devices error', toErrorSection(err))
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('scan devices error', response)
         }
         return response || emptyError()
       }

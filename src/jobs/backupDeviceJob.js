@@ -1,5 +1,5 @@
 const { writeDeviceMetaFileAsync, addFileAsync } = require('../app')
-const { newIdNumber } = require('../fns')
+const { newIdNumber } = require('../utils')
 const fs = require('fs-extra')
 const checkDiskSpace = require('check-disk-space').default
 const path = require('path')
@@ -11,7 +11,7 @@ const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, findUniqueFilenameAsync } = require('../path')
 const { copyAndHashAsync } = require('../crypto')
 
-module.exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
+exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
   const id = newIdNumber()
   let _abort = false
   async function executeAsync (log) {

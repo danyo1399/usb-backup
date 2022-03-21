@@ -1,4 +1,4 @@
-const { project } = require('../src/fns')
+const { project } = require('../src/utils')
 const repo = require('../src/repo')
 const { setupTestEnvironment } = require('./common')
 

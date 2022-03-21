@@ -2,7 +2,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const process = require('process')
 const db = require('../src/db')
-const { newId, _resetNumberRange, curry } = require('../src/fns')
+const { newId, _resetNumberRange, curry } = require('../src/utils')
 const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
 

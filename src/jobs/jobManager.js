@@ -12,7 +12,7 @@ exports.reset = () => {
 }
 
 const EventEmitter = require('events')
-const { createAsyncIterator } = require('../fns')
+const { createAsyncIterator } = require('../utils')
 const { logLevels, createLogger } = require('../logging')
 class JobEmitter extends EventEmitter {
 

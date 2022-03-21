@@ -1,6 +1,6 @@
 const { scanFileHoc, writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync } = require('../app')
 const fileTreeWalkerAsync = require('../fileTreeWalker')
-const { index, identity, newIdNumber } = require('../fns')
+const { index, identity, newIdNumber } = require('../utils')
 const {
   getDeviceByIdAsync,
   addFileAsync,

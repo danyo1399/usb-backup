@@ -1,6 +1,7 @@
 const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLInputObjectType, GraphQLInt } = require('graphql')
 const { GraphQLJSONObject } = require('graphql-type-json')
 const jobManager = require('../jobs/jobManager')
+
 const Job = new GraphQLObjectType({
   name: 'Job',
   fields: {

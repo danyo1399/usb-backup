@@ -7,7 +7,7 @@ const mutation = require('./mutations')
 const query = require('./query')
 const subscription = require('./subscriptions')
 
-module.exports.schema = new GraphQLSchema({
+exports.schema = new GraphQLSchema({
   types: [sourceDevice],
   query,
   mutation,
