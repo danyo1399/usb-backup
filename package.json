@@ -6,6 +6,7 @@
   "bin": "src/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=DEV nodemon --ignore ./public/ src/index.js",
+    "start:watch": "cross-env NODE_ENV=DEV node src/index.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand"
   },
