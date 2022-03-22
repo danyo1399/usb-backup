@@ -13,14 +13,17 @@ exports.reset = () => {
 
 const EventEmitter = require('events')
 const { createAsyncIterator } = require('../utils')
-const { logLevels, createLogger } = require('../logging')
+const { logLevels, createLogger, defaultLogger } = require('../logging')
 class JobEmitter extends EventEmitter {
 
 }
 
 const JOB_EVENTS = { jobUpdated: 'jobUpdated', jobFinished: 'jobFinished', logAdded: 'logAdded' }
 
-const jobEmitter = exports.jobEmitter = new JobEmitter()
+const jobEmitter = exports.jobEmitter = new JobEmitter({ captureRejections: true })
+jobEmitter.addListener('error', (err) => {
+  defaultLogger.error('An error occured with in job emitter', err)
+})
 
 function createJobLogger (state) {
   const log = state.logs
