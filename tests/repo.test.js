@@ -56,8 +56,8 @@ Array [
   it('can check a source file exists or not by id', async function () {
     const sourceFile = await createSourceFileAsync()
 
-    const exists = await repo.fileExistsAsync(sourceFile.id)
-    const doesNotExist = await repo.fileExistsAsync('invalid id')
+    const exists = await repo.getFileExistsAsync(sourceFile.id)
+    const doesNotExist = await repo.getFileExistsAsync('invalid id')
 
     expect(exists).toEqual(true)
     expect(doesNotExist).toEqual(false)

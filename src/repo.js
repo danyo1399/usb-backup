@@ -82,7 +82,7 @@ exports.updateDeviceAsync = async function ({ id, name, description, path }) {
     `, name, description, path, id)
 }
 
-exports.setDeviceScanDateAsync = async function (id) {
+exports.updateDeviceScanDateAsync = async function (id) {
   await db.runAsync(`
     update
         devices
@@ -105,7 +105,7 @@ exports.deleteFileAsync = async function (id) {
     `, Date.now(), id)
 }
 
-exports.fileExistsAsync = async function (id) {
+exports.getFileExistsAsync = async function (id) {
   return !!(
     await db.getAsync(
             `

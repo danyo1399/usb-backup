@@ -1,4 +1,7 @@
 {
     "liveServer.settings.multiRootWorkspaceName": "usb-backup",
-    "liveServer.settings.root": "/public/"
+    "liveServer.settings.root": "/public/",
+    "conventionalCommits.scopes": [
+        "package.json"
+    ]
 }

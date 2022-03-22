@@ -6,8 +6,8 @@ const {
   addFileAsync,
   getFileIdsByDeviceAsync,
   deleteFileAsync,
-  fileExistsAsync,
-  setDeviceScanDateAsync
+  getFileExistsAsync,
+  updateDeviceScanDateAsync
 
 } = require('../repo')
 const { deviceName, isDeviceOnlineAsync } = require('../devices')
@@ -49,7 +49,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
       {
         device,
         addAsync: addFileAsync,
-        existsAsync: fileExistsAsync,
+        existsAsync: getFileExistsAsync,
         onNewFile: (filename) => log.info(`Adding file ${filename}`)
       })
 
@@ -83,7 +83,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
       await deleteFileAsync(id)
     }
 
-    await setDeviceScanDateAsync(deviceId)
+    await updateDeviceScanDateAsync(deviceId)
     await writeSourceDeviceMetaFileAsync(device)
   }
 }
