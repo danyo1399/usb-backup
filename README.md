@@ -26,12 +26,15 @@ you can run the application at any time from a shortcut.
 
 The application will create the a data directory where the database will be stored.
 
-## Goals
+## Features
 - Backups are stored as plain copies of files that can be restored without the need of tools or software
 
 - USB storage is optimised by backing up only one copy of a files content (deduplication)
 
 - File hashes and metadata are stored in three locations source device, backup device, and application DB for redundancy
+
+- Backup files are hashed during copy instead of relying on the file hash on source or re hashing on backup device to ensure the we record an accurate file hash on the backup device
+
 
 ## Known Limitations
 - Supporting unix allowed characters in file names that are not valid on windows when backing up linux filesystems on to windows formmated usb drives
@@ -48,11 +51,3 @@ The application will create the a data directory where the database will be stor
 `Error: listen EADDRINUSE: address already in use`
 
 This means you either have the application already running or something else is listening on the same port. Either shutdown the other instance of the running application or running the application on another port by providing a different port number eg `npx usb-backup 6000`
-
--
-## TODO
-- reattach existing device on create importing meta file.
-- add github star
-- highlight selected page in side nav
-- create checkbox component
-- dialog shouldnt load
