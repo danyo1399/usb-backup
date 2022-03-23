@@ -63,6 +63,10 @@ exports.getDevicesAsync = async function (deviceType) {
   return await db.allAsync('select * from devices where deviceType = ?', deviceType)
 }
 
+exports.getAllDevicesAsync = async function () {
+  return await db.allAsync('select * from devices')
+}
+
 exports.getDeviceByIdAsync = async function (id) {
   return await db.getAsync(`
         select *

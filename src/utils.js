@@ -69,15 +69,13 @@ exports.index = index
 /**
  * Creates a long running async iterator that receives updates via callbacks
  * @param {*} getNewItems function that returns new items to publish
- * @param {*} onNewItems function to set event callback on new items available
  * @param {*} offNewItems function to set event callback to destroy
- * @returns {AsyncIterator}
  */
-exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
+const createAsyncIterator = exports.createAsyncIterator = (getNewItems, offNewItems) => {
   let _resolve
   const retrieveContext = {}
 
-  function handleNewItems () {
+  function notify () {
     if (_resolve) {
       const items = getNewItems(retrieveContext)
       if (items.length) {
@@ -87,10 +85,9 @@ exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
     }
   }
 
-  onNewItems(handleNewItems)
-
   return {
     [Symbol.asyncIterator]: this,
+    notify,
     async next () {
       const items = getNewItems(retrieveContext)
       if (items.length > 0) {
@@ -102,8 +99,33 @@ exports.createAsyncIterator = (getNewItems, onNewItems, offNewItems) => {
       }
     },
     return () {
-      offNewItems(handleNewItems)
+      offNewItems(notify)
       return { done: true }
     }
   }
+}
+
+exports.createAsyncIteratorFromEventEmitter = (emitter, eventName) => {
+  let items = []
+
+  emitter.on(eventName, handleNewItem)
+
+  function getNewItems () {
+    const newItems = items
+    items = []
+    return newItems
+  }
+
+  function dispose () {
+    emitter.off(eventName, handleNewItem)
+  }
+
+  function handleNewItem (item) {
+    items.push(item)
+    iterator?.notify()
+  }
+
+  const iterator = createAsyncIterator(getNewItems, dispose)
+
+  return iterator
 }

@@ -73,15 +73,20 @@ exports.getJobLogIterator = (jobId) => {
     return logs
   }
 
-  return createAsyncIterator(
+  const iterator = createAsyncIterator(
     getLogs,
-    cb => jobEmitter.on(JOB_EVENTS.logAdded, cb),
-    cb => jobEmitter.off(JOB_EVENTS.logAdded, cb))
+    () => jobEmitter.off(JOB_EVENTS.logAdded, handleNewItems))
+
+  jobEmitter.on(JOB_EVENTS.logAdded, handleNewItems)
+
+  function handleNewItems () {
+    iterator.notify()
+  }
+  return iterator
 }
 
 exports.getJobChangeIterator = () => {
   let _jobs = jobIds.map(getJobInfo)
-  let callback
 
   function getNewItems () {
     const value = _jobs
@@ -89,18 +94,16 @@ exports.getJobChangeIterator = () => {
     return value
   }
 
+  const iterator = createAsyncIterator(getNewItems, jobEmitter.off(JOB_EVENTS.jobUpdated, handleNewItems))
+
   function handleNewItems (id) {
     _jobs.push(getJobInfo(id))
-    callback()
+    iterator.notify()
   }
 
   jobEmitter.on(JOB_EVENTS.jobUpdated, handleNewItems)
 
-  function dispose () {
-    jobEmitter.off(JOB_EVENTS.jobUpdated, handleNewItems)
-  }
-
-  return createAsyncIterator(getNewItems, cb => { callback = cb }, dispose)
+  return iterator
 }
 
 exports.getJobState = ({ id }) => {
