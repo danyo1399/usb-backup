@@ -15,13 +15,6 @@ function testJob (name, id = newIdNumber()) {
   return { id, executeAsync, context: { context: 'myContext' }, abort, name }
 }
 
-function iterate (jobsIterator, cb) {
-  return jobsIterator.next().then(j => {
-    cb(j)
-    return iterate(jobsIterator, cb)
-  })
-}
-
 function normaliseLogs (logs) {
   logs.forEach(x => {
     x.value.forEach(y => {
@@ -49,7 +42,7 @@ describe('ScanDeviceJob', function () {
 
       const logsIterator = jobManager.getJobLogIterator(job.id)
 
-      iterate(logsIterator, j => logs.push(j))
+      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
       await testUtils.sleep(100)
 
@@ -89,7 +82,7 @@ describe('ScanDeviceJob', function () {
       jobManager.runJobAsync(job2)
 
       const logsIterator = jobManager.getJobLogIterator(job1.id)
-      iterate(logsIterator, j => logs.push(j))
+      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
       await testUtils.sleep(200)
 
@@ -134,7 +127,7 @@ Array [
       jobManager.runJobAsync(job)
 
       const logsIterator = jobManager.getJobLogIterator(job.id)
-      iterate(logsIterator, j => logs.push(j))
+      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
       await testUtils.sleep(200)
 
@@ -178,7 +171,7 @@ Array [
       const jobs = []
       const jobsIterator = jobManager.getJobChangeIterator()
 
-      iterate(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
       await testUtils.sleep(100)
 
@@ -192,7 +185,7 @@ Array [
 
       const jobsIterator = jobManager.getJobChangeIterator()
 
-      iterate(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
       await testUtils.sleep(100)
       expect(jobs).toHaveLength(1)
@@ -221,7 +214,7 @@ Array [
       const jobs = []
       const jobsIterator = jobManager.getJobChangeIterator()
 
-      iterate(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
       await jobManager.runJobAsync(testJob('j1'))
       await testUtils.sleep(100)
@@ -277,7 +270,7 @@ Array [
       const jobsIterator = jobManager.getJobChangeIterator()
       jobManager.runJobAsync(testJob('j1'))
       jobManager.runJobAsync(testJob('j2'))
-      iterate(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
       await testUtils.sleep(500)
 
@@ -366,7 +359,7 @@ Array [
       const jobsIterator = jobManager.getJobChangeIterator()
       await jobManager.runJobAsync(testJob('j1'))
 
-      iterate(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
       await jobManager.runJobAsync(testJob('j2'))
       await testUtils.sleep(100)

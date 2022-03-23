@@ -23,6 +23,14 @@ exports.replaceUniqueId = curry((replacement, inStr) => {
   return inStr.replaceAll(/[0-9a-f]{32}/g, replacement)
 })
 
+function convertIteratorToCallback (iterator, cb) {
+  return iterator.next().then(j => {
+    cb(j)
+    return convertIteratorToCallback(iterator, cb)
+  })
+}
+exports.convertIteratorToCallback = convertIteratorToCallback
+
 exports.createDevicesAsync = async (env) => {
   const backupSourcePath = await env.createBackupSource()
   const backupDestinationPath = await env.createDummyFolder()
