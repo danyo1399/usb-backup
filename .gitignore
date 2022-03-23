@@ -111,3 +111,7 @@ test.db
 
 # the apps db
 app.db
+
+# ide files
+.vscode
+.idea
