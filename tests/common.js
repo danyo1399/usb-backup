@@ -5,6 +5,7 @@ const db = require('../src/db')
 const { newId, _resetNumberRange, curry } = require('../src/utils')
 const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
+const app = require('../src/app')
 
 const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')
@@ -21,6 +22,15 @@ exports.sleep = (ms) => {
 exports.replaceUniqueId = curry((replacement, inStr) => {
   return inStr.replaceAll(/[0-9a-f]{32}/g, replacement)
 })
+
+exports.createDevicesAsync = async (env) => {
+  const backupSourcePath = await env.createBackupSource()
+  const backupDestinationPath = await env.createDummyFolder()
+
+  const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: backupSourcePath })
+  const backupDevice = await app.createBackupDeviceAsync({ name: 'destination', path: backupDestinationPath })
+  return { sourceDevice, backupDevice }
+}
 
 exports.setupTestEnvironment = () => {
   const id = newId()

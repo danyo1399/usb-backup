@@ -1,9 +1,9 @@
-const jobManager = require('../src/jobs/jobManager')
-const ScanDeviceJob = require('../src/jobs/scanDeviceJob')
+const jobManager = require('../../src/jobs/jobManager')
+const ScanDeviceJob = require('../../src/jobs/scanDeviceJob')
 const fs = require('fs-extra')
-const { getFilesByDeviceAsync, getDeviceByIdAsync } = require('../src/repo')
-const app = require('../src/app')
-const testUtils = require('./common')
+const { getFilesByDeviceAsync, getDeviceByIdAsync } = require('../../src/repo')
+
+const testUtils = require('../common')
 const path = require('path')
 
 function getStableFileProps ({ size, relativePath, hash, mtimeMs }) {
@@ -19,16 +19,12 @@ describe('ScanDeviceJob', function () {
   })
 
   it('deletes orphan files', async () => {
-    const backupSourcePath = await env.createBackupSource()
-    const backupDestinationPath = await env.createDummyFolder()
-
-    const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: backupSourcePath })
-    const backupDevice = await app.createBackupDeviceAsync({ name: 'destination', path: backupDestinationPath })
+    const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
 
     const job = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
 
     await jobManager.runJobAsync(job)
-    await fs.rm(path.join(backupSourcePath, 'ico.png'))
+    await fs.rm(path.join(sourceDevice.path, 'ico.png'))
     await jobManager.runJobAsync(job)
 
     const files = await getFilesByDeviceAsync(sourceDevice.id)
@@ -38,11 +34,7 @@ describe('ScanDeviceJob', function () {
   })
 
   it('Can scan device files', async function () {
-    const backupSourcePath = await env.createBackupSource()
-    const backupDestinationPath = await env.createDummyFolder()
-
-    const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: backupSourcePath })
-    const backupDevice = await app.createBackupDeviceAsync({ name: 'destination', path: backupDestinationPath })
+    const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
 
     const job = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
 
