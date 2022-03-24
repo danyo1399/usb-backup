@@ -40,7 +40,7 @@ describe('ScanDeviceJob', function () {
       job.id = 1
       await jobManager.runJobAsync(job)
 
-      const logsIterator = jobManager.getJobLogIterator(job.id)
+      const logsIterator = jobManager.createJobLogsIterator(job.id)
 
       testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
@@ -81,7 +81,7 @@ describe('ScanDeviceJob', function () {
       jobManager.runJobAsync(job1)
       jobManager.runJobAsync(job2)
 
-      const logsIterator = jobManager.getJobLogIterator(job1.id)
+      const logsIterator = jobManager.createJobLogsIterator(job1.id)
       testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
       await testUtils.sleep(200)
@@ -126,7 +126,7 @@ Array [
 
       jobManager.runJobAsync(job)
 
-      const logsIterator = jobManager.getJobLogIterator(job.id)
+      const logsIterator = jobManager.createJobLogsIterator(job.id)
       testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
       await testUtils.sleep(200)
@@ -169,7 +169,7 @@ Array [
   describe('getJobsIterator', function () {
     it('should not emit when no jobs run', async function () {
       const jobs = []
-      const jobsIterator = jobManager.getJobChangeIterator()
+      const jobsIterator = jobManager.createJobsIterator()
 
       testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
@@ -183,7 +183,7 @@ Array [
       await jobManager.runJobAsync(testJob('j1'))
       await testUtils.sleep(100)
 
-      const jobsIterator = jobManager.getJobChangeIterator()
+      const jobsIterator = jobManager.createJobsIterator()
 
       testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
@@ -212,7 +212,7 @@ Array [
 
     it('should emit one job when one job run after iterator initialised', async function () {
       const jobs = []
-      const jobsIterator = jobManager.getJobChangeIterator()
+      const jobsIterator = jobManager.createJobsIterator()
 
       testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
 
@@ -267,7 +267,7 @@ Array [
 
     it('should wait till one job finishes before running second job', async function () {
       const jobs = []
-      const jobsIterator = jobManager.getJobChangeIterator()
+      const jobsIterator = jobManager.createJobsIterator()
       jobManager.runJobAsync(testJob('j1'))
       jobManager.runJobAsync(testJob('j2'))
       testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
@@ -356,7 +356,7 @@ Array [
 
     it('should emit both jobs when jobs added before and after iterator initialisation', async function () {
       const jobs = []
-      const jobsIterator = jobManager.getJobChangeIterator()
+      const jobsIterator = jobManager.createJobsIterator()
       await jobManager.runJobAsync(testJob('j1'))
 
       testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))

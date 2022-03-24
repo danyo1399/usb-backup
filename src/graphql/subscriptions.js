@@ -34,7 +34,7 @@ module.exports = new GraphQLObjectType({
     jobs: {
       type: new GraphQLList(Job),
       subscribe: async function () {
-        const jobs = jobManager.getJobChangeIterator()
+        const jobs = jobManager.createJobsIterator()
 
         return {
           [Symbol.asyncIterator] () {
@@ -55,7 +55,7 @@ module.exports = new GraphQLObjectType({
       type: new GraphQLList(JobLog),
       args: { input: { type: GetJobLogsRequest } },
       subscribe: async function (_, { input: { jobId } }) {
-        const logs = jobManager.getJobLogIterator(jobId)
+        const logs = jobManager.createJobLogsIterator(jobId)
 
         return {
           [Symbol.asyncIterator] () {

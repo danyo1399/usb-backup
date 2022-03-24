@@ -4,7 +4,7 @@ const { EventEmitter } = require('events')
 const { defaultLogger } = require('./logging')
 const { isDeviceOnlineAsync } = require('./devices')
 const { default: checkDiskSpace } = require('check-disk-space')
-const { createAsyncIteratorFromEventEmitter } = require('./utils')
+const { createEmitterAsyncIterator } = require('./utils')
 
 const EVENTS = { DEVICES_UPDATED: 'DEVICES_UPDATED' }
 const eventEmitter = new EventEmitter({ captureRejections: true })
@@ -51,7 +51,7 @@ exports.deviceInfo = {
     return this.devices
   },
   iterator () {
-    const iterator = createAsyncIteratorFromEventEmitter(eventEmitter, EVENTS.DEVICES_UPDATED)
+    const iterator = createEmitterAsyncIterator(eventEmitter, EVENTS.DEVICES_UPDATED)
     this.refresh()
     return iterator
   }

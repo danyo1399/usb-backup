@@ -12,7 +12,7 @@ exports.reset = () => {
 }
 
 const EventEmitter = require('events')
-const { createAsyncIterator } = require('../utils')
+const { createEmitterAsyncIterator, createEmitterWithCallbackAsyncIterator } = require('../utils')
 const { logLevels, createLogger, defaultLogger } = require('../logging')
 class JobEmitter extends EventEmitter {
 
@@ -58,7 +58,7 @@ function getJobInfo (jobId) {
   return { name, id, context, status, active: ACTIVE_STATUSES.includes(status) }
 }
 
-exports.getJobLogIterator = (jobId) => {
+exports.createJobLogsIterator = (jobId) => {
   let index = 0
 
   function getStateLogs () {
@@ -73,35 +73,19 @@ exports.getJobLogIterator = (jobId) => {
     return logs
   }
 
-  const iterator = createAsyncIterator(
-    getLogs,
-    () => jobEmitter.off(JOB_EVENTS.logAdded, handleNewItems))
+  const iterator = createEmitterWithCallbackAsyncIterator(jobEmitter, JOB_EVENTS.logAdded, getLogs)
 
-  jobEmitter.on(JOB_EVENTS.logAdded, handleNewItems)
-
-  function handleNewItems () {
-    iterator.notify()
-  }
   return iterator
 }
 
-exports.getJobChangeIterator = () => {
-  let _jobs = jobIds.map(getJobInfo)
+exports.createJobsIterator = () => {
+  const initialItems = jobIds.map(getJobInfo)
 
-  function getNewItems () {
-    const value = _jobs
-    _jobs = []
-    return value
+  const iterator = createEmitterAsyncIterator(jobEmitter, JOB_EVENTS.jobUpdated, { getNewItems, initialItems })
+
+  function getNewItems (id) {
+    return [getJobInfo(id)]
   }
-
-  const iterator = createAsyncIterator(getNewItems, jobEmitter.off(JOB_EVENTS.jobUpdated, handleNewItems))
-
-  function handleNewItems (id) {
-    _jobs.push(getJobInfo(id))
-    iterator.notify()
-  }
-
-  jobEmitter.on(JOB_EVENTS.jobUpdated, handleNewItems)
 
   return iterator
 }

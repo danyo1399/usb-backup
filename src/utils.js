@@ -105,23 +105,58 @@ const createAsyncIterator = exports.createAsyncIterator = (getNewItems, offNewIt
   }
 }
 
-exports.createAsyncIteratorFromEventEmitter = (emitter, eventName) => {
-  let items = []
+/**
+ * Creates an async iterator from an event emitter.
+ * Attaches to an event emitter.
+ *
+ * When an event is emitted, the emitted payload is either returned by the async iterator or
+ * pass to a function that returns a list if items to return by the async iterator
+ *
+ * The iterator can start with an initial list of items to emit
+ */
+exports.createEmitterAsyncIterator = (emitter, eventName, { getNewItems, initialItems } = {}) => {
+  let pendingItems = initialItems || []
+  emitter.on(eventName, eventHandler)
 
-  emitter.on(eventName, handleNewItem)
-
-  function getNewItems () {
-    const newItems = items
-    items = []
+  function getPendingItems () {
+    const newItems = pendingItems
+    pendingItems = []
     return newItems
   }
+
+  function dispose () {
+    emitter.off(eventName, eventHandler)
+  }
+
+  function eventHandler (...eventPayload) {
+    if (getNewItems) {
+      const newItems = getNewItems(...eventPayload)
+      pendingItems.push(...newItems)
+    } else {
+      const newItem = eventPayload[0]
+      pendingItems.push(newItem)
+    }
+
+    pendingItems.length > 0 && iterator?.notify()
+  }
+
+  const iterator = createAsyncIterator(getPendingItems, dispose)
+
+  return iterator
+}
+
+/**
+ * Creates an async iterator from an event emitter.
+ * The event emitter emits when new items are available and can be retrieved calling a callback function
+ */
+exports.createEmitterWithCallbackAsyncIterator = (emitter, eventName, getNewItems) => {
+  emitter.on(eventName, handleNewItem)
 
   function dispose () {
     emitter.off(eventName, handleNewItem)
   }
 
-  function handleNewItem (item) {
-    items.push(item)
+  function handleNewItem () {
     iterator?.notify()
   }
 
