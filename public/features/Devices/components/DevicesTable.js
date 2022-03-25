@@ -1,5 +1,8 @@
 import { toDateString } from '../../../components/index.js'
+import { bytesToSize } from '../../../fns.js'
 import * as globals from '../../../globals.js'
+import { useObservableState } from '../../../hooks.js'
+import { deviceInfo$ } from '../queries.js'
 
 const html = globals.html
 
@@ -8,15 +11,18 @@ export default function DevicesTable ({ devices, selected, toggleSelected, delet
     return null
   }
 
+  const deviceInfo = useObservableState(deviceInfo$) || {}
   return html`
         <div>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col"></th>
+                        <th scope="col">Online</th>
                         <th scope="col">Name</th>
                         <th scope="col">Description</th>
                         <th scope="col">Path</th>
+                        <th scope="col">Available</th>
                         <th scope="col">Last Scanned</th>
                     </tr>
                 </thead>
@@ -30,10 +36,11 @@ export default function DevicesTable ({ devices, selected, toggleSelected, delet
                                 <label class="form-check-label" for="cb-${dev.id}"></label>
                                 </div>
                                 </td>
-
+                                <td>${deviceInfo[dev.id]?.isOnline ? 'Y' : ''}</td>
                                 <td>${dev.name}</td>
                                 <td>${dev.description}</td>
                                 <td>${dev.path}</td>
+                                <td>${bytesToSize(deviceInfo[dev.id]?.freeSpace)}</td>
                                 <td>${toDateString(dev.lastScanDate)}</td>
                                 <td>
                                     <div class="dropdown">

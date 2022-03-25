@@ -1,6 +1,6 @@
 import * as globals from './globals.js'
 const { createClient } = globals.graphqlWs
-
+const rxjs = globals.rxjs
 /*
 Common Graphql
 ==================================================================================
@@ -22,6 +22,16 @@ export function execute (payload) {
       complete: () => result.errors && result.errors.length > 0 ? rejectWithLog(result.errors) : resolve(result)
     })
   })
+}
+
+export function toObservable (operation) {
+  return new rxjs.Observable((observer) =>
+    client.subscribe(operation, {
+      next: (data) => observer.next(data),
+      error: (err) => observer.error(err),
+      complete: () => observer.complete()
+    })
+  )
 }
 
 export function subscribe (payload) {
@@ -67,29 +77,3 @@ export function subscribe (payload) {
     }
   }
 }
-
-;(async () => {
-  // const result = await execute({ query: 'query { sourceDevices {name, description} }' })
-  // console.log(result)
-  // const result = await execute({
-  //   query: `mutation ( $test: SomeName) {
-  //     testMutate(input: {zname: $test})
-  // }`,
-  //   variables: { test: 'boo' },
-  // })
-  // console.log('lol mutate response', result)
-  // const subscription = subscribe({
-  //   query: `subscription {
-  //     jobs {
-  //       id, name, context, status
-  //     }
-  //   }
-  //     `
-
-  // })
-  // subscription.return() to dispose
-  // for await (const result of subscription) {
-  //   console.log('lol job event', result)
-  // }
-  // complete
-})()

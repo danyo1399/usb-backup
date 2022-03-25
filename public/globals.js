@@ -5,3 +5,4 @@ export const graphqlWs = window.graphqlWs
 export const preactRouter = window.preactRouter
 export const classNames = window.classNames
 export const bootstrap = window.bootstrap
+export const rxjs = window.rxjs

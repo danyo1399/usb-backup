@@ -1,6 +1,8 @@
-const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLInputObjectType, GraphQLInt } = require('graphql')
+const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLInputObjectType, GraphQLInt, GraphQLFloat } = require('graphql')
 const { GraphQLJSONObject } = require('graphql-type-json')
+const { deviceInfo } = require('../deviceInfo')
 const jobManager = require('../jobs/jobManager')
+const { toGraphqlIterator } = require('./utils')
 
 const Job = new GraphQLObjectType({
   name: 'Job',
@@ -28,27 +30,31 @@ const GetJobLogsRequest = new GraphQLInputObjectType({
   }
 })
 
+const DeviceInfo = new GraphQLObjectType({
+  name: 'DeviceInfo',
+  fields: {
+    id: { type: GraphQLString },
+    isOnline: { type: GraphQLBoolean },
+    freeSpace: { type: GraphQLFloat },
+    totalSpace: { type: GraphQLFloat }
+  }
+})
 module.exports = new GraphQLObjectType({
   name: 'Subscription',
   fields: {
+    deviceInfo: {
+      type: new GraphQLList(DeviceInfo),
+      subscribe: async function () {
+        const iterator = deviceInfo.iterator()
+        return toGraphqlIterator(iterator, 'deviceInfo')
+      }
+    },
     jobs: {
       type: new GraphQLList(Job),
       subscribe: async function () {
         const jobs = jobManager.createJobsIterator()
 
-        return {
-          [Symbol.asyncIterator] () {
-            return this
-          },
-
-          next: async function next () {
-            const { value, done } = await jobs.next()
-            return { value: { jobs: value }, done }
-          },
-          return () {
-            return jobs.return()
-          }
-        }
+        return toGraphqlIterator(jobs, 'jobs')
       }
     },
     jobLogs: {
@@ -57,19 +63,7 @@ module.exports = new GraphQLObjectType({
       subscribe: async function (_, { input: { jobId } }) {
         const logs = jobManager.createJobLogsIterator(jobId)
 
-        return {
-          [Symbol.asyncIterator] () {
-            return this
-          },
-
-          next: async function next () {
-            const { value, done } = await logs.next()
-            return { value: { jobLogs: value }, done }
-          },
-          return () {
-            return logs.return()
-          }
-        }
+        return toGraphqlIterator(logs, 'jobLogs')
       }
     }
   }

@@ -14,6 +14,7 @@ const { createBackupDevicesJobAsync } = require('../jobs/backupDeviceJob')
 const { defaultLogger } = require('../logging')
 const { toGraphqlErrorSection } = require('./utils')
 const { emptyError } = require('../errors')
+const { deviceInfo } = require('../deviceInfo')
 
 function sourceDeviceMutations () {
   const CreateSourceDeviceRequest = new GraphQLInputObjectType({
@@ -210,6 +211,12 @@ function jobMutations () {
     }
   })
   return {
+    refreshDeviceInfo: {
+      type: GenericErrorResponse,
+      resolve: async () => {
+        await deviceInfo.refresh()
+      }
+    },
     backupDevices: {
       type: GenericErrorResponse,
       args: {

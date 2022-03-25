@@ -1,5 +1,26 @@
 
+import { toObservable } from '../../graphql.js'
 import { execute, handleResponseError } from '../../index.js'
+import * as globals from '../../globals.js'
+const { rxjs } = globals
+/*
+Devices
+==================================================================================
+*/
+
+export const deviceInfo$ = toObservable({
+  query: `
+  subscription {
+    deviceInfo {
+      id, isOnline, freeSpace, totalSpace
+    }
+  }
+`
+}).pipe(
+  rxjs.map(x => x.data.deviceInfo),
+  rxjs.mergeAll(),
+  rxjs.scan((acc, curr) => ({ ...acc, [curr.id]: curr }), {}),
+  rxjs.shareReplay(1))
 
 /*
 Source Devices

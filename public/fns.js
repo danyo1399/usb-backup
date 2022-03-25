@@ -4,6 +4,14 @@ export function delay (fn, timeout = 500) {
   }
 }
 
+export function bytesToSize (bytes) {
+  if (!bytes) return ''
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes === 0) return '0 Byte'
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
+  return (bytes / Math.pow(1024, i)).toFixed(i >= 3 ? 2 : 0) + ' ' + sizes[i]
+}
+
 export function getSelectedKeys (obj) {
   return Object.entries(obj || {}).filter(([_, selected]) => selected).map(([id]) => id)
 }

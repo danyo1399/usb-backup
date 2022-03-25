@@ -78,6 +78,18 @@ export function useIteratorState (getIterator, getItems) {
   return state
 }
 
+export function useObservableState (observable$) {
+  const [state, setState] = useState()
+
+  useEffect(() => {
+    const subscription = observable$.subscribe(value => {
+      setState(value)
+    })
+    return () => subscription.unsubscribe()
+  }, [observable$])
+  return state
+}
+
 export function useIdentityTrackedIteratorState (getIterator, getId = x => x.id, getItems) {
   const [state, setState] = useState(defaultEntityAdapterState())
   useEffect(() => {
