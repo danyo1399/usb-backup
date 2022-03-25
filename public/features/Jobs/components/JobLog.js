@@ -1,11 +1,13 @@
 import * as globals from '../../../globals.js'
-import { useJobLog } from '../hooks.js'
+import { useObservableState } from '../../../hooks.js'
+import { getJobLog } from '../queries.js'
 
 const html = window.html
-const { useEffect, useState } = globals.preactHooks
+const { useState } = globals.preactHooks
 
 export default function JobLog ({ jobId }) {
-  const jobLog = useJobLog(jobId)
+  const jobLog = useObservableState(getJobLog(jobId)) || []
+
   const [filter, setFilter] = useState('all')
 
   const filteredLogs = jobLog.filter(({ type }) =>
