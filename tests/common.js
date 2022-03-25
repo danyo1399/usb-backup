@@ -19,6 +19,37 @@ exports.sleep = (ms) => {
   })
 }
 
+/**
+ * Creates a this like context to store test contextual state assigned during test setup
+ *
+ * Remarks:
+ * Created as jest does not support context aware this anymore.
+ */
+exports.createContext = () => {
+  let state = {}
+  const context = {
+    append (obj) { state = { ...state, ...obj } },
+    reset () { state = {} }
+  }
+
+  beforeEach(async function () {
+    context.reset()
+  })
+
+  const handler = {
+    get (obj, prop) {
+      if (prop === 'state') return state
+      return prop in state
+        ? state[prop]
+        : obj[prop]
+    },
+    set (obj, prop, value) {
+      state[prop] = value
+    }
+  }
+  return new Proxy(context, handler)
+}
+
 exports.replaceUniqueId = curry((replacement, inStr) => {
   return inStr.replaceAll(/[0-9a-f]{32}/g, replacement)
 })

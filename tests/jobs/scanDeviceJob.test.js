@@ -12,16 +12,19 @@ function getStableFileProps ({ size, relativePath, hash, mtimeMs }) {
 
 describe('ScanDeviceJob', function () {
   const env = testUtils.setupTestEnvironment()
+  const ctx = testUtils.createContext()
   env.setupDb()
 
   beforeEach(async function () {
     jobManager.reset()
-  })
-
-  it('deletes orphan files', async () => {
     const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
 
     const job = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
+    ctx.append({ backupDevice, sourceDevice, job })
+  })
+
+  it('deletes orphan files', async () => {
+    const { sourceDevice, job } = ctx.state
 
     await jobManager.runJobAsync(job)
     await fs.rm(path.join(sourceDevice.path, 'ico.png'))
@@ -34,9 +37,7 @@ describe('ScanDeviceJob', function () {
   })
 
   it('Can scan device files', async function () {
-    const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
-
-    const job = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
+    const { sourceDevice, job } = ctx.state
 
     const promise = jobManager.runJobAsync(job)
     const state = jobManager.getJobState(job)
