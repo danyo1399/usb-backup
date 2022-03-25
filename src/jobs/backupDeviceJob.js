@@ -4,7 +4,7 @@ const fs = require('fs-extra')
 const checkDiskSpace = require('check-disk-space').default
 const path = require('path')
 const {
-  getDeviceByIdAsync, getSourceFilesToBackupAsync
+  getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
 const { deviceName, isDeviceOnlineAsync } = require('../devices')
 const { scanDevices } = require('./scanDeviceJob')
@@ -63,6 +63,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
           handleBackupFileError(error, log, context)
         }
       }
+      await updateLastBackupDate(context.sourceDevice.id, Date.now())
       await writeDeviceMetaFileAsync(context.backupDevice)
     }
   }

@@ -31,7 +31,7 @@ export async function getSourceDevicesAsync () {
     query: `
             query {
                 sourceDevices {
-                id, name, description, path, lastScanDate
+                id, name, description, path, lastScanDate, lastBackupDate
                 }
             }
         `

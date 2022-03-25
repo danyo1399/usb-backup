@@ -52,6 +52,10 @@ exports.addDeviceAsync = async function ({ deviceType, id, name, description, pa
   return { id, name, description, path, lastScanDate, lastBackupDate, addDate }
 }
 
+exports.updateLastBackupDate = async (id, lastBackupDate) => {
+  await db.runAsync('update devices set lastBackupDate = ? where id = ?', lastBackupDate, id)
+}
+
 exports.deleteDeviceAsync = async function (id) {
   await db.performInTransactionAsync(async () => {
     await db.runAsync('delete from files where deviceId=?', id)

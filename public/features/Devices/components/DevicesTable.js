@@ -6,7 +6,7 @@ import { deviceInfo$ } from '../queries.js'
 
 const html = globals.html
 
-export default function DevicesTable ({ devices, selected, toggleSelected, deleteDevice, editDevice, onCreateBackupJob }) {
+export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, onCreateBackupJob }) {
   if (devices.length === 0) {
     return null
   }
@@ -24,6 +24,7 @@ export default function DevicesTable ({ devices, selected, toggleSelected, delet
                         <th scope="col">Path</th>
                         <th scope="col">Available</th>
                         <th scope="col">Last Scanned</th>
+                        ${variant === 'source' && html`<th scope="col">Last Backup</th>`}
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +43,7 @@ export default function DevicesTable ({ devices, selected, toggleSelected, delet
                                 <td>${dev.path}</td>
                                 <td>${bytesToSize(deviceInfo[dev.id]?.freeSpace)}</td>
                                 <td>${toDateString(dev.lastScanDate)}</td>
+                                ${variant === 'source' && html`<td>${toDateString(dev.lastBackupDate)}</td>`}
                                 <td>
                                     <div class="dropdown">
                                         <button

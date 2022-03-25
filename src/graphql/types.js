@@ -24,6 +24,9 @@ exports.SourceDevice = new GraphQLObjectType({
     lastScanDate: {
       type: GraphQLFloat
     },
+    lastBackupDate: {
+      type: GraphQLFloat
+    },
     addDate: {
       type: GraphQLFloat
     }

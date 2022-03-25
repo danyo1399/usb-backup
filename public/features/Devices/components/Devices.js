@@ -110,6 +110,7 @@ export default function Devices ({ variant }) {
 
         <${DevicesTable}
             devices="${devices}"
+            variant=${variant}
             selected=${selectedDevices}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
