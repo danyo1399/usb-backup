@@ -78,6 +78,19 @@ export function useIteratorState (getIterator, getItems) {
   return state
 }
 
+export function useApiData (apiFn) {
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    (async () => {
+      const response = await apiFn()
+      setData(response)
+    })()
+  }, [])
+
+  return data
+}
+
 export function useObservableState (observable$) {
   const [state, setState] = useState()
 

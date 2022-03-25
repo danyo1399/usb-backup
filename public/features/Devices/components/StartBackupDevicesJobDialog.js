@@ -1,7 +1,8 @@
-import { useFetching } from '../../../hooks.js'
+import { useApiData, useFetching, useObservableState } from '../../../hooks.js'
 import { useToast, Dialog, Alert, Button, Checkbox } from '../../../components/index.js'
 import * as globals from '../../../globals.js'
-import { createBackupDevicesJobAsync, getBackupDevicesAsync } from '../queries.js'
+import { createBackupDevicesJobAsync, deviceInfo$, getBackupDevicesAsync } from '../queries.js'
+import { bytesToSize } from '../../../fns.js'
 const { html, preactHooks } = globals
 
 const { useEffect, useState } = preactHooks
@@ -16,17 +17,12 @@ export default function StartBackupDevicesJobDialog ({
   const { addToast } = useToast()
 
   const [selectedBackupDeviceId, setSelectedBackupDeviceId] = useState(null)
-  const [backupDevices, setBackupDevices] = useState(null)
 
   const hasInvalidPathError = error?.code === 'devicePathDoesNotExist'
   const unknownError = error && !hasInvalidPathError
 
-  useEffect(() => {
-    (async () => {
-      const devices = await getBackupDevicesAsync()
-      setBackupDevices(devices)
-    })()
-  }, [])
+  const deviceInfo = useObservableState(deviceInfo$) || {}
+  const backupDevices = (useApiData(getBackupDevicesAsync) || []).filter(dev => deviceInfo[dev.id]?.isOnline)
 
   useEffect(() => {
     resetFetchState()
@@ -52,6 +48,7 @@ export default function StartBackupDevicesJobDialog ({
 
   return html`
     <${Dialog}
+    size="modal-lg"
     id="createBackupDeviceModal"
     show=${show}
     onClose=${_onClose}
@@ -74,6 +71,7 @@ export default function StartBackupDevicesJobDialog ({
             <th style="width: 50px;" scope="col"></th>
             <th scope="col">Name</th>
             <th scope="col">Description</th>
+            <th scope="col">Available</th>
         </tr>
     </thead>
     <tbody>
@@ -88,7 +86,10 @@ export default function StartBackupDevicesJobDialog ({
         </td>
         <td>
         ${dev.description}
-      </td>
+        </td>
+        <td>
+        ${bytesToSize(deviceInfo[dev.id]?.freeSpace)}
+        </td>
       </tr>
 
       `)}
