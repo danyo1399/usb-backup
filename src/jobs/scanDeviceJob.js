@@ -129,7 +129,6 @@ const scanFileHoc = ({ device, existsAsync, addAsync, log, fullScan }) => {
         await addAsync(newFile)
 
         if (movedFile) {
-          log.info(` ${filename}`)
           await deleteFileHardAsync(movedFile.id)
         }
       }
