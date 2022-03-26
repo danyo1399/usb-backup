@@ -6,6 +6,7 @@ const { newId, _resetNumberRange, curry } = require('../src/utils')
 const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
 const app = require('../src/app')
+const { migrateDbAsync } = require('../src/migrations')
 
 const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')
@@ -104,10 +105,11 @@ exports.setupTestEnvironment = () => {
     return folder
   }
 
-  const setupDb = () => {
+  const setupDb = ({ maxDbVersion } = {}) => {
     beforeEach(async () => {
       isDbSetup = true
-      await db.setDbFilename(path.join(tempPath, 'app.db'))
+      await db.setDbFilePath(path.join(tempPath, 'app.db'))
+      maxDbVersion !== null && await migrateDbAsync(maxDbVersion)
       await db.openDbAsync()
     })
   }
@@ -137,7 +139,7 @@ exports.setupTestEnvironment = () => {
   })
 
   afterEach(async () => {
-    if (isDbSetup) await db.closeAsync()
+    if (isDbSetup) await db.closeDbAsync()
     await fs.rm(tempPath, { force: true, recursive: true, maxRetries: 3, retryDelay: 100 })
   })
 

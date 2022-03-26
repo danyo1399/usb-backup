@@ -15,6 +15,23 @@ exports.pipe = (...args) => {
   }
 }
 
+/**
+ * Runs a function at most once and cache the response.
+ *
+ * Subsequent executions just return the cached response
+ */
+exports.runOnce = (fnAsync) => {
+  let hasRun = false
+  let response
+  return async () => {
+    if (!hasRun) {
+      response = await fnAsync()
+      hasRun = true
+    }
+    return response
+  }
+}
+
 exports.project = (props, list) =>
   list.map(x => props.reduce((prev, curr) => ({ ...prev, [curr]: x[curr] }), {}))
 

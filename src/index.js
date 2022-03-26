@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 'use strict'
 const db = require('./db')
-db.openDbAsync()
+
 const fs = require('fs-extra')
 const open = require('open')
 const Inert = require('@hapi/inert')
 const path = require('path')
 const Hapi = require('@hapi/hapi')
+const { migrateDbAsync } = require('./migrations')
 const { schema } = require('./graphql')
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/lib/use/ws')
@@ -70,11 +71,10 @@ process.on('unhandledRejection', (err) => {
   process.exit(1)
 })
 
-console.log('usb-backup version ' + packageJson.version)
-initSpa().then(() => {
-  initApi()
-}).then(() => copyApplicationFilesToRootDirectory())
-
+async function setupDb () {
+  await migrateDbAsync()
+  await db.openDbAsync()
+}
 async function copyApplicationFilesToRootDirectory () {
   if (process.env.NODE_ENV !== 'DEV') {
     const cwd = process.cwd()
@@ -83,3 +83,12 @@ async function copyApplicationFilesToRootDirectory () {
     await fs.copyFile(path.resolve(__dirname, '../assets/run.sh'), path.join(cwd, 'run.sh'))
   }
 }
+
+console.log('usb-backup version ' + packageJson.version);
+
+(async function main () {
+  await setupDb()
+  await initSpa()
+  await initApi()
+  await copyApplicationFilesToRootDirectory()
+})()
