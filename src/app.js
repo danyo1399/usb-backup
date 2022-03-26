@@ -137,7 +137,7 @@ exports.createBackupDeviceAsync = async (device) => {
   }
 
   if (await isExistingDeviceAsync(device.path)) raiseError(errorCodes.existingSource)
-  if (process.arch === 'win32' && !device.path.contains(':')) {
+  if (process.platform === 'win32' && !device.path.includes(':')) {
     raiseError(errorCodes.pathNotSupported)
   }
   const createdDevice = await repo.addDeviceAsync(device)
