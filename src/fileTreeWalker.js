@@ -3,7 +3,7 @@ const path = require('path')
 const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
 
-const ignoredFolders = ['$RECYCLE.BIN']
+const ignoredFolders = ['$RECYCLE.BIN', 'System Volume Information']
 /**
  * Walks the directory structure calling the callback for each file found
  *
