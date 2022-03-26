@@ -32,7 +32,13 @@ let migrations = [
 
     create index idx_files_hash on files(hash);
     `)
-  }]
+  },
+  async () => {
+    await execAsync(`
+    create index idx_files_relativePath_mtimeMs on files(relativePath, mtimeMs)
+  `)
+  }
+]
 
 exports.addDbMigration = (fnAsync) => {
   migrations.push(fnAsync)

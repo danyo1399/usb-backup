@@ -3,6 +3,7 @@ const path = require('path')
 const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
 
+const ignoredFolders = ['$RECYCLE.BIN']
 /**
  * Walks the directory structure calling the callback for each file found
  *
@@ -33,7 +34,14 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
           if (_abort) break
           const stat = await fs.stat(fullPath)
           if (stat.isDirectory()) {
-            directories.push(fullPath)
+            const parts = fullPath.replaceAll('\\', '/').split('/')
+            const base = parts[parts.length - 1]
+            // ignored files and unix hidden folders
+            if (!ignoredFolders.includes(base) && !base.startsWith('.')) {
+              directories.push(fullPath)
+            } else {
+              logger.info(`Ignoring folder ${fullPath}`)
+            }
           } else if (stat.isFile()) {
             try {
               await callback(null, { filename: fullPath, stat, path: subpath, abort })
