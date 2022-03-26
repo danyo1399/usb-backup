@@ -89,10 +89,11 @@ exports.migrateDbAsync = async (maxVersion = Number.MAX_SAFE_INTEGER) => {
   }
 }
 
-function getDbBackupFilename(version) {
+function getDbBackupFilename (version) {
   const dbFilename = getDbFilePath()
   return `${dbFilename}.backup-${version}`
 }
+
 exports.restoreDbBackup = async (version) => {
   const openDb = hasActiveConnection() === false
   const dbFilename = getDbFilePath()
