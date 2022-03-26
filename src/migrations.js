@@ -1,9 +1,8 @@
 const { execAsync, performInTransactionAsync, runAsync, openDbAsync, closeDbAsync, getDbFilePath, getAsync, hasActiveConnection } = require('./db')
 const fs = require('fs-extra')
 const { defaultLogger } = require('./logging')
-const { runOnce } = require('./utils')
 
-const migrations = [
+let migrations = [
   async () => {
     await execAsync(`
     CREATE TABLE IF NOT EXISTS devices (
@@ -37,6 +36,10 @@ const migrations = [
 
 exports.addDbMigration = (fnAsync) => {
   migrations.push(fnAsync)
+}
+
+exports.removeMigration = (fnAsync) => {
+  migrations = migrations.filter(x => x !== fnAsync)
 }
 
 const getCurrentVersionAsync = exports.getCurrentVersionAsync = async function () {

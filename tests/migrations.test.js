@@ -1,9 +1,12 @@
 const { runAsync, allAsync } = require('../src/db')
-const { getCurrentVersionAsync, migrateDbAsync, getRequiredDbVersion, addDbMigration, restoreDbBackup } = require('../src/migrations')
+const { getCurrentVersionAsync, migrateDbAsync, getRequiredDbVersion, addDbMigration, restoreDbBackup, removeMigration } = require('../src/migrations')
 const { setupTestEnvironment } = require('./common')
+
 describe('db tests', () => {
   const env = setupTestEnvironment()
   env.setupDb({ maxDbVersion: null })
+
+  afterEach(() => removeMigration(testMigration))
 
   it('Initial db version should be -1', async () => {
     const version = await getCurrentVersionAsync()
@@ -17,15 +20,18 @@ describe('db tests', () => {
   })
 
   it('should backup existing db when upgrading', async () => {
-    addDbMigration(async () => {
-      await runAsync('ALTER TABLE files RENAME TO files2')
-    })
+    const currentVersion = getRequiredDbVersion()
+    addDbMigration(testMigration)
 
-    await migrateDbAsync(0)
+    await migrateDbAsync(currentVersion)
     await allAsync('select 1 from files')
-    await migrateDbAsync(1)
+    await migrateDbAsync(currentVersion + 1)
     await allAsync('select 1 from files2')
-    await restoreDbBackup(0)
+    await restoreDbBackup(currentVersion)
     await allAsync('select 1 from files')
   })
 })
+
+const testMigration = async () => {
+  await runAsync('ALTER TABLE files RENAME TO files2')
+}
