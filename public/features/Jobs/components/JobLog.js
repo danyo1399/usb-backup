@@ -3,10 +3,15 @@ import { useObservableState } from '../../../hooks.js'
 import { getJobLog } from '../queries.js'
 
 const html = window.html
-const { useState } = globals.preactHooks
+const { useState, useEffect } = globals.preactHooks
 
 export default function JobLog ({ jobId }) {
-  const jobLog = useObservableState(getJobLog(jobId)) || []
+  const [$log, set$log] = useState(null)
+
+  useEffect(() => {
+    set$log(getJobLog(jobId))
+  }, [jobId])
+  const jobLog = useObservableState($log) || []
 
   const [filter, setFilter] = useState('all')
 

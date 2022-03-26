@@ -95,10 +95,10 @@ export function useObservableState (observable$) {
   const [state, setState] = useState()
 
   useEffect(() => {
-    const subscription = observable$.subscribe(value => {
+    const subscription = observable$?.subscribe(value => {
       setState(value)
     })
-    return () => subscription.unsubscribe()
+    return () => subscription?.unsubscribe()
   }, [observable$])
   return state
 }
