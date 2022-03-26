@@ -71,6 +71,7 @@ export default function StartBackupDevicesJobDialog ({
             <th style="width: 50px;" scope="col"></th>
             <th scope="col">Name</th>
             <th scope="col">Description</th>
+            <th scope="col">Path</th>
             <th scope="col">Available</th>
         </tr>
     </thead>
@@ -86,6 +87,9 @@ export default function StartBackupDevicesJobDialog ({
         </td>
         <td>
         ${dev.description}
+        </td>
+        <td>
+        ${dev.path}
         </td>
         <td>
         ${bytesToSize(deviceInfo[dev.id]?.freeSpace)}
