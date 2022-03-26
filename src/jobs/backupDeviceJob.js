@@ -8,7 +8,7 @@ const {
 } = require('../repo')
 const { deviceName, isDeviceOnlineAsync } = require('../devices')
 const { scanDevices } = require('./scanDeviceJob')
-const { ensureFilePathExistsAsync, findUniqueFilenameAsync } = require('../path')
+const { ensureFilePathExistsAsync, findUniqueFilenameAsync, appendFilePathToPath } = require('../path')
 const { copyAndHashAsync } = require('../crypto')
 
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
@@ -105,7 +105,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
 
   async function backupFile (log, context) {
     const sourceFilename = path.join(context.sourceDevice.path, context.sourceFile.relativePath)
-    let targetFilename = path.join(context.backupDevice.path, context.sourceFile.relativePath)
+    let targetFilename = appendFilePathToPath(sourceFilename, context.backupDevice.path)
     await ensureFilePathExistsAsync(targetFilename)
     targetFilename = await findUniqueFilenameAsync(targetFilename)
     context.tempFilename = targetFilename + '.tmp'

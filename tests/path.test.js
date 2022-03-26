@@ -1,6 +1,7 @@
 const testUtils = require('./common')
 const path = require('path')
-const { currentPath, getRelativePath, appendSuffixToFilename, findUniqueFilenameAsync } = require('../src/path')
+const { currentPath, getRelativePath, appendSuffixToFilename, findUniqueFilenameAsync, appendFilePathToPath } = require('../src/path')
+const fs = require('fs-extra')
 
 describe('path tests', () => {
   describe('environment required tests', function () {
@@ -28,6 +29,30 @@ describe('path tests', () => {
         expect(result).toBe(path.join(env.tempPath, 'test 002.txt'))
       })
     })
+  })
+
+  it('should append file path to target path', async function () {
+    expect(appendFilePathToPath('c:\\test.txt', 'd:/')).toBe('d:/test.txt')
+    expect(appendFilePathToPath('c:\\test.txt', 'd:\\')).toBe('d:/test.txt')
+    expect(appendFilePathToPath('/test.txt', 'd:\\')).toBe('d:/test.txt')
+    expect(appendFilePathToPath('c:/test.txt', 'd:\\')).toBe('d:/test.txt')
+
+    expect(appendFilePathToPath('c:\\s1\\test.txt', 'd:\\')).toBe('d:/s1/test.txt')
+    expect(appendFilePathToPath('c:/s1/test.txt', 'd:/')).toBe('d:/s1/test.txt')
+    expect(appendFilePathToPath('/s1/test.txt', 'd:/')).toBe('d:/s1/test.txt')
+    expect(appendFilePathToPath('//someserver/s1/test.txt', 'd:/')).toBe('d:/s1/test.txt')
+    expect(appendFilePathToPath('\\\\someserver\\s1\\test.txt', 'd:\\')).toBe('d:/s1/test.txt')
+
+    expect(appendFilePathToPath('c:\\s1\\test.txt', 'd:\\d1')).toBe('d:/d1/s1/test.txt')
+    expect(appendFilePathToPath('c:/s1/test.txt', 'd:/d1')).toBe('d:/d1/s1/test.txt')
+    expect(appendFilePathToPath('/s1/test.txt', 'd:/d1')).toBe('d:/d1/s1/test.txt')
+    expect(appendFilePathToPath('\\\\server\\s1\\test.txt', 'd:\\d1')).toBe('d:/d1/s1/test.txt')
+    expect(appendFilePathToPath('//server/s1/test.txt', 'd:\\d1')).toBe('d:/d1/s1/test.txt')
+
+    expect(appendFilePathToPath('/test.txt', '/')).toBe('/test.txt')
+    expect(appendFilePathToPath('/test.txt', '/d1')).toBe('/d1/test.txt')
+    expect(appendFilePathToPath('/s1/test.txt', '/d1')).toBe('/d1/s1/test.txt')
+    expect(appendFilePathToPath('/s1/test.txt', '/d1/')).toBe('/d1/s1/test.txt')
   })
 
   it('modify filename tests', async function () {

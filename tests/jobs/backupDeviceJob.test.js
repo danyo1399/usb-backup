@@ -1,4 +1,5 @@
 const fs = require('fs-extra')
+const path = require('path')
 const { getAllBackupFilesAsync, getFilesByDeviceAsync, getDeviceByIdAsync } = require('../../src/repo')
 const testUtils = require('../common')
 const { createBackupDevicesJobAsync } = require('../../src/jobs/backupDeviceJob')
@@ -11,7 +12,7 @@ describe('backup device job', function () {
   env.setupDb()
 
   beforeEach(async function () {
-    const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
+    const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env, '8f4929d058d3f3bfde84945ccff36977', '8f4929d058d3f3bfde84945ccff36978')
     const job = await createBackupDevicesJobAsync([sourceDevice.id], backupDevice.id)
     ctx.append({ backupDevice, sourceDevice, job })
   })
@@ -45,26 +46,27 @@ describe('backup device job', function () {
         expect(file.deviceType).toBe('backup')
       }
       const fileSnapshotToCompare = deviceFiles.map(({ relativePath, size, hash }) => ({ relativePath, size, hash }))
+      const tempPath = env.tempPathNormalised.substring(1) // remove leading slash/
       expect(fileSnapshotToCompare).toMatchInlineSnapshot(`
 Array [
   Object {
     "hash": "c00e0c01987a268341fab87973d366f0",
-    "relativePath": "ico.png",
+    "relativePath": "${tempPath}/source/ico.png",
     "size": 4118,
   },
   Object {
     "hash": "bc2f9ba0b1ae43677c3951194026665c",
-    "relativePath": "subfolder/ico2.png",
+    "relativePath": "${tempPath}/source/subfolder/ico2.png",
     "size": 3490,
   },
   Object {
     "hash": "954cb5e230cd88e80a9b6960ed77d6e6",
-    "relativePath": "subfolder/subfolder2/ico4.jfif",
+    "relativePath": "${tempPath}/source/subfolder/subfolder2/ico4.jfif",
     "size": 6312,
   },
   Object {
     "hash": "f3d25ea025f48138b294449b60aacf41",
-    "relativePath": "subfolder/subfolder2/ico3.png",
+    "relativePath": "${tempPath}/source/subfolder/subfolder2/ico3.png",
     "size": 7858,
   },
 ]
@@ -80,17 +82,16 @@ Array [
       const { backupDevice, logs } = ctx.state
 
       expect(logs.some(x => x.type === 'error')).toBe(false)
-      const files = glob.sync(`${backupDevice.path}/**/*`, {}).map(testUtils.replaceUniqueId('replaced-foldername'))
+      const files = glob.sync(`${backupDevice.path}/**/*`, {})
+        .filter(filename => path.extname(filename) !== '') // Remove folders
 
       expect(files).toMatchInlineSnapshot(`
 Array [
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/replaced-foldername.usbb",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/ico.png",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/subfolder",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/subfolder/ico2.png",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/subfolder/subfolder2",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/subfolder/subfolder2/ico3.png",
-  "c:/src/usb-backup/temp/replaced-foldername/replaced-foldername/subfolder/subfolder2/ico4.jfif",
+  "${env.tempPath}/backup/8f4929d058d3f3bfde84945ccff36978.usbb",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/ico.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/ico2.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/subfolder2/ico3.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/subfolder2/ico4.jfif",
 ]
 `)
     })

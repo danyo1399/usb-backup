@@ -62,24 +62,40 @@ function convertIteratorToCallback (iterator, cb) {
 }
 exports.convertIteratorToCallback = convertIteratorToCallback
 
-exports.createDevicesAsync = async (env) => {
-  const backupSourcePath = await env.createBackupSource()
-  const backupDestinationPath = await env.createDummyFolder()
+exports.createDevicesAsync = async (env, sourceDeviceId, backupDeviceId) => {
+  const sourcePath = await env.createSourcePath()
+  const backupPath = await env.createBackupPath()
 
-  const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: backupSourcePath })
-  const backupDevice = await app.createBackupDeviceAsync({ name: 'destination', path: backupDestinationPath })
+  const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: sourcePath, id: sourceDeviceId })
+  const backupDevice = await app.createBackupDeviceAsync({ name: 'backup', path: backupPath, id: backupDeviceId })
   return { sourceDevice, backupDevice }
 }
 
 exports.setupTestEnvironment = () => {
   const id = newId()
-  const tempPath = path.resolve(tempRootPath, id)
+  const tempPath = path.resolve(tempRootPath, id).replaceAll('\\', '/')
   let isDbSetup = false
 
-  const createBackupSource = async () => {
-    const tempSourcePath = path.join(tempPath, 'backup-source')
+  const createSourcePath = async () => {
+    const tempSourcePath = path.join(tempPath, 'source')
     await fs.copy(testBackupSourcePath, tempSourcePath, { recursive: true })
     return tempSourcePath
+  }
+
+  /**
+   * Creates similar paths on windows and linux eg
+   * c:/test
+   * and /test
+   * should return the same temp path /test
+   *
+   * This is used for testing
+   */
+  const tempPathNormalised = process.platform === 'win32' ? tempPath.substring(2) : tempPath
+
+  const createBackupPath = async () => {
+    const backupPath = path.join(tempPath, 'backup')
+    await fs.mkdir(backupPath)
+    return backupPath
   }
 
   const createDummyFolder = async () => {
@@ -125,5 +141,5 @@ exports.setupTestEnvironment = () => {
     await fs.rm(tempPath, { force: true, recursive: true, maxRetries: 3, retryDelay: 100 })
   })
 
-  return { tempPath, createDummyFolder, setupDb, createDummyFile, createBackupSource }
+  return { tempPath, tempPathNormalised, createDummyFolder, setupDb, createDummyFile, createSourcePath, createBackupPath }
 }

@@ -80,3 +80,26 @@ exports.getRelativePath = function (basePath, filePath) {
 exports.appendRelativePath = (...subpaths) => {
   return path.join(currentPath, ...subpaths)
 }
+
+/**
+ * Takes a file path and appends it to the
+ * end of another path stripping windows drive letters
+ * eg
+ * c:\folder1\folder2\test.txt
+ * being appeneded to d:\folder3
+ * becomes
+ * d:\folder3\folder1\folder2\test.txt
+ *
+ */
+exports.appendFilePathToPath = (filePath, destinationDir) => {
+  filePath = filePath.replaceAll('\\', '/')
+  destinationDir = destinationDir.replaceAll('\\', '/')
+  let fileDir = path.dirname(filePath)
+  const filename = path.basename(filePath)
+  if (/^[a-z]:\//i.test(fileDir)) {
+    fileDir = fileDir.substring(3)
+  } else {
+    fileDir = fileDir.replace(/^\/\/[^/]+/, '')
+  }
+  return path.join(destinationDir, fileDir, filename).replaceAll('\\', '/')
+}
