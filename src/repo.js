@@ -113,6 +113,13 @@ exports.deleteFileAsync = async function (id) {
     `, Date.now(), id)
 }
 
+exports.deleteFileHardAsync = async function (id) {
+  await db.runAsync(
+        `
+        delete from files where id = ?
+    `, id)
+}
+
 exports.getFileExistsAsync = async function (id) {
   return !!(
     await db.getAsync(
@@ -122,6 +129,26 @@ exports.getFileExistsAsync = async function (id) {
             id
     )
   ).fileExists
+}
+
+exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutDir, birthtimeMs, mtimeMs) {
+  return await db.allAsync(`
+    select *
+    from files
+     where
+       deviceId = $deviceId
+      and (relativePath = $filename or relativePath like $likeFilename)
+      and birthtimeMs = $birthtimeMs
+      and mtimeMs = $mtimeMs
+      and size = $size
+  `, {
+    $size: size,
+    $deviceId: deviceId,
+    $birthtimeMs: Math.floor(birthtimeMs),
+    $mtimeMs: Math.floor(mtimeMs),
+    $filename: filenameWithoutDir,
+    $likeFilename: `%/${filenameWithoutDir}`
+  })
 }
 
 exports.addFileAsync = async function ({
@@ -176,8 +203,8 @@ exports.getFileByIdAsync = async function (id) {
   return result
 }
 
-exports.getFilesByDeviceAsync = async (id) => {
-  return await db.allAsync('select * from files where deviceId = ? and deleted = 0', id)
+exports.getFilesByDeviceAsync = async (id, { includeDeleted } = {}) => {
+  return await db.allAsync('select * from files where deviceId = ? and (deleted = 0 or 1 = ?)', id, !!includeDeleted)
 }
 
 exports.getFileIdsByDeviceAsync = async (id) => {

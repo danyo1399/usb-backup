@@ -118,6 +118,7 @@ exports.runJobAsync = async (job) => {
   let state, log
   const id = job.id
   try {
+    if  (jobStates[id]) throw new Error(`job id exists: ${id}`)
     state = jobStates[id] = { job, logs: [], context: job.context, status: JOB_STATUSES.pending }
     jobIds.push(id)
     log = createJobLogger(state)

@@ -5,9 +5,8 @@ const repo = require('./repo')
 const fs = require('fs-extra')
 
 const { newId } = require('./utils')
-const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync, isMetafile } = require('./devices')
+const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync } = require('./devices')
 const { getRelativePath } = require('./path')
-const { hashFileAsync } = require('./crypto')
 const { raiseError, errorCodes } = require('./errors')
 
 /**
@@ -15,7 +14,7 @@ const { raiseError, errorCodes } = require('./errors')
  * @param {*} param0
  * @returns {string} the id of the file
  */
-const createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
+const createFileId = exports.createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
   return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])
 }
 
@@ -24,7 +23,7 @@ const createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birtht
  * @param {*} param0
  * @returns
  */
-const createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
+const createFile = exports.createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
   mtimeMs = Math.floor(mtimeMs)
   birthtimeMs = Math.floor(birthtimeMs)
   const id = createFileId({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } })
@@ -60,24 +59,6 @@ exports.addFileAsync = async (device, filename, hash) => {
 Source Devices
 ==========================================================================
 */
-
-exports.scanFileHoc = ({ device, existsAsync, addAsync, onNewFile }) => {
-  return async ({ filename, stat }) => {
-    const relativePath = getRelativePath(device.path, filename)
-
-    if (isMetafile(relativePath) === false) {
-      const fileId = createFileId({ deviceId: device.id, relativePath, stat })
-      const fileExists = await existsAsync(fileId)
-      if (!fileExists) {
-        const hash = await hashFileAsync(filename)
-        const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
-        onNewFile && onNewFile(filename)
-        await addAsync(newFile)
-      }
-      return fileId
-    }
-  }
-}
 
 exports.removeDeviceAsync = async (id) => {
   const source = await repo.getDeviceByIdAsync(id)

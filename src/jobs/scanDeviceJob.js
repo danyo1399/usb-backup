@@ -1,4 +1,4 @@
-const { scanFileHoc, writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync } = require('../app')
+const { writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync, createFileId, createFile } = require('../app')
 const fileTreeWalkerAsync = require('../fileTreeWalker')
 const { index, identity, newIdNumber } = require('../utils')
 const {
@@ -7,10 +7,16 @@ const {
   getFileIdsByDeviceAsync,
   deleteFileAsync,
   getFileExistsAsync,
-  updateDeviceScanDateAsync
+  updateDeviceScanDateAsync,
+  findSimilarFilesAsync,
+  deleteFileHardAsync
 
 } = require('../repo')
-const { deviceName, isDeviceOnlineAsync } = require('../devices')
+const fs = require('fs-extra')
+const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../devices')
+const { getRelativePath } = require('../path')
+const path = require('path')
+const { hashFileAsync } = require('../crypto')
 
 module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan }) => {
   const context = { sourceDeviceIds, useFullScan }
@@ -50,7 +56,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
         device,
         addAsync: addFileAsync,
         existsAsync: getFileExistsAsync,
-        onNewFile: (filename) => log.info(`Adding file ${filename}`)
+        log
       })
 
     const scannedFileIds = []
@@ -85,5 +91,49 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
 
     await updateDeviceScanDateAsync(deviceId)
     await writeSourceDeviceMetaFileAsync(device)
+  }
+}
+
+const scanFileHoc = ({ device, existsAsync, addAsync, log, fullScan }) => {
+  async function getMovedFileAsync (filename, stat) {
+    // Detect file moved
+    let movedFile = null
+    const baseName = path.basename(filename)
+    const { mtimeMs, birthtimeMs, size } = stat
+    const files = await findSimilarFilesAsync(device.id, size, baseName, birthtimeMs, mtimeMs)
+
+    if (files.length === 1 && files[0].hash) {
+      const file = files[0]
+      const fullPath = path.join(device.path, file.relativePath)
+
+      const exists = await fs.pathExists(fullPath)
+      if (!exists) {
+        movedFile = file
+        movedFile.fullPath = fullPath
+      }
+    }
+    return movedFile
+  }
+  return async ({ filename, stat }) => {
+    const relativePath = getRelativePath(device.path, filename)
+
+    if (isMetafile(relativePath) === false) {
+      const fileId = createFileId({ deviceId: device.id, relativePath, stat })
+      const fileExists = await existsAsync(fileId)
+      if (!fileExists) {
+        const movedFile = !fullScan ? await getMovedFileAsync(filename, stat) : null
+
+        const hash = movedFile?.hash ?? await hashFileAsync(filename)
+        const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
+        movedFile ? log.info(`File moved from ${movedFile.fullPath} to ${filename}`) : log.info(`Adding file ${filename}`)
+        await addAsync(newFile)
+
+        if (movedFile) {
+          log.info(` ${filename}`)
+          await deleteFileHardAsync(movedFile.id)
+        }
+      }
+      return fileId
+    }
   }
 }

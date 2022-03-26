@@ -27,13 +27,64 @@ describe('ScanDeviceJob', function () {
     const { sourceDevice, job } = ctx.state
 
     await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+
     await fs.rm(path.join(sourceDevice.path, 'ico.png'))
+    job.id++
     await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+
 
     const files = await getFilesByDeviceAsync(sourceDevice.id)
 
     expect(files).toHaveLength(4)
     expect(files.some(x => x.relativePath === 'ico.png')).toBe(false)
+  })
+
+  it('can move files without creating additional rows', async function () {
+    const { sourceDevice, backupDevice, job } = ctx.state
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+    const filePath = path.join(sourceDevice.path, 'ico.png')
+    const destPath = path.join(sourceDevice.path, 'new-path', 'ico.png')
+    await fs.move(filePath, destPath)
+
+    const secondJob = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
+    await jobManager.runJobAsync(secondJob)
+    testUtils.assertJobLogHasNoErrors(secondJob.id)
+
+    const files = (await getFilesByDeviceAsync(sourceDevice.id, { includeDeleted: true }))
+      .map(({ deleted, relativePath, hash }) => ({ deleted, relativePath, hash }))
+
+    expect(files).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "deleted": 0,
+    "hash": "bc2f9ba0b1ae43677c3951194026665c",
+    "relativePath": "subfolder/ico2.png",
+  },
+  Object {
+    "deleted": 0,
+    "hash": "bc2f9ba0b1ae43677c3951194026665c",
+    "relativePath": "subfolder/ico2 copy.png",
+  },
+  Object {
+    "deleted": 0,
+    "hash": "954cb5e230cd88e80a9b6960ed77d6e6",
+    "relativePath": "subfolder/subfolder2/ico4.jfif",
+  },
+  Object {
+    "deleted": 0,
+    "hash": "f3d25ea025f48138b294449b60aacf41",
+    "relativePath": "subfolder/subfolder2/ico3.png",
+  },
+  Object {
+    "deleted": 0,
+    "hash": "c00e0c01987a268341fab87973d366f0",
+    "relativePath": "new-path/ico.png",
+  },
+]
+`)
   })
 
   it('Can scan device files', async function () {
@@ -52,7 +103,7 @@ describe('ScanDeviceJob', function () {
 
     const log = jobManager.getJobLog(job.id)
 
-    expect(log.some(x => x.type === 'error')).toBe(false)
+    testUtils.assertJobLogHasNoErrors(job.id)
     expect(log.length).toBeGreaterThan(0)
     expect(log[0].type).toBe('info')
 

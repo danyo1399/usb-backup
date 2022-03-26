@@ -47,10 +47,39 @@ describe('repo tests', () => {
 Array [
   Object {
     "id": "id",
-    "relativePath": "relativePath",
+    "relativePath": "c:/folder/file.txt",
   },
 ]
 `)
+  })
+
+  it('should find similar files', async function () {
+    const sourceFile = await createSourceFileAsync()
+
+    const sameFile = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, sourceFile.size, 'file.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
+
+    const differentFilenameResult = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, sourceFile.size, 'somefile.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
+
+    const differentCaseResult = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, sourceFile.size, 'FILE.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
+
+    const differentSize = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, 999, 'file.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
+
+    const differentMtime = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, sourceFile.size, 'file.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs + 100)
+
+    const differentBirthTime = await repo.findSimilarFilesAsync(
+      sourceFile.deviceId, sourceFile.size, 'file.txt', sourceFile.birthtimeMs + 100, sourceFile.mtimeMs)
+
+    expect(sameFile.length).toBe(1)
+    expect(differentFilenameResult.length).toBe(0)
+    expect(differentCaseResult.length).toBe(1)
+    expect(differentSize.length).toBe(0)
+    expect(differentMtime.length).toBe(0)
+    expect(differentBirthTime.length).toBe(0)
   })
 
   it('can check a source file exists or not by id', async function () {
@@ -123,7 +152,7 @@ async function createSourceFileAsync () {
     hash: 'hash',
     id: 'id',
     mtimeMs: 789,
-    relativePath: 'relativePath',
+    relativePath: 'c:/folder/file.txt',
     size: 101112
   }
   await repo.addFileAsync(sourceFile)

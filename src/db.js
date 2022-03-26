@@ -87,7 +87,7 @@ exports.performInTransactionAsync = async function (fn) {
 
 exports.allAsync = function (sql, ...args) {
   return new Promise((resolve, reject) => {
-    db.all(sql, args, (err, res) => {
+    db.all(sql, ...args, (err, res) => {
       if (err) reject(err)
       else resolve(res)
     })
@@ -96,7 +96,7 @@ exports.allAsync = function (sql, ...args) {
 
 exports.getAsync = function (sql, ...args) {
   return new Promise((resolve, reject) => {
-    db.get(sql, args, (err, res) => {
+    db.get(sql, ...args, (err, res) => {
       if (err) reject(err)
       else resolve(res)
     })

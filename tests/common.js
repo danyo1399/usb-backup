@@ -12,6 +12,16 @@ const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')
 const testBackupSourcePath = exports.testBackupSourcePath = path.resolve(testDataPath, 'backup-source')
 
+// So we can debug tests
+// We only run time manually anyway
+jest.setTimeout(100 * 1000)
+
+
+exports.assertJobLogHasNoErrors = (jobId) => {
+  const logs = jobManager.getJobLog(jobId)
+  expect(logs.some(x => x.type === 'error')).toBe(false)
+}
+
 exports.sleep = (ms) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
