@@ -34,7 +34,6 @@ describe('ScanDeviceJob', function () {
     await jobManager.runJobAsync(job)
     testUtils.assertJobLogHasNoErrors(job.id)
 
-
     const files = await getFilesByDeviceAsync(sourceDevice.id)
 
     expect(files).toHaveLength(4)

@@ -16,7 +16,6 @@ const testBackupSourcePath = exports.testBackupSourcePath = path.resolve(testDat
 // We only run time manually anyway
 jest.setTimeout(100 * 1000)
 
-
 exports.assertJobLogHasNoErrors = (jobId) => {
   const logs = jobManager.getJobLog(jobId)
   expect(logs.some(x => x.type === 'error')).toBe(false)
