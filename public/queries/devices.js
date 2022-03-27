@@ -1,7 +1,7 @@
 
-import { toObservable } from '../../graphql.js'
-import { execute, handleResponseError } from '../../index.js'
-import * as globals from '../../globals.js'
+import { toObservable } from '../graphql.js'
+import { execute, handleResponseError } from '../index.js'
+import * as globals from '../globals.js'
 const { rxjs } = globals
 /*
 Devices

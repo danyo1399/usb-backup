@@ -1,17 +1,15 @@
 import constants from '../../../constants.js'
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
-import { jobs$ } from '../queries.js'
+import { jobs$ } from '../../../queries/jobs.js'
 
 const html = globals.html
 const { route } = globals.preactRouter
 const { routes } = constants
 
-export default function Jobs ({ jobId }) {
+export default function Jobs () {
   const jobs = useObservableState(jobs$) || []
 
-  // const jobs = [
-  //   { id: 1, name: 'ScanDevices', status: 'running'}]
   return html`
   <h1>Jobs</h1>
   <table class="table table-striped">

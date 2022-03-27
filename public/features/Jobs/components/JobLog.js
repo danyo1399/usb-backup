@@ -1,6 +1,6 @@
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
-import { getJobLog } from '../queries.js'
+import { getJobLog } from '../../../queries/jobs.js'
 
 const html = window.html
 const { useState, useEffect } = globals.preactHooks

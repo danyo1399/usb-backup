@@ -2,7 +2,7 @@ import { SideNavMenuItem } from '../../../components/index.js'
 import constants from '../../../constants.js'
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
-import { jobs$ } from '../queries.js'
+import { jobs$ } from '../../../queries/index.js'
 
 const { html } = globals
 

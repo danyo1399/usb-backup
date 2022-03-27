@@ -10,7 +10,7 @@ import {
   scanDevicesAsync,
   updateBackupDeviceAsync,
   updateSourceDeviceAsync
-} from '../queries.js'
+} from '../../../queries/index.js'
 import * as globals from '../../../globals.js'
 import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
 import { ConfirmDialog } from '../../../components/ConfirmDialog.js'

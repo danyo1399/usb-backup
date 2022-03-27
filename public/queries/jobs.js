@@ -1,5 +1,5 @@
-import { toObservable } from '../../graphql.js'
-import * as globals from '../../globals.js'
+import { toObservable } from '../graphql.js'
+import * as globals from '../globals.js'
 const { rxjs } = globals
 
 export const jobs$ = toObservable({
