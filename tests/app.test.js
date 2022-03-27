@@ -1,5 +1,7 @@
 const app = require('../src/app')
 const testUtils = require('./common')
+const { loadDeviceMetafileAsync } = require('../src/device')
+const { assertNewMetafileCorrect } = require('./assertions')
 
 describe('app tests', () => {
   const env = testUtils.setupTestEnvironment()
@@ -16,6 +18,9 @@ describe('app tests', () => {
   })
 
   it('creates source and meta file', async function () {
-    await app.createSourceDeviceAsync({ name: 'name', path: env.tempPath })
+    const source = await app.createSourceDeviceAsync({ name: 'name', path: env.tempPath })
+    const metafile = await loadDeviceMetafileAsync(source)
+
+    assertNewMetafileCorrect(source, metafile)
   })
 })

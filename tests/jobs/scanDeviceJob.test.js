@@ -106,8 +106,6 @@ Array [
     expect(log.length).toBeGreaterThan(0)
     expect(log[0].type).toBe('info')
 
-    expect(files).toHaveLength(5)
-
     expect(files).toMatchInlineSnapshot(`
 Array [
   Object {
