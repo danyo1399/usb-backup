@@ -6,7 +6,7 @@ const { newId, _resetNumberRange, curry } = require('../src/utils')
 const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
 const app = require('../src/app')
-const { migrateDbAsync } = require('../src/migrations')
+const { migrateDbAsync } = require('../src/migration')
 
 const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')

@@ -6,7 +6,7 @@ const path = require('path')
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
-const { deviceName, isDeviceOnlineAsync } = require('../devices')
+const { deviceName, isDeviceOnlineAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, findUniqueFilenameAsync, appendFilePathToPath } = require('../path')
 const { copyAndHashAsync } = require('../crypto')

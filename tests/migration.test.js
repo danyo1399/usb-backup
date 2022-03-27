@@ -1,8 +1,8 @@
 const { runAsync, allAsync } = require('../src/db')
-const { getCurrentVersionAsync, migrateDbAsync, getRequiredDbVersion, addDbMigration, restoreDbBackup, removeMigration } = require('../src/migrations')
+const { getCurrentVersionAsync, migrateDbAsync, getRequiredDbVersion, addDbMigration, restoreDbBackup, removeMigration } = require('../src/migration')
 const { setupTestEnvironment } = require('./common')
 
-describe('db tests', () => {
+describe('migration tests', () => {
   const env = setupTestEnvironment()
   env.setupDb({ maxDbVersion: null })
 

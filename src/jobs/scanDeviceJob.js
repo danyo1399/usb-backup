@@ -13,7 +13,7 @@ const {
 
 } = require('../repo')
 const fs = require('fs-extra')
-const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../devices')
+const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../device')
 const { getRelativePath } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')

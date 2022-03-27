@@ -2,7 +2,7 @@ const { getAllDevicesAsync } = require('./repo')
 
 const { EventEmitter } = require('events')
 const { defaultLogger } = require('./logging')
-const { isDeviceOnlineAsync } = require('./devices')
+const { isDeviceOnlineAsync } = require('./device')
 const { default: checkDiskSpace } = require('check-disk-space')
 const { createEmitterAsyncIterator } = require('./utils')
 

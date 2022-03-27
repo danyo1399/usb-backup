@@ -5,7 +5,7 @@ const repo = require('./repo')
 const fs = require('fs-extra')
 
 const { newId } = require('./utils')
-const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync } = require('./devices')
+const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync } = require('./device')
 const { getRelativePath } = require('./path')
 const { raiseError, errorCodes } = require('./errors')
 
