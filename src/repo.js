@@ -49,7 +49,7 @@ exports.addDeviceAsync = async function ({ deviceType, id, name, description, pa
         lastBackupDate,
         addDate
   )
-  return { id, name, description, path, lastScanDate, lastBackupDate, addDate }
+  return { deviceType, id, name, description, path, lastScanDate, lastBackupDate, addDate }
 }
 
 exports.updateLastBackupDate = async (id, lastBackupDate) => {
