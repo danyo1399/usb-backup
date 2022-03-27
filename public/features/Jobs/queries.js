@@ -33,6 +33,7 @@ export function getJobLog (jobId) {
   }).pipe(
     rxjs.map(x => x.data?.jobLogs || []),
     rxjs.scan((acu, curr) => [...acu, ...curr], []),
+    rxjs.debounceTime(1000),
     rxjs.shareReplay(1)
   )
 }
