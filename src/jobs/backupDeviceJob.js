@@ -15,6 +15,10 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
   const id = newIdNumber()
   let _abort = false
 
+  const sources = (await Promise.all(sourceDeviceIds.map(id => getDeviceByIdAsync(id)))).map(src => `[${src.name}]`)
+  const backupDevice = await getDeviceByIdAsync(backupDeviceId)
+  const description = `backing up devices ${sources.join(', ')} to device [${backupDevice.name}]`
+
   async function executeAsync (log) {
     const context = { log, sourceDevice: null, freeSpace: null, addedHashes: {}, backupDevice: null, tempFilename: null, sourceFile: null }
 
@@ -135,5 +139,5 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     _abort = true
   }
 
-  return { id, executeAsync, context: { sourceDeviceIds, backupDeviceId }, abort, name: 'BackupDeviceJob' }
+  return { id, executeAsync, description, context: { sourceDeviceIds, backupDeviceId }, abort, name: 'BackupDeviceJob' }
 }

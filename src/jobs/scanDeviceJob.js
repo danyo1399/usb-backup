@@ -21,6 +21,8 @@ const { hashFileAsync } = require('../crypto')
 module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan }) => {
   const context = { sourceDeviceIds, useFullScan }
 
+  const devices = (await Promise.all(sourceDeviceIds.map(id => getDeviceByIdAsync(id)))).map(d => `[${d.name}]`)
+  const description = `performing ${useFullScan ? 'full scan' : 'scan'} on devices ${devices.join(', ')}`
   const id = newIdNumber()
   let _abort = false
   async function executeAsync (log) {
@@ -31,7 +33,7 @@ module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan 
     _abort = true
   }
 
-  return { id, executeAsync, context, abort, name: 'scanDeviceJob' }
+  return { id, executeAsync, context, description, abort, name: 'scanDeviceJob' }
 }
 
 const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsAborting) {

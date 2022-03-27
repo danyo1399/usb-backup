@@ -10,6 +10,7 @@ const Job = new GraphQLObjectType({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     status: { type: GraphQLString },
+    description: { type: GraphQLString },
     active: { type: GraphQLBoolean },
     context: { type: GraphQLJSONObject }
   }

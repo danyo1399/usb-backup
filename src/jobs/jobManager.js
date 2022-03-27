@@ -54,8 +54,8 @@ function createJobLogger (state) {
 }
 
 function getJobInfo (jobId) {
-  const { job: { name, id, context }, status } = jobStates[jobId]
-  return { name, id, context, status, active: ACTIVE_STATUSES.includes(status) }
+  const { job: { name, id, context, description }, status } = jobStates[jobId]
+  return { name, id, context, description, status, active: ACTIVE_STATUSES.includes(status) }
 }
 
 exports.createJobLogsIterator = (jobId) => {
@@ -119,7 +119,7 @@ exports.runJobAsync = async (job) => {
   const id = job.id
   try {
     if (jobStates[id]) throw new Error(`job id exists: ${id}`)
-    state = jobStates[id] = { job, logs: [], context: job.context, status: JOB_STATUSES.pending }
+    state = jobStates[id] = { job, logs: [], context: job.context, description: job.description, status: JOB_STATUSES.pending }
     jobIds.push(id)
     log = createJobLogger(state)
 

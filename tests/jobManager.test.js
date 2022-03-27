@@ -12,7 +12,7 @@ function testJob (name, id = newIdNumber()) {
 
   }
 
-  return { id, executeAsync, context: { context: 'myContext' }, abort, name }
+  return { id, executeAsync, description: 'test job', context: { context: 'myContext' }, abort, name }
 }
 
 function normaliseLogs (logs) {
@@ -200,6 +200,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "id": 1,
         "name": "j1",
         "status": "success",
@@ -230,6 +231,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "pending",
       },
@@ -243,6 +245,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "running",
       },
@@ -256,6 +259,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "success",
       },
@@ -285,6 +289,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "pending",
       },
@@ -293,6 +298,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "pending",
       },
@@ -306,6 +312,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "running",
       },
@@ -319,6 +326,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "success",
       },
@@ -332,6 +340,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "running",
       },
@@ -345,6 +354,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "success",
       },
@@ -375,6 +385,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "pending",
       },
@@ -383,6 +394,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "running",
       },
@@ -391,6 +403,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j1",
         "status": "success",
       },
@@ -404,6 +417,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "pending",
       },
@@ -417,6 +431,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "running",
       },
@@ -430,6 +445,7 @@ Array [
         "context": Object {
           "context": "myContext",
         },
+        "description": "test job",
         "name": "j2",
         "status": "success",
       },
