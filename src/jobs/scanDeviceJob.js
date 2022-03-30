@@ -22,7 +22,7 @@ module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan 
   const context = { sourceDeviceIds, useFullScan }
 
   const devices = (await Promise.all(sourceDeviceIds.map(id => getDeviceByIdAsync(id)))).map(d => `[${d.name}]`)
-  const description = `performing ${useFullScan ? 'full scan' : 'scan'} on devices ${devices.join(', ')}`
+  const description = `${useFullScan ? 'full scan' : 'scan'} devices ${devices.join(', ')}`
   const id = newIdNumber()
   let _abort = false
   async function executeAsync (log) {
