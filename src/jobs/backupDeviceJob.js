@@ -34,7 +34,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     }
 
     log.info('Scanning devices before backup')
-    await scanDevices(log, sourceDeviceIds, () => _abort)
+    await scanDevices(log, [...sourceDeviceIds, backupDeviceId], () => _abort)
 
     for (const deviceId of sourceDeviceIds) {
       if (_abort) break
