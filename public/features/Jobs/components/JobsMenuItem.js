@@ -9,7 +9,7 @@ const { html } = globals
 export function JobsMenuItem ({ ...props }) {
   const jobs = useObservableState(jobs$) || []
 
-  const activeCount = jobs.filter(x => x.status === 'running').length
+  const activeCount = jobs.filter(x => x.status === 'running' || x.status === 'pending').length
   return html`<${SideNavMenuItem} icon="text-left" href=${constants.routes.jobs}>
   Jobs <span class="badge bg-secondary">${activeCount}</span>
 </$>
