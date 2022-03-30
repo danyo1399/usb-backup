@@ -11,6 +11,7 @@ const Job = new GraphQLObjectType({
     name: { type: GraphQLString },
     status: { type: GraphQLString },
     description: { type: GraphQLString },
+    errorCount: { type: GraphQLInt },
     active: { type: GraphQLBoolean },
     context: { type: GraphQLJSONObject }
   }

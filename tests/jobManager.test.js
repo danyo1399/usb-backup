@@ -3,9 +3,10 @@ const testUtils = require('./common')
 
 const { newIdNumber } = require('../src/utils')
 
-function testJob (name, id = newIdNumber()) {
+function testJob (name, id = newIdNumber(), logError = false) {
   async function executeAsync (log) {
     log.info(`i did something ${id}`)
+    if (logError) log.error('i am a error')
   }
 
   async function abort () {
@@ -178,6 +179,40 @@ Array [
       expect(jobs).toHaveLength(0)
     })
 
+    it('Should show error count on job finished', async function () {
+      const jobs = []
+      await jobManager.runJobAsync(testJob('j1', undefined, true))
+      await testUtils.sleep(100)
+
+      const jobsIterator = jobManager.createJobsIterator()
+
+      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+
+      await testUtils.sleep(100)
+      expect(jobs).toHaveLength(1)
+      jobs.forEach(j => { delete j.value.id })
+      expect(jobs).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "done": false,
+    "value": Array [
+      Object {
+        "active": false,
+        "context": Object {
+          "context": "myContext",
+        },
+        "description": "test job",
+        "errorCount": 1,
+        "id": 1,
+        "name": "j1",
+        "status": "success",
+      },
+    ],
+  },
+]
+`)
+    })
+
     it('should emit job when one job run before we initialise iterator', async function () {
       const jobs = []
       await jobManager.runJobAsync(testJob('j1'))
@@ -201,6 +236,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "id": 1,
         "name": "j1",
         "status": "success",
@@ -232,6 +268,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "pending",
       },
@@ -246,6 +283,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "running",
       },
@@ -260,6 +298,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "name": "j1",
         "status": "success",
       },
@@ -290,6 +329,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "pending",
       },
@@ -299,6 +339,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j2",
         "status": "pending",
       },
@@ -313,6 +354,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "running",
       },
@@ -327,6 +369,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "name": "j1",
         "status": "success",
       },
@@ -341,6 +384,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j2",
         "status": "running",
       },
@@ -355,6 +399,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "name": "j2",
         "status": "success",
       },
@@ -386,6 +431,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "pending",
       },
@@ -395,6 +441,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j1",
         "status": "running",
       },
@@ -404,6 +451,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "name": "j1",
         "status": "success",
       },
@@ -418,6 +466,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j2",
         "status": "pending",
       },
@@ -432,6 +481,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": null,
         "name": "j2",
         "status": "running",
       },
@@ -446,6 +496,7 @@ Array [
           "context": "myContext",
         },
         "description": "test job",
+        "errorCount": 0,
         "name": "j2",
         "status": "success",
       },

@@ -6,7 +6,7 @@ export const jobs$ = toObservable({
   query: `
     subscription {
       jobs {
-        id, name, context, status, active, description
+        id, name, context, status, active, description, errorCount
       }
     }
 `

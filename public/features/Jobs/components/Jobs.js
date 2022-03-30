@@ -19,6 +19,7 @@ export default function Jobs () {
             <th scope="col">Name</th>
             <th scope="col">Status</th>
             <th scope="col">Description</th>
+            <th scope="col">Error Count</th>
             <th scope="col">Actions</th>
         </tr>
     </thead>
@@ -29,6 +30,7 @@ export default function Jobs () {
           <td> ${job.name} </td>
           <td> ${job.status} </td>
           <td> ${job.description} </td>
+          <td> ${job.errorCount} </td>
           <td><${Dropdown} viewLog=${() => route(routes.getJobLogUrl(job.id))}/></td>
         </tr>
       `)}
