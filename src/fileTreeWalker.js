@@ -4,6 +4,7 @@ const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
 
 const ignoredFolders = ['$RECYCLE.BIN', 'System Volume Information']
+const ignoredFiles = ['Thumbs.db']
 /**
  * Walks the directory structure calling the callback for each file found
  *
@@ -30,23 +31,26 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
       while (filesOrDirectories.length > 0) {
         const name = filesOrDirectories.pop()
         const fullPath = path.join(subpath, name)
+        if (_abort) break
         try {
-          if (_abort) break
           const stat = await fs.stat(fullPath)
           if (stat.isDirectory()) {
-            const parts = fullPath.replaceAll('\\', '/').split('/')
-            const base = parts[parts.length - 1]
+            const basename = path.basename(fullPath)
             // ignored files and unix hidden folders
-            if (!ignoredFolders.includes(base) && !base.startsWith('.')) {
+            if (!ignoredFolders.includes(basename) && !basename.startsWith('.')) {
               directories.push(fullPath)
             } else {
               logger.info(`Ignoring folder ${fullPath}`)
             }
           } else if (stat.isFile()) {
-            try {
-              await callback(null, { filename: fullPath, stat, path: subpath, abort })
-            } catch (error) {
-              logger.error('file tree walker callback threw an exception, ignoring', error)
+            if (!ignoredFiles.includes(path.basename(fullPath))) {
+              try {
+                await callback(null, { filename: fullPath, stat, path: subpath, abort })
+              } catch (error) {
+                logger.error('file tree walker callback threw an exception, ignoring', error)
+              }
+            } else {
+              logger.info(`Ignoring file ${fullPath}`)
             }
           }
         } catch (error) {
