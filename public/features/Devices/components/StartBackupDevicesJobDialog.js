@@ -8,7 +8,7 @@ const { html, preactHooks } = globals
 const { useEffect, useState } = preactHooks
 
 export default function StartBackupDevicesJobDialog ({
-  sourceDeviceIds,
+  sourceDevices,
   show,
   setShow,
   onClose
@@ -30,7 +30,7 @@ export default function StartBackupDevicesJobDialog ({
 
   async function _createJob () {
     await doFetch(async () => {
-      await createBackupDevicesJobAsync(sourceDeviceIds, selectedBackupDeviceId)
+      await createBackupDevicesJobAsync(sourceDevices.map(x => x.id), selectedBackupDeviceId)
 
       setShow(false)
       addToast({
@@ -63,8 +63,8 @@ export default function StartBackupDevicesJobDialog ({
         dismiss=${resetFetchState}
         >Something went wrong (${error.message})<//
     >`}
-
-    <h6>Select Target Backup Device</h6>
+    <p class="mb-3">Backing up from devices: ${sourceDevices.map(x => html`[${x.name}] `)}</p>
+    <h5>Select Target Backup Device</h5>
     <table class="table table-striped">
     <thead>
         <tr>

@@ -16,7 +16,6 @@ import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
 import { ConfirmDialog } from '../../../components/ConfirmDialog.js'
 import { useFetching } from '../../../hooks.js'
 import { useToast } from '../../../components/Toast.js'
-import { getSelectedKeys } from '../../../fns.js'
 
 const html = window.html
 const { useEffect, useState } = globals.preactHooks
@@ -36,18 +35,19 @@ export default function Devices ({ variant }) {
   const createDevice = isSourceDeviceView ? createSourceDeviceAsync : createBackupDeviceAsync
   const updateDevice = isSourceDeviceView ? updateSourceDeviceAsync : updateBackupDeviceAsync
 
-  const [selectedDevices, setSelectedDevices] = useState({})
-  const anyDevicesSelected = Object.values(selectedDevices).some(selected => selected)
-  const selectedDeviceIds = getSelectedKeys(selectedDevices)
+  const [selectedDevicesMap, setSelectedDevicesMap] = useState({})
+  const anyDevicesSelected = Object.values(selectedDevicesMap).some(selected => selected)
+  const selectedDevices = devices.filter(d => selectedDevicesMap[d.id])
+
   function toggleSelectedDevice (id) {
-    setSelectedDevices(x => ({ ...x, [id]: !x[id] }))
+    setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
   }
 
   async function onScanDevicesJobAsync () {
-    if (selectedDeviceIds.length > 0) {
-      await scanDevicesAsync(selectedDeviceIds)
+    if (selectedDevices.length > 0) {
+      await scanDevicesAsync(selectedDevices.map(x => x.id))
       addToast({ header: 'Job Enqueued', body: 'Scan Devices job successfully enqueued', type: 'success' })
-      setSelectedDevices({})
+      setSelectedDevicesMap({})
     }
   }
 
@@ -111,7 +111,7 @@ export default function Devices ({ variant }) {
         <${DevicesTable}
             devices="${devices}"
             variant=${variant}
-            selected=${selectedDevices}
+            selected=${selectedDevicesMap}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
             editDevice="${onEditDevice}"
@@ -132,7 +132,7 @@ export default function Devices ({ variant }) {
         show=${showBackupJobDialog}
         setShow=${setShowBackupJobDialog}
         onClose=${() => setShowBackupJobDialog(false)}
-        sourceDeviceIds=${selectedDeviceIds}
+        sourceDevices=${selectedDevices}
 
       />
 
