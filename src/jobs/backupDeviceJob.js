@@ -101,7 +101,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
 
     const isDeviceOnline = await isDeviceOnlineAsync(device)
     if (!isDeviceOnline) {
-      log.warn(`${deviceType} Device offline: ${deviceName(device)}`)
+      log.error(`${deviceType} Device offline: ${deviceName(device)}`)
       return null
     }
     return device
