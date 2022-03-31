@@ -18,7 +18,7 @@ jest.setTimeout(100 * 1000)
 
 exports.assertJobLogHasNoErrors = (jobId) => {
   const logs = jobManager.getJobLog(jobId)
-  expect(logs.some(x => x.type === 'error')).toBe(false)
+  expect(logs.filter(x => x.type === 'error')).toEqual([])
 }
 
 exports.sleep = (ms) => {

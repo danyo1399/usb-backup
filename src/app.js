@@ -6,15 +6,15 @@ const fs = require('fs-extra')
 
 const { newId } = require('./utils')
 const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync } = require('./device')
-const { getRelativePath } = require('./path')
+const { getFileRelativePath } = require('./path')
 const { raiseError, errorCodes } = require('./errors')
 
 /**
- * Creates a composite primary key that uniquly identifies a file.
+ * Creates a fingerprint for a file.
  * @param {*} param0
  * @returns {string} the id of the file
  */
-const createFileId = exports.createFileId = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
+exports.getFileFingerprint = function ({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } }) {
   return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])
 }
 
@@ -26,12 +26,10 @@ const createFileId = exports.createFileId = function ({ deviceId, relativePath, 
 const createFile = exports.createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
   mtimeMs = Math.floor(mtimeMs)
   birthtimeMs = Math.floor(birthtimeMs)
-  const id = createFileId({ deviceId, relativePath, stat: { mtimeMs, birthtimeMs, size } })
-  const deleted = false
+
   const addDate = Date.now()
 
   return {
-    id,
     deviceType,
     deviceId,
     relativePath,
@@ -39,7 +37,7 @@ const createFile = exports.createFile = ({ deviceType, deviceId, relativePath, h
     birthtimeMs,
     size,
     hash,
-    deleted,
+    deleted: 0,
     addDate
   }
 }
@@ -49,7 +47,7 @@ Files
 ==================================================================================
 */
 exports.addFileAsync = async (device, filename, hash) => {
-  const relativePath = getRelativePath(device.path, filename)
+  const relativePath = getFileRelativePath(device.path, filename)
   const stat = await fs.stat(filename)
   const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
   await repo.addFileAsync(newFile)

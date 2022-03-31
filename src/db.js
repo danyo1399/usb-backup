@@ -62,9 +62,9 @@ exports.openDbAsync = async function () {
 }
 
 const runAsync = exports.runAsync = function (sql, ...args) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, ...args, (err, res) => {
-      err ? reject(err) : resolve(res)
+  return new Promise(function (resolve, reject) {
+    db.run(sql, ...args, function (err, result) {
+      err ? reject(err) : resolve({ ...this })
     })
   })
 }

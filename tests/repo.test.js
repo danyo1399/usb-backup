@@ -43,11 +43,20 @@ describe('repo tests', () => {
   it('getSourceFilesToBackupAsync', async function () {
     const sourceFile = await createSourceFileAsync()
     const files = await repo.getSourceFilesToBackupAsync(sourceFile.deviceId)
-    expect(project(['id', 'relativePath'], files)).toMatchInlineSnapshot(`
+    expect(files).toMatchInlineSnapshot(`
 Array [
   Object {
-    "id": "id",
+    "addDate": 123,
+    "birthtimeMs": 456,
+    "deleted": 0,
+    "deviceId": "deviceId",
+    "deviceType": "source",
+    "editDate": ${sourceFile.editDate},
+    "hash": "hash",
+    "id": 1,
+    "mtimeMs": 789,
     "relativePath": "c:/folder/file.txt",
+    "size": 101112,
   },
 ]
 `)
@@ -85,11 +94,13 @@ Array [
   it('can check a source file exists or not by id', async function () {
     const sourceFile = await createSourceFileAsync()
 
-    const exists = await repo.getFileExistsAsync(sourceFile.id)
-    const doesNotExist = await repo.getFileExistsAsync('invalid id')
+    const exists = await repo.getFileByFingerprintAsync(
+      sourceFile.deviceId, sourceFile.relativePath, sourceFile)
+    const file = await repo.getFileByFingerprintAsync(
+      sourceFile.deviceId, sourceFile.relativePath, { ...sourceFile, mtimeMs: 1234 })
 
-    expect(exists).toEqual(true)
-    expect(doesNotExist).toEqual(false)
+    expect(exists).toEqual(sourceFile)
+    expect(file).toBeUndefined()
   })
 
   it('can load a source file by id', async function () {
@@ -100,7 +111,6 @@ Array [
     expect(file.editDate).toBeGreaterThan(0)
 
     expect(doesNotExistFile).toBeUndefined()
-    delete file.editDate
     expect(file).toEqual(sourceFile)
   })
 
@@ -115,9 +125,9 @@ Array [
 
     sourceFileVersions.push(await repo.getFileByIdAsync(sourceFile.id))
 
-    expect(sourceFileVersions[0].deleted).toBe(false)
-    expect(sourceFileVersions[1].deleted).toBe(true)
-    expect(sourceFileVersions[2].deleted).toBe(false)
+    expect(sourceFileVersions[0].deleted).toBe(0)
+    expect(sourceFileVersions[1].deleted).toBe(1)
+    expect(sourceFileVersions[2].deleted).toBe(0)
   })
 
   it('can delete a source device', async () => {
@@ -146,16 +156,17 @@ async function createSourceFileAsync () {
   const sourceFile = {
     addDate: 123,
     birthtimeMs: 456,
-    deleted: false,
+    deleted: 0,
     deviceId: source.id,
     deviceType: 'source',
     hash: 'hash',
-    id: 'id',
     mtimeMs: 789,
     relativePath: 'c:/folder/file.txt',
     size: 101112
   }
-  await repo.addFileAsync(sourceFile)
+  const newFile = await repo.addFileAsync(sourceFile)
+  sourceFile.editDate = newFile.editDate
+  sourceFile.id = newFile.id
   return sourceFile
 }
 
@@ -164,7 +175,7 @@ async function createBackupFileAsync () {
   const file = {
     addDate: 123,
     birthtimeMs: 456,
-    deleted: false,
+    deleted: 0,
     deviceId: source.id,
     deviceType: 'backup',
     hash: 'hash',

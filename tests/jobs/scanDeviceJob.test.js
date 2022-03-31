@@ -5,6 +5,7 @@ const { getFilesByDeviceAsync, getDeviceByIdAsync } = require('../../src/repo')
 
 const testUtils = require('../common')
 const path = require('path')
+const { project } = require('../../src/utils')
 
 function getStableFileProps ({ size, relativePath, hash, mtimeMs }) {
   return { size, relativePath, hash }
@@ -23,7 +24,7 @@ describe('ScanDeviceJob', function () {
     ctx.append({ backupDevice, sourceDevice, job })
   })
 
-  it('deletes orphan files', async () => {
+  it('should mark a file as deleted when a file is removed', async () => {
     const { sourceDevice, job } = ctx.state
 
     await jobManager.runJobAsync(job)
@@ -40,7 +41,77 @@ describe('ScanDeviceJob', function () {
     expect(files.some(x => x.relativePath === 'ico.png')).toBe(false)
   })
 
-  it('can move files without creating additional rows', async function () {
+  it('Should mark existing file deleted and create new file record when a file is modified', async function () {
+    const { sourceDevice, backupDevice, job } = ctx.state
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+    const filePath = path.join(sourceDevice.path, 'ico.png')
+    await fs.writeJson(filePath, 'some changed file')
+
+    const secondJob = await ScanDeviceJob.createScanDeviceJobAsync({
+      sourceDeviceIds: [sourceDevice.id]
+    })
+    await jobManager.runJobAsync(secondJob)
+    testUtils.assertJobLogHasNoErrors(secondJob.id)
+
+    const files = await getFilesByDeviceAsync(sourceDevice.id, { includeDeleted: true })
+    expect(project(['deleted', 'id', 'relativePath', 'size'], files)).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "deleted": 1,
+    "id": 1,
+    "relativePath": "ico.png",
+    "size": 4118,
+  },
+  Object {
+    "deleted": 0,
+    "id": 2,
+    "relativePath": "subfolder/ico2.png",
+    "size": 3490,
+  },
+  Object {
+    "deleted": 0,
+    "id": 3,
+    "relativePath": "subfolder/ico2 copy.png",
+    "size": 3490,
+  },
+  Object {
+    "deleted": 0,
+    "id": 4,
+    "relativePath": "subfolder/subfolder2/ico4.jfif",
+    "size": 6312,
+  },
+  Object {
+    "deleted": 0,
+    "id": 5,
+    "relativePath": "subfolder/subfolder2/ico3.png",
+    "size": 7858,
+  },
+  Object {
+    "deleted": 0,
+    "id": 6,
+    "relativePath": "ico.png",
+    "size": 20,
+  },
+]
+`)
+  })
+
+  it('makes no changes when scan job is run twice with no file system changes', async function () {
+    const { sourceDevice, backupDevice, job } = ctx.state
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+    const firstFiles = (await getFilesByDeviceAsync(sourceDevice.id, { includeDeleted: true }))
+
+    const secondJob = await ScanDeviceJob.createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id], backupDeviceId: backupDevice.id })
+    await jobManager.runJobAsync(secondJob)
+    testUtils.assertJobLogHasNoErrors(secondJob.id)
+    const secondFiles = (await getFilesByDeviceAsync(sourceDevice.id, { includeDeleted: true }))
+
+    expect(firstFiles).toEqual(secondFiles)
+  })
+
+  it('should update the existing row and not delete and recreate a new row when a file is moved', async function () {
     const { sourceDevice, backupDevice, job } = ctx.state
     await jobManager.runJobAsync(job)
     testUtils.assertJobLogHasNoErrors(job.id)

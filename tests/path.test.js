@@ -1,6 +1,6 @@
 const testUtils = require('./common')
 const path = require('path')
-const { currentPath, getRelativePath, appendSuffixToFilename, findUniqueFilenameAsync, appendFilePathToPath } = require('../src/path')
+const { currentPath, getFileRelativePath, appendSuffixToFilename, findUniqueFilenameAsync, appendFilePathToPath } = require('../src/path')
 const fs = require('fs-extra')
 
 describe('path tests', () => {
@@ -66,28 +66,28 @@ describe('path tests', () => {
   })
 
   it('calculate relatiev path from two paths', function () {
-    expect(getRelativePath('c:\\test\\test2\\', 'c:/test/test2/file.txt')).toEqual('file.txt')
+    expect(getFileRelativePath('c:\\test\\test2\\', 'c:/test/test2/file.txt')).toEqual('file.txt')
 
-    expect(getRelativePath('c:\\test\\test2', 'c:/test/test2/file.txt')).toEqual('file.txt')
+    expect(getFileRelativePath('c:\\test\\test2', 'c:/test/test2/file.txt')).toEqual('file.txt')
 
-    expect(getRelativePath('c:\\test\\', 'c:/test/test2/file.txt')).toEqual('test2/file.txt')
+    expect(getFileRelativePath('c:\\test\\', 'c:/test/test2/file.txt')).toEqual('test2/file.txt')
 
-    expect(getRelativePath('c:\\test', 'c:/test/test2/file.txt')).toEqual('test2/file.txt')
+    expect(getFileRelativePath('c:\\test', 'c:/test/test2/file.txt')).toEqual('test2/file.txt')
 
-    expect(getRelativePath('c:\\', 'c:/test/test2/file.txt')).toEqual('test/test2/file.txt')
+    expect(getFileRelativePath('c:\\', 'c:/test/test2/file.txt')).toEqual('test/test2/file.txt')
 
-    expect(getRelativePath('/test/test2/', '/test/test2/file.txt')).toEqual('file.txt')
+    expect(getFileRelativePath('/test/test2/', '/test/test2/file.txt')).toEqual('file.txt')
 
-    expect(getRelativePath('/test/test2', '/test/test2/file.txt')).toEqual('file.txt')
+    expect(getFileRelativePath('/test/test2', '/test/test2/file.txt')).toEqual('file.txt')
 
-    expect(getRelativePath('/test', '/test/test2/file.txt')).toEqual('test2/file.txt')
+    expect(getFileRelativePath('/test', '/test/test2/file.txt')).toEqual('test2/file.txt')
 
-    expect(getRelativePath('/test/', '/test/test2/file.txt')).toEqual('test2/file.txt')
+    expect(getFileRelativePath('/test/', '/test/test2/file.txt')).toEqual('test2/file.txt')
 
-    expect(getRelativePath('/', '/test/test2/file.txt')).toEqual('test/test2/file.txt')
+    expect(getFileRelativePath('/', '/test/test2/file.txt')).toEqual('test/test2/file.txt')
 
     expect(() => {
-      getRelativePath('/differentroot', '/test/test2/file.txt')
+      getFileRelativePath('/differentroot', '/test/test2/file.txt')
     }).toThrowError()
   })
 })

@@ -37,6 +37,53 @@ let migrations = [
     await execAsync(`
     create index idx_files_relativePath_mtimeMs on files(relativePath, mtimeMs)
   `)
+  },
+  async () => {
+    await execAsync(`
+    create table files_dg_tmp
+(
+    id           INTEGER
+        primary key autoincrement,
+    deviceId     TEXT,
+    deviceType   TEXT,
+    relativePath TEXT,
+    mtimeMs      INTEGER,
+    birthtimeMs  INTEGER,
+    size         INTEGER,
+    hash         TEXT,
+    deleted      INTEGER,
+    addDate      INTEGER not null,
+    editDate     INTEGER not null
+);
+
+insert into files_dg_tmp(id, deviceId, deviceType, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate,
+                         editDate)
+select id,
+       deviceId,
+       deviceType,
+       relativePath,
+       mtimeMs,
+       birthtimeMs,
+       size,
+       hash,
+       deleted,
+       addDate,
+       editDate
+from files;
+
+drop table files;
+
+alter table files_dg_tmp
+    rename to files;
+
+create index idx_files_hash
+    on files (hash);
+
+create index idx_files_relativePath_mtimeMs
+    on files (relativePath, mtimeMs);
+
+
+    `)
   }
 ]
 

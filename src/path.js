@@ -59,7 +59,7 @@ exports.ensureFilePathExistsAsync = async (fullFilePath) => {
  * @param {*} filePath the full path of the file
  * @returns the relative path of the file from the root directory
  */
-exports.getRelativePath = function (basePath, filePath) {
+exports.getFileRelativePath = function (basePath, filePath) {
   const rpath = path.resolve(basePath.replaceAll('\\', '/'))
   const fpath = path.resolve(filePath.replaceAll('\\', '/'))
   if (fpath.startsWith(rpath) === false) {

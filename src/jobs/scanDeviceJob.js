@@ -1,4 +1,4 @@
-const { writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync, createFileId, createFile } = require('../app')
+const { writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync, createFile } = require('../app')
 const fileTreeWalkerAsync = require('../fileTreeWalker')
 const { index, identity, newIdNumber } = require('../utils')
 const {
@@ -6,15 +6,16 @@ const {
   addFileAsync,
   getFileIdsByDeviceAsync,
   deleteFileAsync,
-  getFileExistsAsync,
+  getFileByFingerprintAsync,
   updateDeviceScanDateAsync,
   findSimilarFilesAsync,
-  deleteFileHardAsync
+  deleteFileHardAsync,
+  getFileByDeviceRelativePathAsync
 
 } = require('../repo')
 const fs = require('fs-extra')
 const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../device')
-const { getRelativePath } = require('../path')
+const { getFileRelativePath } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')
 
@@ -56,8 +57,6 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
     const processFileAsync = scanFileHoc(
       {
         device,
-        addAsync: addFileAsync,
-        existsAsync: getFileExistsAsync,
         log
       })
 
@@ -75,7 +74,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
         }
         log.debug(`Processing file ${filename}`)
         const fileId = await processFileAsync({ filename, stat })
-        fileId && scannedFileIds.push(fileId)
+        fileId != null && scannedFileIds.push(fileId)
       } catch (error) {
         log.error(`Unhandled exception thrown processing file ${filename}`, error)
       }
@@ -96,7 +95,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
   }
 }
 
-const scanFileHoc = ({ device, existsAsync, addAsync, log, fullScan }) => {
+const scanFileHoc = ({ device, log, fullScan }) => {
   async function getMovedFileAsync (filename, stat) {
     // Detect file moved
     let movedFile = null
@@ -117,24 +116,32 @@ const scanFileHoc = ({ device, existsAsync, addAsync, log, fullScan }) => {
     return movedFile
   }
   return async ({ filename, stat }) => {
-    const relativePath = getRelativePath(device.path, filename)
-
+    const relativePath = getFileRelativePath(device.path, filename)
+    let file
     if (isMetafile(relativePath) === false) {
-      const fileId = createFileId({ deviceId: device.id, relativePath, stat })
-      const fileExists = await existsAsync(fileId)
-      if (!fileExists) {
-        const movedFile = !fullScan ? await getMovedFileAsync(filename, stat) : null
+      if (fullScan) {
+        const hash = await hashFileAsync(filename)
+        const existingFile = await getFileByDeviceRelativePathAsync(device.id, relativePath)
+        if (existingFile && existingFile.hash === hash) {
+          console.log('Not implemented')
+        }
+      } else {
+        file = await getFileByFingerprintAsync(device.id, relativePath, stat)
+        if (!file) {
+          const movedFile = await getMovedFileAsync(filename, stat)
 
-        const hash = movedFile?.hash ?? await hashFileAsync(filename)
-        const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
-        movedFile ? log.info(`File moved from ${movedFile.fullPath} to ${filename}`) : log.info(`Adding file ${filename}`)
-        await addAsync(newFile)
+          const hash = movedFile?.hash ?? await hashFileAsync(filename)
+          const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
+          movedFile ? log.info(`File moved from ${movedFile.fullPath} to ${filename}`) : log.info(`Adding file ${filename}`)
+          file = await addFileAsync(newFile)
 
-        if (movedFile) {
-          await deleteFileHardAsync(movedFile.id)
+          if (movedFile) {
+            await deleteFileHardAsync(movedFile.id)
+          }
         }
       }
-      return fileId
+
+      return file.id
     }
   }
 }

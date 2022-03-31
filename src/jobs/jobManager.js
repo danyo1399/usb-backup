@@ -117,8 +117,9 @@ async function waitForTurnToRunAsync (id) {
 exports.runJobAsync = async (job) => {
   let state, log
   const id = job.id
+  // we should fail fast as we dont have a logger yet. Somethings wrong
+  if (jobStates[id]) throw new Error(`job id exists: ${id}`)
   try {
-    if (jobStates[id]) throw new Error(`job id exists: ${id}`)
     state = jobStates[id] = { errorCount: null, job, logs: [], context: job.context, description: job.description, status: JOB_STATUSES.pending }
     jobIds.push(id)
     log = createJobLogger(state)
@@ -142,7 +143,9 @@ exports.runJobAsync = async (job) => {
       state.status = JOB_STATUSES.failed
     }
   } finally {
-    state.errorCount = state.logs.filter(x => x.type === logLevels.error).length
+    if (state) {
+      state.errorCount = state.logs.filter(x => x.type === logLevels.error).length
+    }
     jobEmitter.emit(JOB_EVENTS.jobUpdated, id)
     jobEmitter.emit(JOB_EVENTS.jobFinished)
   }

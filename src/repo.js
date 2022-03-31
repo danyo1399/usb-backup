@@ -5,30 +5,6 @@ this module contains the database queries for the application
 const db = require('./db')
 
 /*
-Common
-==================================================================================
-*/
-
-/**
- * Returns a list of files that have not been backed up to a backup device.
- * @param {string} sourceDeviceId
- * @returns files that have not been backed up
- */
-exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
-  return await db.allAsync(`
-    select s.*
-    from files s left join files b on
-        s.hash = b.hash
-        and b.deleted = 0
-        and b.deviceType = 'backup'
-    where
-      b.id is null and s.deviceId = ?
-      and s.deviceType = 'source'
-
-  `, sourceDeviceId)
-}
-
-/*
 Source devices
 ======================================================================================
 */
@@ -104,6 +80,25 @@ Files
 =====================================================================================================
 */
 
+/**
+ * Returns a list of files that have not been backed up to a backup device.
+ * @param {string} sourceDeviceId
+ * @returns files that have not been backed up
+ */
+exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
+  return await db.allAsync(`
+    select s.*
+    from files s left join files b on
+        s.hash = b.hash
+        and b.deleted = 0
+        and b.deviceType = 'backup'
+    where
+      b.id is null and s.deviceId = ?
+      and s.deviceType = 'source'
+
+  `, sourceDeviceId)
+}
+
 exports.deleteFileAsync = async function (id) {
   await db.runAsync(
         `
@@ -120,15 +115,19 @@ exports.deleteFileHardAsync = async function (id) {
     `, id)
 }
 
-exports.getFileExistsAsync = async function (id) {
-  return !!(
-    await db.getAsync(
+exports.getFileByDeviceRelativePathAsync = async function (deviceId, relativePath) {
+  return await db.getAsync(`
+  select * from files
+  where deviceId = ? and relativePath = ? and deleted = 0`, deviceId, relativePath)
+}
+
+exports.getFileByFingerprintAsync = async function (deviceId, relativePath, { mtimeMs, birthtimeMs, size }) {
+  return await db.getAsync(
             `
-  select case
-    when exists(select * from files where id = ?) then 1 else 0 end fileExists`,
-            id
-    )
-  ).fileExists
+  select * from files
+      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ?`,
+            deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
+  )
 }
 
 exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutDir, birthtimeMs, mtimeMs) {
@@ -152,7 +151,6 @@ exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutD
 }
 
 exports.addFileAsync = async function ({
-  id,
   deviceType,
   deviceId,
   relativePath,
@@ -163,12 +161,12 @@ exports.addFileAsync = async function ({
   deleted,
   addDate
 }) {
-  await db.runAsync(
+  const editDate = Date.now()
+  const result = await db.runAsync(
         `
-  insert into files(id, deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
-  values(?,?,?,?,?,?,?,?,?,?,?)
+  insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
+  values(?,?,?,?,?,?,?,?,?,?);
   `,
-        id,
         deviceType,
         deviceId,
         relativePath,
@@ -178,8 +176,21 @@ exports.addFileAsync = async function ({
         hash,
         deleted,
         addDate,
-        Date.now()
+        editDate
   )
+  return {
+    id: result.lastID,
+    deviceType,
+    deviceId,
+    relativePath,
+    mtimeMs,
+    birthtimeMs,
+    size,
+    hash,
+    deleted,
+    addDate,
+    editDate
+  }
 }
 
 exports.unDeleteFileAsyc = async function (id) {
@@ -197,9 +208,6 @@ exports.getFileByIdAsync = async function (id) {
   select * from files where id = ?
   `, id
   )
-  if (result) {
-    result.deleted = !!result.deleted
-  }
   return result
 }
 
@@ -211,11 +219,6 @@ exports.getFileIdsByDeviceAsync = async (id) => {
   const results = await db.allAsync('select id from files where deviceId = ? and deleted = 0', id)
   return results.map(x => x.id)
 }
-
-/*
-Backup Files
-=====================================================================================================
-*/
 
 exports.getAllBackupFilesAsync = async function () {
   return await db.allAsync("select * from files where deviceType = 'backup'")
