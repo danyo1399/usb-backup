@@ -62,7 +62,7 @@ const initSpa = async () => {
   })
 
   await app.start()
-  console.log('Server running on %s', app.info.uri)
+  console.log('spa web server running on %s', app.info.uri)
   await open('http://localhost:' + port)
 }
 
