@@ -34,7 +34,7 @@ describe('Device info tests', function () {
     const deviceInfoList = []
 
     testUtils.convertIteratorToCallback(deviceInfo.iterator(), (device) => deviceInfoList.push(device))
-    await testUtils.sleep(500)
+    await testUtils.sleep(1000)
     await deviceInfo.refresh()
 
     expect(deviceInfoList).toHaveLength(4)
@@ -45,10 +45,10 @@ describe('Device info tests', function () {
     const deviceInfoList = []
     const iterator = deviceInfo.iterator()
     testUtils.convertIteratorToCallback(iterator, (device) => deviceInfoList.push(device))
-    await testUtils.sleep(500)
+    await testUtils.sleep(1000)
     const returnValue = await iterator.return()
     await deviceInfo.refresh()
-    await testUtils.sleep(500)
+    await testUtils.sleep(1000)
 
     expect(deviceInfoList).toHaveLength(2)
     expect(returnValue.done).toBe(true)
