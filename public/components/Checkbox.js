@@ -4,6 +4,7 @@ import { useUniqueId } from '../hooks.js'
 
 const h = globals.html
 const { useState, useEffect } = globals.preactHooks
+
 export function Checkbox ({ label, id, checked, onClick, ...props }) {
   const generatedId = useUniqueId()
   const componentId = id || generatedId

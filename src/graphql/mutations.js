@@ -3,7 +3,8 @@ const {
   GraphQLString,
   GraphQLInputObjectType,
   GraphQLList,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLBoolean
 } = require('graphql')
 
 const { SourceDevice, BackupDevice, GenericErrorResponse, Error } = require('./types')
@@ -197,6 +198,9 @@ function jobMutations () {
     fields: {
       devices: {
         type: new GraphQLList(new GraphQLNonNull(GraphQLString))
+      },
+      useFullScan: {
+        type: GraphQLBoolean
       }
     }
   })
@@ -246,10 +250,10 @@ function jobMutations () {
       resolve: async (_, args) => {
         let response
         const {
-          input: { devices: sourceDeviceIds }
+          input: { devices: sourceDeviceIds, useFullScan }
         } = args
         try {
-          const job = await createScanDeviceJobAsync({ sourceDeviceIds })
+          const job = await createScanDeviceJobAsync({ sourceDeviceIds, useFullScan })
           runJobAsync(job)
         } catch (err) {
           response = toGraphqlErrorSection(err)

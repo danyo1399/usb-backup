@@ -4,6 +4,17 @@ const crypto = require('crypto')
  Common Utils
  =======================================================================================
 */
+const curry = exports.curry = function (func) {
+  return function curried (...args) {
+    if (args.length >= func.length) {
+      return func.apply(this, args)
+    } else {
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2))
+      }
+    }
+  }
+}
 
 exports.pipe = (...args) => {
   return (...firstArgs) => {
@@ -32,25 +43,13 @@ exports.runOnce = (fnAsync) => {
   }
 }
 
-exports.project = (props, list) =>
-  list.map(x => props.reduce((prev, curr) => ({ ...prev, [curr]: x[curr] }), {}))
+exports.project = curry((props, list) =>
+  list.map(x => props.reduce((prev, curr) => ({ ...prev, [curr]: x[curr] }), {})))
 
 exports.identity = (value) => value
 
 exports.prop = name => {
   return (obj) => obj[name]
-}
-
-exports.curry = function (func) {
-  return function curried (...args) {
-    if (args.length >= func.length) {
-      return func.apply(this, args)
-    } else {
-      return function (...args2) {
-        return curried.apply(this, args.concat(args2))
-      }
-    }
-  }
 }
 
 exports.newId = function () {

@@ -124,7 +124,7 @@ Array [
     expect(file.editDate).toBeGreaterThan(sourceFile.editDate)
   })
 
-  it('marks existing file at path as deleted before inserting new record', async function() {
+  it('marks existing file at path as deleted before inserting new record', async function () {
     const file = createFile('dev', 'source')
     await repo.addFileAsync(file)
     file.hash = 'newhash'
@@ -166,7 +166,7 @@ Array [
   })
 })
 
-function createFile(deviceId, deviceType) {
+function createFile (deviceId, deviceType) {
   return {
     addDate: 123,
     birthtimeMs: 456,

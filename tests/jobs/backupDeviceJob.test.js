@@ -103,9 +103,9 @@ Array [
     })
 
     it('should backup files to disk', async function () {
-      const { backupDevice, logs } = ctx.state
+      const { backupDevice, job } = ctx.state
 
-      expect(logs.some(x => x.type === 'error')).toBe(false)
+      testUtils.assertJobLogHasNoErrors(job.id)
       const files = glob.sync(`${backupDevice.path}/**/*`, {})
         .filter(filename => path.extname(filename) !== '') // Remove folders
 

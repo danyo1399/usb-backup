@@ -23,11 +23,11 @@ module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan 
   const context = { sourceDeviceIds, useFullScan }
 
   const devices = (await Promise.all(sourceDeviceIds.map(id => getDeviceByIdAsync(id)))).map(d => `[${d.name}]`)
-  const description = `${useFullScan ? 'full scan' : 'scan'} devices ${devices.join(', ')}`
+  const description = `${useFullScan ? 'full scan' : 'fast scan'} devices ${devices.join(', ')}`
   const id = newIdNumber()
   let _abort = false
   async function executeAsync (log) {
-    await scanDevices(log, sourceDeviceIds, () => _abort)
+    await scanDevices(log, sourceDeviceIds, () => _abort, useFullScan)
   }
 
   async function abort () {
@@ -37,7 +37,7 @@ module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan 
   return { id, executeAsync, context, description, abort, name: 'scanDeviceJob' }
 }
 
-const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsAborting) {
+const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsAborting, useFullScan) {
   for (const deviceId of deviceIds) {
     if (getIsAborting()) break
 
@@ -57,11 +57,12 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
     const processFileAsync = scanFileHoc(
       {
         device,
-        log
+        log,
+        useFullScan
       })
 
     const scannedFileIds = []
-    log.info(`Scanning device ${deviceName(device)}`)
+    log.info(`Performing ${useFullScan ? 'full' : 'fast'} scan device ${deviceName(device)}`)
     await fileTreeWalkerAsync(device.path, handleFileAsync, log)
 
     async function handleFileAsync (err, { filename, stat, abort }) {
@@ -79,7 +80,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
         log.error(`Unhandled exception thrown processing file ${filename}`, error)
       }
     }
-
+    log.debug('Removing orphan files')
     const dbFileIds = await getFileIdsByDeviceAsync(device.id)
     const existsInScannedFiles = index(identity, scannedFileIds)
 
@@ -95,7 +96,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
   }
 }
 
-const scanFileHoc = ({ device, log, fullScan }) => {
+const scanFileHoc = ({ device, log, useFullScan }) => {
   async function getMovedFileAsync (filename, stat) {
     // Detect file moved
     let movedFile = null
@@ -119,11 +120,19 @@ const scanFileHoc = ({ device, log, fullScan }) => {
     const relativePath = getFileRelativePath(device.path, filename)
     let file
     if (isMetafile(relativePath) === false) {
-      if (fullScan) {
+      if (useFullScan) {
+        const matchingFingerprintFile = await getFileByFingerprintAsync(device.id, relativePath, stat)
         const hash = await hashFileAsync(filename)
-        const existingFile = await getFileByDeviceRelativePathAsync(device.id, relativePath)
-        if (existingFile && existingFile.hash === hash) {
-          console.log('Not implemented')
+        file = matchingFingerprintFile ?? await getFileByDeviceRelativePathAsync(device.id, relativePath)
+        const isNewFile = file == null
+        const hashChanged = file?.hash !== hash
+        const fingerprintChanged = matchingFingerprintFile == null
+
+        if (isNewFile || hashChanged || fingerprintChanged) {
+          const changeDesc = isNewFile ? 'New file' : hashChanged ? 'Hash changed' : 'Fingerprint changed'
+          log.info(`${changeDesc}, creating new file ${filename}`)
+          const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
+          file = await addFileAsync(newFile)
         }
       } else {
         file = await getFileByFingerprintAsync(device.id, relativePath, stat)
@@ -133,6 +142,7 @@ const scanFileHoc = ({ device, log, fullScan }) => {
           const hash = movedFile?.hash ?? await hashFileAsync(filename)
           const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
           movedFile ? log.info(`File moved from ${movedFile.fullPath} to ${filename}`) : log.info(`Adding file ${filename}`)
+
           file = await addFileAsync(newFile)
 
           if (movedFile) {

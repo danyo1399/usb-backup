@@ -16,6 +16,7 @@ import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
 import { ConfirmDialog } from '../../../components/ConfirmDialog.js'
 import { useFetching } from '../../../hooks.js'
 import { useToast } from '../../../components/Toast.js'
+import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 
 const html = window.html
 const { useEffect, useState } = globals.preactHooks
@@ -24,6 +25,7 @@ export default function Devices ({ variant }) {
   const { addToast } = useToast()
   const [showManageDevice, setShowManageDevice] = useState(false)
   const [showBackupJobDialog, setShowBackupJobDialog] = useState(false)
+  const [showScanJobDialog, setShowScanJobDialog] = useState(false)
   const [devices, setDevices] = useState([])
   const [editingDevice, setEditingDevice] = useState(null)
   const { doFetch } = useFetching()
@@ -43,12 +45,16 @@ export default function Devices ({ variant }) {
     setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
   }
 
-  async function onScanDevicesJobAsync () {
+  async function onScanDevicesJobAsync (useFullScan) {
     if (selectedDevices.length > 0) {
-      await scanDevicesAsync(selectedDevices.map(x => x.id))
-      addToast({ header: 'Job Enqueued', body: 'Scan Devices job successfully enqueued', type: 'success' })
-      setSelectedDevicesMap({})
+      setShowScanJobDialog(true)
     }
+  }
+
+  async function createScanDevicesJobAsync (useFullScan) {
+    await scanDevicesAsync(selectedDevices.map(x => x.id), useFullScan)
+    addToast({ header: 'Job Enqueued', body: 'Scan Devices job successfully enqueued', type: 'success' })
+    setSelectedDevicesMap({})
   }
 
   const label = isSourceDeviceView ? 'Source Device' : 'Backup Device'
@@ -127,6 +133,12 @@ export default function Devices ({ variant }) {
             loadDevices=${loadDevicesAsync}
             onClose=${() => setEditingDevice(undefined)}
         />
+        <${StartScanDevicesJobDialog}
+        show=${showScanJobDialog}
+        setShow=${setShowScanJobDialog}
+        onClose=${() => setShowScanJobDialog(false)}
+        createJob=${createScanDevicesJobAsync}
+        devices=${selectedDevices}  />
 
         <${StartBackupDevicesJobDialog}
         show=${showBackupJobDialog}

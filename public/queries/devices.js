@@ -100,7 +100,7 @@ export async function createSourceDeviceAsync ({ name, description, path }) {
   return response
 }
 
-export async function scanDevicesAsync (deviceIds) {
+export async function scanDevicesAsync (deviceIds, useFullScan) {
   const response = await execute({
     query: `
       mutation ($input: ScanDevicesRequest) {
@@ -110,7 +110,7 @@ export async function scanDevicesAsync (deviceIds) {
       }
     `,
     variables: {
-      input: { devices: deviceIds }
+      input: { devices: deviceIds, useFullScan }
     }
   })
 
