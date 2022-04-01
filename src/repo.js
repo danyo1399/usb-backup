@@ -158,28 +158,37 @@ exports.addFileAsync = async function ({
   birthtimeMs,
   size,
   hash,
-  deleted,
   addDate
 }) {
   const editDate = Date.now()
-  const result = await db.runAsync(
-        `
-  insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
-  values(?,?,?,?,?,?,?,?,?,?);
-  `,
-        deviceType,
-        deviceId,
-        relativePath,
-        mtimeMs,
-        birthtimeMs,
-        size,
-        hash,
-        deleted,
-        addDate,
-        editDate
-  )
+  const deleted = false
+  let insertResult
+  await db.performInTransactionAsync(async () => {
+    await db.runAsync(`
+    update files
+    set deleted = 1
+    where deviceId = ? and relativePath = ?`
+    , deviceId, relativePath)
+
+    insertResult = await db.runAsync(`
+insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
+values(?,?,?,?,?,?,?,?,?,?);
+`,
+    deviceType,
+    deviceId,
+    relativePath,
+    mtimeMs,
+    birthtimeMs,
+    size,
+    hash,
+    deleted,
+    addDate,
+    editDate
+    )
+  })
+
   return {
-    id: result.lastID,
+    id: insertResult.lastID,
     deviceType,
     deviceId,
     relativePath,
@@ -192,7 +201,6 @@ exports.addFileAsync = async function ({
     editDate
   }
 }
-
 
 exports.getFileByIdAsync = async function (id) {
   const result = await db.getAsync(
