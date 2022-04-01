@@ -9,6 +9,7 @@ const META_FILE_GLOB = `*${FILE_SUFFIX}`
 function getMetaFilePath ({ path, id }) {
   return _path.join(path, `${id}${FILE_SUFFIX}`)
 }
+exports.getMetaFilePath = getMetaFilePath
 
 exports.deviceName = (device) => {
   const { id, name } = device

@@ -5,6 +5,8 @@ const testUtils = require('../common')
 const { createBackupDevicesJobAsync } = require('../../src/jobs/backupDeviceJob')
 const jobManager = require('../../src/jobs/jobManager')
 const { glob } = require('glob')
+const { createScanDeviceJobAsync } = require('../../src/jobs/scanDeviceJob')
+const { getMetaFilePath } = require('../../src/device')
 
 describe('backup device job', function () {
   const ctx = testUtils.createContext()
@@ -25,6 +27,28 @@ describe('backup device job', function () {
     const logs = jobManager.getJobLog(job.id)
 
     expect(logs.some(x => x.type === 'error')).toBe(true)
+    expect(getAllBackupFilesAsync()).resolves.toHaveLength(0)
+  })
+
+  it('shouldnt try to backup deleted source files', async function () {
+    const { sourceDevice, job } = ctx.state
+
+    const scanJob = await createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id] })
+
+    await jobManager.runJobAsync(scanJob)
+
+    const metafilePath = getMetaFilePath(sourceDevice)
+    const tempMetafilePath = path.join(env.tempPath, path.basename(metafilePath))
+    await fs.move(metafilePath, tempMetafilePath)
+    await fs.rm(sourceDevice.path, { recursive: true, force: true })
+    await fs.mkdir(sourceDevice.path)
+    await fs.move(tempMetafilePath, metafilePath)
+
+    scanJob.id++
+    await jobManager.runJobAsync(scanJob)
+
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
     expect(getAllBackupFilesAsync()).resolves.toHaveLength(0)
   })
 

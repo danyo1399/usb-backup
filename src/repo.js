@@ -93,9 +93,10 @@ exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
         and b.deleted = 0
         and b.deviceType = 'backup'
     where
-      b.id is null and s.deviceId = ?
+      b.id is null
+      and s.deviceId = ?
       and s.deviceType = 'source'
-
+      and s.deleted = 0
   `, sourceDeviceId)
 }
 
