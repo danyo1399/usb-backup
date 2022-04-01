@@ -114,20 +114,14 @@ Array [
     expect(file).toEqual(sourceFile)
   })
 
-  it('can delete and undelete a source file', async function () {
+  it('can delete a source file', async function () {
     const sourceFile = await createSourceFileAsync()
-    const sourceFileVersions = [sourceFile]
 
     await repo.deleteFileAsync(sourceFile.id)
-    sourceFileVersions.push(await repo.getFileByIdAsync(sourceFile.id))
+    const file = await repo.getFileByIdAsync(sourceFile.id)
 
-    await repo.unDeleteFileAsyc(sourceFile.id)
-
-    sourceFileVersions.push(await repo.getFileByIdAsync(sourceFile.id))
-
-    expect(sourceFileVersions[0].deleted).toBe(0)
-    expect(sourceFileVersions[1].deleted).toBe(1)
-    expect(sourceFileVersions[2].deleted).toBe(0)
+    expect(file.deleted).toBe(1)
+    expect(file.editDate).toBeGreaterThan(sourceFile.editDate)
   })
 
   it('can delete a source device', async () => {

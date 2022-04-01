@@ -41,6 +41,42 @@ describe('ScanDeviceJob', function () {
     expect(files.some(x => x.relativePath === 'ico.png')).toBe(false)
   })
 
+  it('should undelete file when file is removed then added', async () => {
+    const { sourceDevice, job, backupDevice } = ctx.state
+
+    const sourcePath = path.join(sourceDevice.path, 'ico.png')
+    const backupPath = path.join(backupDevice.path, 'ico.png')
+
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+
+    await fs.move(sourcePath, backupPath)
+    job.id++
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+
+    await fs.move(backupPath, sourcePath)
+    job.id++
+    await jobManager.runJobAsync(job)
+    testUtils.assertJobLogHasNoErrors(job.id)
+
+    const files = (await getFilesByDeviceAsync(sourceDevice.id, { includeDeleted: true })).filter(x => x.relativePath === 'ico.png')
+    expect(project(['relativePath', 'deleted', 'id'], files)).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "deleted": 1,
+    "id": 1,
+    "relativePath": "ico.png",
+  },
+  Object {
+    "deleted": 0,
+    "id": 6,
+    "relativePath": "ico.png",
+  },
+]
+`)
+  })
+
   it('Should mark existing file deleted and create new file record when a file is modified', async function () {
     const { sourceDevice, backupDevice, job } = ctx.state
     await jobManager.runJobAsync(job)

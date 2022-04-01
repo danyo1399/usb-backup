@@ -125,7 +125,7 @@ exports.getFileByFingerprintAsync = async function (deviceId, relativePath, { mt
   return await db.getAsync(
             `
   select * from files
-      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ?`,
+      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ? and deleted = 0`,
             deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
   )
 }
@@ -193,14 +193,6 @@ exports.addFileAsync = async function ({
   }
 }
 
-exports.unDeleteFileAsyc = async function (id) {
-  await db.runAsync(`
-    update files set
-    deleted = 0,
-    editDate = ?
-    where id= ?
-  `, Date.now(), id)
-}
 
 exports.getFileByIdAsync = async function (id) {
   const result = await db.getAsync(
