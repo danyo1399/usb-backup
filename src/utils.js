@@ -85,6 +85,7 @@ const index = (indexFn, list) => {
   }, {})
   return (key) => !!map[key]
 }
+
 exports.index = index
 
 /**

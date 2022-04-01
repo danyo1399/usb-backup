@@ -74,10 +74,10 @@ exports.execAsync = function (sql, ...args) {
     db.exec(sql, ...args, (err, res) => { err ? reject(err) : resolve(res) })
   })
 }
-exports.performInTransactionAsync = async function (fn) {
+exports.performInTransactionAsync = async function (fnAsync) {
   try {
     await runAsync('begin')
-    await fn()
+    await fnAsync()
     await runAsync('commit')
   } catch (error) {
     await runAsync('rollback')
