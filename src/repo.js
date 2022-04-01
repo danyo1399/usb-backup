@@ -166,9 +166,9 @@ exports.addFileAsync = async function ({
   await db.performInTransactionAsync(async () => {
     await db.runAsync(`
     update files
-    set deleted = 1
-    where deviceId = ? and relativePath = ?`
-    , deviceId, relativePath)
+    set deleted = 1, editDate = ?
+    where deviceId = ? and relativePath = ?`,
+    editDate, deviceId, relativePath)
 
     insertResult = await db.runAsync(`
 insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
