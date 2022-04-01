@@ -61,6 +61,9 @@ exports.openDbAsync = async function () {
   })
 }
 
+/**
+ * executes only the first statement.
+ */
 const runAsync = exports.runAsync = function (sql, ...args) {
   return new Promise(function (resolve, reject) {
     db.run(sql, ...args, function (err, result) {

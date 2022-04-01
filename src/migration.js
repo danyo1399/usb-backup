@@ -56,9 +56,9 @@ let migrations = [
     editDate     INTEGER not null
 );
 
-insert into files_dg_tmp(id, deviceId, deviceType, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate,
+insert into files_dg_tmp(deviceId, deviceType, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate,
                          editDate)
-select id,
+select
        deviceId,
        deviceType,
        relativePath,
