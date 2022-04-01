@@ -40,7 +40,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
             if (!ignoredFolders.includes(basename) && !basename.startsWith('.')) {
               directories.push(fullPath)
             } else {
-              logger.info(`Ignoring folder ${fullPath}`)
+              logger.debug(`Ignoring folder ${fullPath}`)
             }
           } else if (stat.isFile()) {
             if (!ignoredFiles.includes(path.basename(fullPath))) {
@@ -50,7 +50,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
                 logger.error('file tree walker callback threw an exception, ignoring', error)
               }
             } else {
-              logger.info(`Ignoring file ${fullPath}`)
+              logger.debug(`Ignoring file ${fullPath}`)
             }
           }
         } catch (error) {
