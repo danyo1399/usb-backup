@@ -78,7 +78,11 @@ List utilities
  * @returns
  */
 const index = (indexFn, list) => {
-  const map = list.reduce((prev, curr) => ({ ...prev, [indexFn(curr)]: true }), {})
+  // Dont use spread because the list can be huge
+  const map = list.reduce((prev, curr) => {
+    prev[indexFn(curr)] = true
+    return prev
+  }, {})
   return (key) => !!map[key]
 }
 exports.index = index

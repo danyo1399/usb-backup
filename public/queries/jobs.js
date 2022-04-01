@@ -32,7 +32,11 @@ export function getJobLog (jobId) {
     }
   }).pipe(
     rxjs.map(x => x.data?.jobLogs || []),
-    rxjs.scan((acu, curr) => [...acu, ...curr], []),
+    // dont use spread because of perf
+    rxjs.scan((acu, curr) => {
+      acu.push(...curr)
+      return acu
+    }, []),
     rxjs.debounceTime(500),
     rxjs.shareReplay(1)
   )
