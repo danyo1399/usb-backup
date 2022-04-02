@@ -72,6 +72,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       }
       const pendingFilesAfterBackup = await getSourceFilesToBackupAsync(context.sourceDevice.id)
       if (pendingFilesAfterBackup.length === 0) {
+        log.debug('Updating last backup date')
         await updateLastBackupDate(context.sourceDevice.id, Date.now())
       } else {
         log.error(`Not all files were backed up: ${pendingFilesAfterBackup.length} files remaining`)

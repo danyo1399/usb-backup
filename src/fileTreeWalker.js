@@ -3,8 +3,16 @@ const path = require('path')
 const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
 
-const ignoredFolders = ['$RECYCLE.BIN', 'System Volume Information']
-const ignoredFiles = ['Thumbs.db']
+const ignoredFolders = [
+  '$RECYCLE.BIN', // windows
+  'System Volume Information', // windows
+  '#recycle' // synology diskstation recycle bin
+]
+const ignoredFiles = [
+  'Thumbs.db' // windows folder image db
+]
+const ignoredBaseNames = [...ignoredFolders]
+
 /**
  * Walks the directory structure calling the callback for each file found
  *
@@ -31,19 +39,26 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
       while (filesOrDirectories.length > 0) {
         const name = filesOrDirectories.pop()
         const fullPath = path.join(subpath, name)
+        const basename = path.basename(fullPath)
+
+        if (ignoredBaseNames.includes(basename)) {
+          logger.debug(`Ignoring path ${fullPath}`)
+          continue
+        }
+
         if (_abort) break
         try {
           const stat = await fs.stat(fullPath)
+
           if (stat.isDirectory()) {
-            const basename = path.basename(fullPath)
             // ignored files and unix hidden folders
-            if (!ignoredFolders.includes(basename) && !basename.startsWith('.')) {
-              directories.push(fullPath)
-            } else {
+            if (basename.startsWith('.')) {
               logger.debug(`Ignoring folder ${fullPath}`)
+            } else {
+              directories.push(fullPath)
             }
           } else if (stat.isFile()) {
-            if (!ignoredFiles.includes(path.basename(fullPath))) {
+            if (!ignoredFiles.includes(basename)) {
               try {
                 await callback(null, { filename: fullPath, stat, path: subpath, abort })
               } catch (error) {
@@ -54,7 +69,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
             }
           }
         } catch (error) {
-          logger.error(`Error processing path ${fullPath}`)
+          logger.error(`Error processing path ${fullPath}, ${error.message}`)
           await callback(new FileTreeWalkerPathError(fullPath), {})
         }
       }
