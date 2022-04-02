@@ -88,12 +88,9 @@ Files
 exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
   return await db.allAsync(`
     select s.*
-    from files s left join files b on
-        s.hash = b.hash
-        and b.deleted = 0
-        and b.deviceType = 'backup'
+    from files s
     where
-      b.id is null
+      not exists( select 1 from files b where b.hash = s.hash and b.deleted = 0 and b.deviceType = 'backup')
       and s.deviceId = ?
       and s.deviceType = 'source'
       and s.deleted = 0
