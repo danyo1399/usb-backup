@@ -1,5 +1,6 @@
 import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
+import { jobs$ } from './queries/jobs.js'
 const { useEffect, useState } = globals.preactHooks
 export function useFormControl (defaultValue) {
   const [value, setValue] = useState(defaultValue)
@@ -31,6 +32,9 @@ export function useFormControl (defaultValue) {
   return { attributes, value, setValue, dirty, touched, reset }
 }
 
+export function useJob (jobId) {
+  return (useObservableState(jobs$) || []).find(x => x.id === jobId)
+}
 export function useFetching () {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState(null)

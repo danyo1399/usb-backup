@@ -1,70 +1,98 @@
+import TextFormField from '../../../components/TextFormField.js'
 import * as globals from '../../../globals.js'
-import { useObservableState } from '../../../hooks.js'
+import { useFormControl, useJob, useObservableState } from '../../../hooks.js'
 import { getJobLog } from '../../../queries/jobs.js'
 
 const html = globals.html
-const ps = globals.ps
+const { css } = globals.goober
 const { useState, useEffect } = globals.preactHooks
 
-const itemsPerPage = 500
-export default function JobLog ({ jobId }) {
-  const [$log, set$log] = useState(null)
-  const [pageNo, setPageNo] = useState(1)
+const itemsPerPage = 100
 
+function filterType (type, filter) {
+  return filter === 'all'
+    ? true
+    : filter === 'info'
+      ? ['info', 'warn', 'error'].includes(type)
+      : filter === 'warn'
+        ? ['warn', 'error'].includes(type)
+        : type === 'error'
+}
+export default function JobLog ({ jobId }) {
+  const [log$, setLog$] = useState(null)
+  const [pageNo, setPageNo] = useState(1)
+  const job = useJob(jobId)
+  const { attributes, value: filterText } = useFormControl()
   useEffect(() => {
-    set$log(getJobLog(jobId))
+    setLog$(getJobLog(jobId))
   }, [jobId])
-  const jobLog = useObservableState($log) || []
+  const jobLog = (useObservableState(log$)?.data || [])
 
   const [filter, setFilter] = useState('all')
 
-  const filteredLogs = jobLog.filter(({ type }) =>
-    filter === 'all'
-      ? true
-      : filter === 'info'
-        ? ['info', 'warn', 'error'].includes(type)
-        : filter === 'warn'
-          ? ['warn', 'error'].includes(type)
-          : type === 'error')
+  const ucFilterText = (filterText || '').toUpperCase()
+  const filteredLogs = jobLog.filter(({ type, message }) => filterType(type, filter) && (!filterText || message.toUpperCase().includes(ucFilterText)))
 
   const page = filteredLogs.slice((pageNo - 1) * itemsPerPage, pageNo * itemsPerPage)
   const lastPageNo = Math.ceil(filteredLogs.length / itemsPerPage)
+
+  function scrollToBottom () {
+    setTimeout(() => {
+      window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'instant' })
+    }, 10)
+  }
+
   function nextPage () {
     setPageNo(x => x < lastPageNo ? x + 1 : x)
+    scrollToBottom()
   }
 
   function previousPage () {
     setPageNo(x => x > 1 ? x - 1 : x)
+    scrollToBottom()
   }
 
-  function firstPage () {
+  function firstPage (noScroll) {
     setPageNo(1)
+    !noScroll && scrollToBottom()
   }
 
   function lastPage () {
     setPageNo(lastPageNo)
+    scrollToBottom()
   }
 
   function updateFilter (evt) {
-    firstPage()
+    firstPage(true)
     setFilter(evt.target.value)
   }
 
-  const Wrapper = ps('div')({
-    ' .button-container': {
-      display: 'flex',
-      justifyContent: 'center',
-      gap: '1rem'
-    },
-    ' .button-container button': {
-      width: '7rem',
-      textTransform: 'uppercase'
-    }
-  })
+  const styles = css`
+.button-container {
+  display: flex;
+  justifyContent: center;
+  gap: 1rem;
+  button {
+    width: 7rem;
+    text-transform: uppercase;
+  }
+}
+table {
+  margin-top: 1rem;
+}
+section {
+  margin-top: 1rem;
+}
+  `
+
   return html`
-  <${Wrapper}>
+    <div class=${styles}>
   <h1>Job Log</h1>
-  <secton>
+  <h5>${job?.name} - ${job?.description}</h5>
+  <section class="text-filter">
+  <${TextFormField} label="Filter" ...${attributes}/>
+  </section>
+<section class="level-filter">
   <label for="min-log-level" class="form-label">Min Log Level</label>
   <select id="min-log-level" value=${filter} onChange=${updateFilter} class="form-select" aria-label="Min Log Level">
   <option value="all">All</option>
@@ -95,6 +123,7 @@ export default function JobLog ({ jobId }) {
   <button type="button" class="btn btn-secondary  btn-sm" disabled=${pageNo === lastPageNo} onClick=${lastPage}>Last</button>
 </div>
 
-<//>
+</div>
+
   `
 }

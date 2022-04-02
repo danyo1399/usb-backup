@@ -32,12 +32,15 @@ export function getJobLog (jobId) {
     }
   }).pipe(
     rxjs.map(x => x.data?.jobLogs || []),
-    // dont use spread because of perf
     rxjs.scan((acu, curr) => {
-      acu.push(...curr)
-      return acu
-    }, []),
-    rxjs.debounceTime(500),
+      // dont use spread because of perf
+      // We need to wrap it because of ref comparison to trigger state change detection
+      // we need to mutate because the dataset is too big to recreate the array on each new item
+      const { data } = acu
+      data.push(...curr)
+      return { data }
+    }, { data: [] }),
+    rxjs.throttleTime(500),
     rxjs.shareReplay(1)
   )
 }
