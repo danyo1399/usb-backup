@@ -28,7 +28,7 @@ export default function JobLog ({ jobId }) {
   }, [jobId])
   const jobLog = (useObservableState(log$)?.data || [])
 
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState('info')
 
   const ucFilterText = (filterText || '').toUpperCase()
   const filteredLogs = jobLog.filter(({ type, message }) => filterType(type, filter) && (!filterText || message.toUpperCase().includes(ucFilterText)))
