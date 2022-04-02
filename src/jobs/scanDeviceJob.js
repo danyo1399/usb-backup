@@ -10,7 +10,8 @@ const {
   updateDeviceScanDateAsync,
   findSimilarFilesAsync,
   deleteFileHardAsync,
-  getFileByDeviceRelativePathAsync
+  getFileByDeviceRelativePathAsync,
+  getFileByIdAsync
 
 } = require('../repo')
 const fs = require('fs-extra')
@@ -87,7 +88,9 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
     const deletedIds = dbFileIds.filter(id => !existsInScannedFiles(id))
 
     for (const id of deletedIds) {
-      log.warn(`Marking file deleted: ${id}`)
+      const fileToDelete = await getFileByIdAsync(id)
+
+      log.warn(`Marking file deleted: id ${id}, device ${device.name}, path ${fileToDelete?.relativePath}`)
       await deleteFileAsync(id)
     }
 
