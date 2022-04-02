@@ -39,12 +39,14 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     for (const deviceId of sourceDeviceIds) {
       if (_abort) break
 
-      log.info(`Backing up device ${deviceId}`)
+      log.debug(`Backing up source device ${deviceId}`)
 
       context.sourceDevice = await tryLoadDeviceAsync(log, deviceId, 'source')
       if (!context.sourceDevice) continue
 
       const filesToBackup = await getSourceFilesToBackupAsync(context.sourceDevice.id)
+
+      log.info(`Backing up ${filesToBackup.length} files from source device [${context.sourceDevice.name}]`)
 
       context.freeSpace = (await checkDiskSpace(context.backupDevice.path)).free
 
@@ -103,7 +105,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     const device = (await getDeviceByIdAsync(deviceId))
 
     if (!device || device.deviceType !== 'source') {
-      log.warn(`${deviceType} device with id does not exist ${deviceId}`)
+      log.error(`${deviceType} device with id does not exist ${deviceId}`)
       return null
     }
 
