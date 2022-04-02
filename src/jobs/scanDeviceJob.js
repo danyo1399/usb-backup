@@ -78,7 +78,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
         const fileId = await processFileAsync({ filename, stat })
         fileId != null && scannedFileIds.push(fileId)
       } catch (error) {
-        log.error(`Unhandled exception thrown processing file ${filename}`, error)
+        log.error(`Unhandled exception thrown processing file ${filename}. ${error.message}`, error)
       }
     }
     log.debug('Removing orphan files')
