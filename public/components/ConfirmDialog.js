@@ -25,7 +25,7 @@ export function ConfirmDialog ({ show, onConfirm, onCancel, header, body }) {
                     </div>
                 </div>
             </div>
-        </Modal>
+        <//>
 
     `
 }

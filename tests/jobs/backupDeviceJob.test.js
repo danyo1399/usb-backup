@@ -58,9 +58,16 @@ describe('backup device job', function () {
       ctx.logs = jobManager.getJobLog(ctx.job.id)
     })
 
-    it('create database files records', async function () {
-      const { backupDevice } = ctx.state
+    it('create database files records and updates device info', async function () {
+      const { sourceDevice, backupDevice } = ctx.state
       const deviceFiles = await getFilesByDeviceAsync(backupDevice.id)
+
+      const updatedSourceDevice = await getDeviceByIdAsync(sourceDevice.id)
+      expect(updatedSourceDevice.lastBackupDate).toBeGreaterThan(0)
+      expect(updatedSourceDevice.lastScanDate).toBeGreaterThan(0)
+
+      const updatedBackupDevice = await getDeviceByIdAsync(backupDevice.id)
+      expect(updatedBackupDevice.lastScanDate).toBeGreaterThan(0)
 
       for (const file of deviceFiles) {
         expect(file.deviceId).toEqual(backupDevice.id)

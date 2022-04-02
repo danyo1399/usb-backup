@@ -153,7 +153,7 @@ export default function Devices ({ variant }) {
         onConfirm=${() => deleteDevice(deleting)}
         show=${deleting}
         header="Are you sure?"
-        body="Do you want to delete source'${deleting?.name}'"
+        body="Do you want to delete source [${deleting?.name}]"
       / >
 
     `

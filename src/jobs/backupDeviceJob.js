@@ -40,6 +40,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       if (_abort) break
 
       log.info(`Backing up device ${deviceId}`)
+
       context.sourceDevice = await tryLoadDeviceAsync(log, deviceId, 'source')
       if (!context.sourceDevice) continue
 
@@ -67,7 +68,14 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
           handleBackupFileError(error, log, context)
         }
       }
-      await updateLastBackupDate(context.sourceDevice.id, Date.now())
+      const pendingFilesAfterBackup = await getSourceFilesToBackupAsync(context.sourceDevice.id)
+      if (pendingFilesAfterBackup.length === 0) {
+        await updateLastBackupDate(context.sourceDevice.id, Date.now())
+      } else {
+        log.error(`Not all files were backed up: ${pendingFilesAfterBackup.length} files remaining`)
+      }
+
+      log.debug('Writing backup metafile')
       await writeDeviceMetaFileAsync(context.backupDevice)
     }
   }
