@@ -8,6 +8,10 @@ This is a port of a .net project i developed and have been using since 2010 that
 [![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Getting started
+Make sure you have node js installed. You get get it from here
+
+https://nodejs.org/en/
+
 There are two methods of running the application.
 
 ### Latest Bundled Package (Simple method)
