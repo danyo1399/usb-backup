@@ -7,7 +7,7 @@ const html = globals.html
 const { css } = globals.goober
 const { useState, useEffect } = globals.preactHooks
 
-const itemsPerPage = 100
+const itemsPerPage = 5000
 
 function filterType (type, filter) {
   return filter === 'all'
@@ -108,12 +108,14 @@ section {
   <table class="table table-striped">
   <thead>
       <tr>
+      <th scope="col">No.</th>
           <th scope="col">Type</th>
           <th scope="col">Message</th>
       </tr>
   </thead>
   <tbody>
-  ${page.map(log => html`<tr>
+  ${page.map((log, index) => html`<tr>
+  <td> ${index + 1} </td>
   <td> ${log.type} </td>
   <td> ${log.message} </td>
 </tr>`)}
