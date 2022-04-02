@@ -11,7 +11,8 @@ const {
   findSimilarFilesAsync,
   deleteFileHardAsync,
   getFileByDeviceRelativePathAsync,
-  getFileByIdAsync
+  getFileByIdAsync,
+  getFilesByHashAndDeviceTypeAsync
 
 } = require('../repo')
 const fs = require('fs-extra')
@@ -144,12 +145,18 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
 
           const hash = movedFile?.hash ?? await hashFileAsync(filename)
           const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
-          movedFile ? log.info(`File moved from ${movedFile.fullPath} to ${filename}`) : log.info(`Adding file ${filename}`)
+          if (!movedFile) {
+            const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, newFile.deviceType))[0]
+            if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
+          }
 
           file = await addFileAsync(newFile)
 
           if (movedFile) {
+            log.info(`File moved from ${movedFile.fullPath} to ${filename}`)
             await deleteFileHardAsync(movedFile.id)
+          } else {
+            log.info(`${device.deviceType} file added ${filename}`)
           }
         }
       }

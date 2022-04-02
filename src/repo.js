@@ -5,6 +5,24 @@ this module contains the database queries for the application
 const db = require('./db')
 
 /*
+Reports
+==================================================================================
+*/
+// TODO not used yet
+exports.reportFilesOnBackupWithNoSourceAsync = async () => {
+  return await db.allAsync(`
+  select d.name deviceName, b.*
+from files b inner join devices d on b.deviceId = d.id
+where b.deviceType = 'backup'
+  and b.deleted = 0
+and not exists(
+    select 1 from files s
+    where s.deleted = 0 and s.deviceType ='source'
+    and s.hash = b.hash
+    )
+  `)
+}
+/*
 Source devices
 ======================================================================================
 */
@@ -113,41 +131,6 @@ exports.deleteFileHardAsync = async function (id) {
     `, id)
 }
 
-exports.getFileByDeviceRelativePathAsync = async function (deviceId, relativePath) {
-  return await db.getAsync(`
-  select * from files
-  where deviceId = ? and relativePath = ? and deleted = 0`, deviceId, relativePath)
-}
-
-exports.getFileByFingerprintAsync = async function (deviceId, relativePath, { mtimeMs, birthtimeMs, size }) {
-  return await db.getAsync(
-            `
-  select * from files
-      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ? and deleted = 0`,
-            deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
-  )
-}
-
-exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutDir, birthtimeMs, mtimeMs) {
-  return await db.allAsync(`
-    select *
-    from files
-     where
-       deviceId = $deviceId
-      and (relativePath = $filename or relativePath like $likeFilename)
-      and birthtimeMs = $birthtimeMs
-      and mtimeMs = $mtimeMs
-      and size = $size
-  `, {
-    $size: size,
-    $deviceId: deviceId,
-    $birthtimeMs: Math.floor(birthtimeMs),
-    $mtimeMs: Math.floor(mtimeMs),
-    $filename: filenameWithoutDir,
-    $likeFilename: `%/${filenameWithoutDir}`
-  })
-}
-
 exports.addFileAsync = async function ({
   deviceType,
   deviceId,
@@ -200,6 +183,41 @@ values(?,?,?,?,?,?,?,?,?,?);
   }
 }
 
+exports.getFileByDeviceRelativePathAsync = async function (deviceId, relativePath) {
+  return await db.getAsync(`
+  select * from files
+  where deviceId = ? and relativePath = ? and deleted = 0`, deviceId, relativePath)
+}
+
+exports.getFileByFingerprintAsync = async function (deviceId, relativePath, { mtimeMs, birthtimeMs, size }) {
+  return await db.getAsync(
+            `
+  select * from files
+      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ? and deleted = 0`,
+            deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
+  )
+}
+
+exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutDir, birthtimeMs, mtimeMs) {
+  return await db.allAsync(`
+    select *
+    from files
+     where
+       deviceId = $deviceId
+      and (relativePath = $filename or relativePath like $likeFilename)
+      and birthtimeMs = $birthtimeMs
+      and mtimeMs = $mtimeMs
+      and size = $size
+  `, {
+    $size: size,
+    $deviceId: deviceId,
+    $birthtimeMs: Math.floor(birthtimeMs),
+    $mtimeMs: Math.floor(mtimeMs),
+    $filename: filenameWithoutDir,
+    $likeFilename: `%/${filenameWithoutDir}`
+  })
+}
+
 exports.getFileByIdAsync = async function (id) {
   const result = await db.getAsync(
         `
@@ -220,4 +238,12 @@ exports.getFileIdsByDeviceAsync = async (id) => {
 
 exports.getAllBackupFilesAsync = async function () {
   return await db.allAsync("select * from files where deviceType = 'backup'")
+}
+
+exports.getFilesByHashAndDeviceTypeAsync = async (hash, deviceType) => {
+  return await db.allAsync(`
+  select d.name deviceName, f.*
+  from files f inner join devices d on f.deviceId = d.id
+  where f.hash = ? and f.deviceType = ? and f.deleted = 0
+  `, hash, deviceType)
 }
