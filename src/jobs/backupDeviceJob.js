@@ -140,6 +140,9 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       log.warn(`target filename already exists but didnt when we started copying ${newTargetFilename}`)
     }
 
+    const editDate = new Date(context.sourceFile.mtimeMs)
+    await fs.utimes(context.tempFilename, editDate, editDate)
+
     await fs.move(context.tempFilename, newTargetFilename)
     await addFileAsync(context.backupDevice, targetFilename, backupHash)
     // two files to backup could have the same hash. We only want to copy one of them
