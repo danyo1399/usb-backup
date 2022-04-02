@@ -38,7 +38,7 @@ export default function JobLog ({ jobId }) {
 
   useEffect(() => {
     setPageNo(1)
-  }, ucFilterText)
+  }, [ucFilterText])
 
   function scrollToBottom () {
     setTimeout(() => {
