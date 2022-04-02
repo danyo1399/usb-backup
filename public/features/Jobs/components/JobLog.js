@@ -36,6 +36,10 @@ export default function JobLog ({ jobId }) {
   const page = filteredLogs.slice((pageNo - 1) * itemsPerPage, pageNo * itemsPerPage)
   const lastPageNo = Math.ceil(filteredLogs.length / itemsPerPage)
 
+  useEffect(() => {
+    setPageNo(1)
+  }, ucFilterText)
+
   function scrollToBottom () {
     setTimeout(() => {
       window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: 'instant' })
@@ -52,9 +56,8 @@ export default function JobLog ({ jobId }) {
     scrollToBottom()
   }
 
-  function firstPage (noScroll) {
+  function firstPage () {
     setPageNo(1)
-    !noScroll && scrollToBottom()
   }
 
   function lastPage () {
@@ -63,7 +66,7 @@ export default function JobLog ({ jobId }) {
   }
 
   function updateFilter (evt) {
-    firstPage(true)
+    setPageNo(1)
     setFilter(evt.target.value)
   }
 
