@@ -54,18 +54,21 @@ describe('ScanDeviceJob', function () {
             "value": Array [
               Object {
                 "context": Array [],
+                "index": 1,
                 "message": "starting job j1: 1",
                 "timestamp": 0,
                 "type": "info",
               },
               Object {
                 "context": Array [],
+                "index": 2,
                 "message": "i did something 1",
                 "timestamp": 0,
                 "type": "info",
               },
               Object {
                 "context": Array [],
+                "index": 3,
                 "message": "job completed j1: 1",
                 "timestamp": 0,
                 "type": "info",
@@ -75,6 +78,7 @@ describe('ScanDeviceJob', function () {
         ]
       `)
     })
+
     it('should only return logs for a particular job', async function () {
       const logs = []
       const job1 = testJob('j1', 1)
@@ -94,6 +98,7 @@ Array [
     "value": Array [
       Object {
         "context": Array [],
+        "index": 1,
         "message": "starting job j1: 1",
         "timestamp": 0,
         "type": "info",
@@ -105,12 +110,14 @@ Array [
     "value": Array [
       Object {
         "context": Array [],
+        "index": 2,
         "message": "i did something 1",
         "timestamp": 0,
         "type": "info",
       },
       Object {
         "context": Array [],
+        "index": 3,
         "message": "job completed j1: 1",
         "timestamp": 0,
         "type": "info",
@@ -139,6 +146,7 @@ Array [
     "value": Array [
       Object {
         "context": Array [],
+        "index": 1,
         "message": "starting job j1: 1",
         "timestamp": 0,
         "type": "info",
@@ -150,12 +158,14 @@ Array [
     "value": Array [
       Object {
         "context": Array [],
+        "index": 2,
         "message": "i did something 1",
         "timestamp": 0,
         "type": "info",
       },
       Object {
         "context": Array [],
+        "index": 3,
         "message": "job completed j1: 1",
         "timestamp": 0,
         "type": "info",
