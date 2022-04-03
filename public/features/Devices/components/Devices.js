@@ -17,9 +17,11 @@ import { ConfirmDialog } from '../../../components/ConfirmDialog.js'
 import { useFetching } from '../../../hooks.js'
 import { useToast } from '../../../components/Toast.js'
 import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
+import constants from '../../../constants.js'
 
 const html = window.html
 const { useEffect, useState } = globals.preactHooks
+const { route } = globals.preactRouter
 
 export default function Devices ({ variant }) {
   const { addToast } = useToast()
@@ -73,8 +75,12 @@ export default function Devices ({ variant }) {
     setShowManageDevice(true)
   }
 
-  function onCreateBackupJob (sourceDeviceIds) {
+  function onCreateBackupJob () {
     setShowBackupJobDialog(true)
+  }
+
+  function viewFiles (device) {
+    route(constants.routes.getViewFilesUrl(device.id))
   }
 
   const [deleting, setDeleting] = useState(null)
@@ -115,13 +121,14 @@ export default function Devices ({ variant }) {
         </div>
 
         <${DevicesTable}
-            devices="${devices}"
+            devices=${devices}
             variant=${variant}
             selected=${selectedDevicesMap}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
-            editDevice="${onEditDevice}"
-            loadDevices="${loadDevicesAsync}"
+            editDevice=${onEditDevice}
+            loadDevices=${loadDevicesAsync}
+            viewFiles=${viewFiles}
         />
         <${ManageDeviceDialog}
             show=${showManageDevice}

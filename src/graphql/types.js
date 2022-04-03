@@ -3,8 +3,20 @@ const {
   GraphQLString,
   GraphQLID,
   GraphQLFloat,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLInt
 } = require('graphql')
+
+exports.File = new GraphQLObjectType({
+  name: 'File',
+  fields: {
+    id: { type: GraphQLInt },
+    size: { type: GraphQLFloat },
+    mtimeMs: { type: GraphQLFloat },
+    hash: { type: GraphQLString },
+    relativePath: { type: GraphQLString }
+  }
+})
 
 exports.SourceDevice = new GraphQLObjectType({
   name: 'SourceDevice',

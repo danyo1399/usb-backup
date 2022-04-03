@@ -6,7 +6,7 @@ import { deviceInfo$ } from '../../../queries/index.js'
 
 const html = globals.html
 
-export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, onCreateBackupJob }) {
+export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles, onCreateBackupJob }) {
   if (devices.length === 0) {
     return null
   }
@@ -68,6 +68,16 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
                                                     Edit
                                                 </button>
                                             </li>
+                                            <li>
+                                                <button
+                                                    class="dropdown-item"
+                                                    onClick="${() => viewFiles(dev)}"
+                                                    type="button"
+                                                >
+                                                    View Files
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"/></li>
                                             <li>
                                                 <button
                                                     class="dropdown-item"

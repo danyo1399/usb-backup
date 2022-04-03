@@ -2,10 +2,14 @@ import { ToastProvider, Toast, SideNav } from './components/index.js'
 import constants from './constants.js'
 import Devices from './features/Devices/index.js'
 import './graphql.js'
-import * as globals from './globals.js'
+
 import Jobs from './features/Jobs/index.js'
 import JobLog from './features/Jobs/components/JobLog.js'
 import LicenceDialog from './components/Licence.js'
+
+import * as globals from './globals.js'
+import Test from './Test.js'
+import ViewFiles from './features/Files/pages/ViewFiles.js'
 const { Router } = globals.preactRouter
 const html = globals.html
 
@@ -25,6 +29,8 @@ export default function App () {
                         <${BackupDevices} path=${constants.routes.backupDevices} />
                         <${Jobs} path=${constants.routes.jobs} />
                         <${JobLog} path=${constants.routes.jobLog} />
+                        <${ViewFiles} path=${constants.routes.viewFiles} />
+                        <${Test} path=${constants.routes.test} />
                     <//>
                 </div>
             <//>

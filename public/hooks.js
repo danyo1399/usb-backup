@@ -1,7 +1,9 @@
 import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
+import { getBackupDevicesAsync, getSourceDevicesAsync } from './queries/devices.js'
 import { jobs$ } from './queries/jobs.js'
 const { useEffect, useState } = globals.preactHooks
+
 export function useFormControl (defaultValue) {
   const [value, setValue] = useState(defaultValue)
   const [touched, setTouched] = useState()
@@ -32,9 +34,58 @@ export function useFormControl (defaultValue) {
   return { attributes, value, setValue, dirty, touched, reset }
 }
 
+export function useRowSelector () {
+  const shift = useKeyDownMonitor('Shift')
+  const control = useKeyDownMonitor('Control')
+  const [selectedRows, setSelectedRows] = useState({})
+  const [lastSelectedIndex, setLastSelectedIndex] = useState()
+
+  function rowClick (index) {
+    if (shift && index !== lastSelectedIndex && lastSelectedIndex != null && selectedRows[lastSelectedIndex]) {
+      setSelectedRows(() => {
+        const newSelected = {}
+        if (lastSelectedIndex < index) for (let i = lastSelectedIndex; i <= index; i++) newSelected[i] = true
+        else for (let i = lastSelectedIndex; i >= index; i--) newSelected[i] = true
+        return newSelected
+      })
+    } else if (control) {
+      setSelectedRows(x => ({ ...x, [index]: !x[index] }))
+    } else {
+      if (!selectedRows[index]) {
+        setLastSelectedIndex(index)
+      }
+      setSelectedRows({ [index]: true })
+    }
+  }
+
+  function reset () {
+    setSelectedRows({})
+    setLastSelectedIndex(null)
+  }
+  return { rowClick, selectedRows, reset }
+}
+
 export function useJob (jobId) {
   return (useObservableState(jobs$) || []).find(x => x.id === jobId)
 }
+
+export function useDevices () {
+  const [sources, setSources] = useState([])
+  const [backups, setBackups] = useState([])
+  const all = [...sources, ...backups]
+  useEffect(() => {
+    getSourceDevicesAsync().then(x => setSources(x))
+    getBackupDevicesAsync().then(x => setBackups(x))
+  }, [])
+
+  return { sources, backups, all }
+}
+
+export function useDevice (deviceId) {
+  const state = useDevices()
+  return (state?.all || []).find(x => x.id === deviceId)
+}
+
 export function useFetching () {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState(null)
@@ -82,13 +133,71 @@ export function useIteratorState (getIterator, getItems) {
   return state
 }
 
-export function useApiData (apiFn) {
-  const [data, setData] = useState(null)
+export function useKeyDownMonitor (key) {
+  const [state, setState] = useState(false)
+  useEffect(() => {
+    function keyDown (evt) {
+      if (evt.key === key) setState(true)
+    }
+
+    function keyUp (evt) {
+      if (evt.key === key) setState(false)
+    }
+
+    function blur () {
+      setState(false)
+    }
+
+    window.addEventListener('keydown', keyDown)
+    window.addEventListener('keyup', keyUp)
+    window.addEventListener('blur', blur)
+    return () => {
+      window.removeEventListener('keyup', keyUp)
+      window.removeEventListener('keydown', keyDown)
+      window.removeEventListener('blur', blur)
+    }
+  }, [])
+  return state
+}
+
+export function useFileTree (files) {
+  function createNode () {
+    return { folders: [], files: [], parent: null }
+  }
+  const tree = { '/': createNode() }
+  const folderAddedMap = {}
+  for (const file of files) {
+    const parts = file.relativePath.split('/')
+    const filename = parts.pop()
+    const dirName = parts.join('/')
+    file.basename = filename
+    let previousPath = ''
+    for (const part of parts) {
+      const currentPath = `${previousPath}/${part}`
+      if (!tree[currentPath]) {
+        tree[currentPath] = createNode()
+      }
+      const parent = !previousPath ? `/${previousPath}` : previousPath
+      tree[currentPath].parent = parent
+      const folderAddedKey = `${parent}-${currentPath}`
+      if (!folderAddedMap[folderAddedKey]) {
+        tree[parent].folders.push({ name: part, path: currentPath })
+        folderAddedMap[folderAddedKey] = true
+      }
+      previousPath = currentPath
+    }
+    tree[`/${dirName}`].files.push(file)
+  }
+  return tree
+}
+
+export function useApiData (apiFn, defaultValue) {
+  const [data, setData] = useState(defaultValue)
 
   useEffect(() => {
     (async () => {
       const response = await apiFn()
-      setData(response)
+      setData(response || defaultValue)
     })()
   }, [])
 

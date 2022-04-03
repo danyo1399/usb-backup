@@ -4,6 +4,9 @@ export function delay (fn, timeout = 500) {
   }
 }
 
+export function shortDateTimeString (date) {
+  return `${date.getFullYear() % 1000}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.toTimeString().substr(0, 8)}`
+}
 export function bytesToSize (bytes) {
   if (!bytes) return ''
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
