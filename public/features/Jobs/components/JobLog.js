@@ -90,8 +90,8 @@ section {
 
   return html`
     <div class=${styles}>
-  <h1>Job Log</h1>
-  <h5>${job?.name} - ${job?.description}</h5>
+  <h1>Job Log - ${job?.name} [${job?.status}]</h1>
+  <h5>${job?.description}</h5>
   <section class="text-filter">
   <${TextFormField} label="Filter" ...${attributes}/>
   </section>
