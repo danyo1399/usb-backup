@@ -48,7 +48,7 @@ export function Table ({ node, navigate }) {
     }
 
     .selected {
-      background-color:#f7f7f7;
+      background-color:#e0edff;
     }
 
     .link {
