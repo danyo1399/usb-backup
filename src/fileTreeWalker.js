@@ -9,7 +9,8 @@ const ignoredFolders = [
   '#recycle' // synology diskstation recycle bin
 ]
 const ignoredFiles = [
-  'Thumbs.db' // windows folder image db
+  'Thumbs.db', // windows folder image db
+  '.DS_Store' // custom mac metadata file
 ]
 const ignoredBaseNames = [...ignoredFolders]
 
