@@ -1,4 +1,4 @@
-import * as globals from '../../../globals.js'
+import * as globals from '../globals.js'
 const { html, preactHooks } = globals
 
 const { useRef } = preactHooks
