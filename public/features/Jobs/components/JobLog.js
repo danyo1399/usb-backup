@@ -28,7 +28,7 @@ export default function JobLog ({ jobId }) {
   }, [jobId])
   const jobLog = (useObservableState(log$)?.data || [])
 
-  const [filter, setFilter] = useState('info')
+  const [filter, setFilter] = useState('all')
 
   const ucFilterText = (filterText || '').toUpperCase()
   const filteredLogs = jobLog.filter(({ type, message }) => filterType(type, filter) && (!filterText || message.toUpperCase().includes(ucFilterText)))
@@ -114,8 +114,8 @@ section {
       </tr>
   </thead>
   <tbody>
-  ${page.map((log, index) => html`<tr>
-  <td> ${index + 1} </td>
+  ${page.map((log) => html`<tr>
+  <td> ${log.index} </td>
   <td> ${log.type} </td>
   <td> ${log.message} </td>
 </tr>`)}

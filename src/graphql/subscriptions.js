@@ -20,6 +20,7 @@ const Job = new GraphQLObjectType({
 const JobLog = new GraphQLObjectType({
   name: 'JobLog',
   fields: {
+    index: { type: GraphQLInt },
     type: { type: GraphQLString },
     message: { type: GraphQLString }
   }

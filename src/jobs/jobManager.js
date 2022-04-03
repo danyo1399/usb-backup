@@ -29,24 +29,25 @@ function createJobLogger (state) {
   const log = state.logs
   const id = state.job.id
 
+  let index = 1
   return createLogger({
     debug (message, ...context) {
-      log.push({ timestamp: Date.now(), type: logLevels.debug, message, context })
+      log.push({ index: index++, timestamp: Date.now(), type: logLevels.debug, message, context })
       console.debug(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     info (message, ...context) {
-      log.push({ timestamp: Date.now(), type: logLevels.info, message, context })
+      log.push({ index: index++, timestamp: Date.now(), type: logLevels.info, message, context })
       console.info(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     warn (message, ...context) {
-      log.push({ timestamp: Date.now(), type: logLevels.warn, message, context })
+      log.push({ index: index++, timestamp: Date.now(), type: logLevels.warn, message, context })
       console.warn(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     error (message, ...context) {
-      log.push({ timestamp: Date.now(), type: logLevels.error, message, context })
+      log.push({ index: index++, timestamp: Date.now(), type: logLevels.error, message, context })
       console.error(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     }

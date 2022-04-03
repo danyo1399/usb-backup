@@ -21,7 +21,7 @@ export function getJobLog (jobId) {
   return toObservable({
     query: `subscription ($input: GetJobLogsRequest) {
       jobLogs(input: $input) {
-        type, message
+        index, type, message
       }
     }
       `,
