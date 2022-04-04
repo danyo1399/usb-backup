@@ -22,6 +22,21 @@ and not exists(
     )
   `)
 }
+
+exports.reportDuplicateFilesOnBackupDevicesAsync = async () => {
+  return await db.allAsync(`
+  select d.name deviceName, b.*
+from files b inner join devices d on b.deviceId = d.id
+where b.deviceType = 'backup'
+  and b.deleted = 0
+and not exists(
+    select 1 from files b2
+    where b2.deleted = 0 and b2.deviceType ='backup'
+    and b2.hash = b.hash
+    and b2.id != b.id
+    )
+  `)
+}
 /*
 Source devices
 ======================================================================================
