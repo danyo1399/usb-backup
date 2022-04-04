@@ -142,6 +142,7 @@ export function Breadcrumbs ({ currentPath, selectNode }) {
   gap: 0.8rem;
   font-size: 1.5rem;
   font-weight:normal;
+  flex-wrap: wrap;
   .node {
     cursor: pointer;
     text-decoration: none;
