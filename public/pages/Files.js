@@ -4,7 +4,7 @@ import Tabs from '../components/Tabs.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
 import { useApiData } from '../index.js'
-import { reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
+import { reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter
@@ -25,8 +25,58 @@ export default function Files ({ tab }) {
     <h1>Files</h1>
     <${Tabs} items=${items} className='mb-3' selected=${tab}/>
     ${tab === 'pending' && html`<${PendingPage}/>`}
+    ${tab === 'duplicates' && html`<${Duplicates}/>`}
+    ${tab === 'removed' && html`<${Removed}/>`}
+    ${tab === 'modified' && html`<${Modified}/>`}
   </div>
   `
+}
+
+function Removed () {
+  const styles = css`
+  `
+  const data = []
+
+  return html`
+  <div class=${styles}>
+<p>
+  List of backup files that dont exist on source devices
+</p>
+<${FileTable} data=${data}/>
+
+</div>`
+}
+
+function Modified () {
+  const styles = css`
+  `
+  const data = []
+
+  return html`
+  <div class=${styles}>
+<p>
+  List of source files that have been silently modified (modified without affecting other attributes).
+  Could be an indication of bit rot
+</p>
+<${FileTable} data=${data}/>
+
+</div>`
+}
+
+
+function Duplicates () {
+  const styles = css`
+  `
+  const data = useApiData(reportDuplicateFilesOnSourceDevicesAsync, [])
+
+  return html`
+  <div class=${styles}>
+<p>
+  List of source files with duplicates
+</p>
+<${FileTable} data=${data}/>
+
+</div>`
 }
 
 function PendingPage () {
@@ -39,11 +89,19 @@ function PendingPage () {
 <p>
   List of files on source devices that dont exist on a backup device
 </p>
-<table className="table">
+<${FileTable} data=${data}/>
+</div>
+  `
+}
+
+function FileTable ({ data }) {
+  return html`
+  <table className="table">
   <thead>
     <tr>
       <td>Device</td>
       <td>path</td>
+      <td>hash</td>
     </tr>
   </thead>
   <tbody>
@@ -55,11 +113,13 @@ function PendingPage () {
       <td>
     ${cleanPath(x.devicePath, x.relativePath)}
       </td>
+      <td>
+        ${x.hash}
+      </td>
     </tr>`)}
   </tbody>
 </table>
 
-</div>
   `
 }
 function cleanPath (devicePath, relativePath) {

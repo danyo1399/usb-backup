@@ -39,16 +39,17 @@ and not exists(
 
 exports.reportDuplicateFilesOnDeviceTypeAsync = async (deviceType) => {
   return await db.allAsync(`
-  select d.name deviceName, b.*
+  select d.name deviceName, d.path devicePath, b.*
 from files b inner join devices d on b.deviceId = d.id
 where b.deviceType = $deviceType
   and b.deleted = 0
-and not exists(
+and exists(
     select 1 from files b2
     where b2.deleted = 0 and b2.deviceType = $deviceType
     and b2.hash = b.hash
     and b2.id != b.id
     )
+  order by b.hash
   `, { $deviceType: deviceType })
 }
 
