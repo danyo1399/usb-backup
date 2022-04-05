@@ -5,7 +5,7 @@ import Tabs from '../components/Tabs.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
 import { useApiData, usePagination } from '../index.js'
-import { reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
+import { reportDuplicateFilesOnBackupDevicesAsync, reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter
@@ -64,17 +64,36 @@ function Modified () {
 </div>`
 }
 
-
 function Duplicates () {
   const styles = css`
+  .form-group {
+    display: flex;
+    align-items: center;
+    gap:1rem;
+    select {
+      width: 10rem;
+    }
+    label {
+      font-weight:500;
+    }
+  }
   `
-  const data = useApiData(reportDuplicateFilesOnSourceDevicesAsync, [])
+
+  const [filter, setFilter] = useState('source')
+  const data = useApiData(filter === 'backup' ? reportDuplicateFilesOnBackupDevicesAsync : reportDuplicateFilesOnSourceDevicesAsync, [])
 
   return html`
   <div class=${styles}>
 <p>
   List of source files with duplicates
 </p>
+<div class="form-group mb-1 mt-4">
+<label for="duplicates-device-type">Device Type</label>
+<select id="duplicates-device-type" value=${filter} onChange=${(e) => setFilter(e.target.value)} class="form-select" aria-label="Device Type">
+  <option value="source">Source</option>
+  <option value="backup">Backup</option>
+</select>
+</div>
 <${FileTable} data=${data}/>
 
 </div>`
@@ -96,10 +115,15 @@ function PendingPage () {
 }
 
 function FileTable ({ data }) {
+  const styles = css`
+  .path-cell {
+    overflow-wrap: anywhere
+  }
+  `
   const pagination = usePagination(data, 15)
   const { page } = pagination
   return html`
-  <table className="table">
+  <table className="table ${styles}">
   <thead>
     <tr>
       <td>Device</td>
@@ -113,7 +137,7 @@ function FileTable ({ data }) {
       <td>
         ${x.deviceName}
       </td>
-      <td>
+      <td class="path-cell">
     ${cleanPath(x.devicePath, x.relativePath)}
       </td>
       <td>

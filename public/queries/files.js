@@ -56,3 +56,16 @@ export async function reportDuplicateFilesOnSourceDevicesAsync (deviceId) {
   })
   return reportDuplicateFilesOnSourceDevicesAsync
 }
+
+export async function reportDuplicateFilesOnBackupDevicesAsync (deviceId) {
+  const { data: { reportDuplicateFilesOnBackupDevicesAsync } } = await execute({
+    query: `
+            query {
+              reportDuplicateFilesOnBackupDevicesAsync {
+                id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
+                }
+            }
+        `
+  })
+  return reportDuplicateFilesOnBackupDevicesAsync
+}

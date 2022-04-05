@@ -242,7 +242,7 @@ export function useApiData (apiFn, defaultValue) {
       const response = await apiFn()
       setData(response || defaultValue)
     })()
-  }, [])
+  }, [apiFn, defaultValue])
 
   return data
 }
