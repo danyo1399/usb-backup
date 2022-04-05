@@ -1,13 +1,13 @@
 import FileBrowser from './components/FileBrowser.js'
 import * as globals from './globals.js'
 import { useApiData, useFileTree } from './hooks.js'
-import { getFilesByDeviceId } from './queries/files.js'
+import { getFilesByDeviceIdAsync } from './queries/files.js'
 const { Router } = globals.preactRouter
 const html = globals.html
 const { useState } = globals.preactHooks
 
 export default function Test () {
-  const files = useApiData(() => getFilesByDeviceId('7b1b2e4850cfd62b3a422769fd3abf02'), [])
+  const files = useApiData(() => getFilesByDeviceIdAsync('7b1b2e4850cfd62b3a422769fd3abf02'), [])
   const tree = useFileTree(files)
   const [path, setPath] = useState('/')
 

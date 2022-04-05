@@ -1,6 +1,6 @@
 import { execute } from '../graphql.js'
 
-export async function getFilesByDeviceId (deviceId) {
+export async function getFilesByDeviceIdAsync (deviceId) {
   const { data: { filesByDeviceId } } = await execute({
     query: `
             query ($input: FilesByDeviceIdRequest) {
