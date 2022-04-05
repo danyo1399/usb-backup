@@ -31,6 +31,19 @@ export async function reportFilesOnSourceWithNoBackupAsync (deviceId) {
   return reportFilesOnSourceWithNoBackupAsync
 }
 
+export async function reportFilesOnBackupWithNoSourceAsync (deviceId) {
+  const { data: { reportFilesOnBackupWithNoSourceAsync } } = await execute({
+    query: `
+            query {
+              reportFilesOnBackupWithNoSourceAsync {
+                id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
+                }
+            }
+        `
+  })
+  return reportFilesOnBackupWithNoSourceAsync
+}
+
 export async function reportDuplicateFilesOnSourceDevicesAsync (deviceId) {
   const { data: { reportDuplicateFilesOnSourceDevicesAsync } } = await execute({
     query: `

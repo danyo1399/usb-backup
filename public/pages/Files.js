@@ -4,7 +4,7 @@ import Tabs from '../components/Tabs.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
 import { useApiData } from '../index.js'
-import { reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
+import { reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter
@@ -35,7 +35,7 @@ export default function Files ({ tab }) {
 function Removed () {
   const styles = css`
   `
-  const data = []
+  const data = useApiData(reportFilesOnBackupWithNoSourceAsync, [])
 
   return html`
   <div class=${styles}>
