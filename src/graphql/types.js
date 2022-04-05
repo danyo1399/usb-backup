@@ -18,6 +18,24 @@ exports.File = new GraphQLObjectType({
   }
 })
 
+exports.ReportFile = new GraphQLObjectType({
+  name: 'ReportFile',
+  fields: {
+    id: { type: GraphQLInt },
+    deviceId: { type: GraphQLString },
+    deviceType: { type: GraphQLString },
+    deviceName: { type: GraphQLString },
+    devicePath: { type: GraphQLString },
+    size: { type: GraphQLFloat },
+    mtimeMs: { type: GraphQLFloat },
+    birthtimeMs: { type: GraphQLFloat },
+    addDate: { type: GraphQLFloat },
+    editDate: { type: GraphQLFloat },
+    hash: { type: GraphQLString },
+    relativePath: { type: GraphQLString }
+  }
+})
+
 exports.SourceDevice = new GraphQLObjectType({
   name: 'SourceDevice',
   fields: () => ({

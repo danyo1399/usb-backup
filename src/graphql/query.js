@@ -6,7 +6,7 @@ const {
 } = require('graphql')
 const { defaultLogger } = require('../logging')
 const repo = require('../repo')
-const { SourceDevice, BackupDevice, File } = require('./types')
+const { SourceDevice, BackupDevice, File, ReportFile } = require('./types')
 
 const FilesByDeviceIdRequest = new GraphQLInputObjectType({
   name: 'FilesByDeviceIdRequest',
@@ -45,6 +45,34 @@ module.exports = new GraphQLObjectType({
         }
 
         return response
+      }
+    },
+    reportFilesOnSourceWithNoBackupAsync: {
+      type: new GraphQLList(ReportFile),
+      resolve: async () => {
+        const data = await repo.reportFilesOnSourceWithNoBackupAsync()
+        return data
+      }
+    },
+    reportFilesOnBackupWithNoSourceAsync: {
+      type: new GraphQLList(ReportFile),
+      resolve: async () => {
+        const data = await repo.reportFilesOnBackupWithNoSourceAsync()
+        return data
+      }
+    },
+    reportDuplicateFilesOnSourceDevicesAsync: {
+      type: new GraphQLList(ReportFile),
+      resolve: async () => {
+        const data = await repo.reportDuplicateFilesOnDeviceTypeAsync('source')
+        return data
+      }
+    },
+    reportDuplicateFilesOnBackupDevicesAsync: {
+      type: new GraphQLList(ReportFile),
+      resolve: async () => {
+        const data = await repo.reportDuplicateFilesOnDeviceTypeAsync('backup')
+        return data
       }
     }
   }

@@ -10,6 +10,7 @@ import LicenceDialog from './components/Licence.js'
 import * as globals from './globals.js'
 import Test from './Test.js'
 import ViewFiles from './features/Files/pages/ViewFiles.js'
+import Files from './pages/Files.js'
 const { Router } = globals.preactRouter
 const html = globals.html
 
@@ -30,6 +31,7 @@ export default function App () {
                         <${Jobs} path=${constants.routes.jobs} />
                         <${JobLog} path=${constants.routes.jobLog} />
                         <${ViewFiles} path=${constants.routes.viewFiles} />
+                        <${Files} path=${constants.routes.files} />
                         <${Test} path=${constants.routes.test} />
                     <//>
                 </div>

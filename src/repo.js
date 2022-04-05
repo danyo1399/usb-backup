@@ -11,7 +11,7 @@ Reports
 // TODO not used yet
 exports.reportFilesOnBackupWithNoSourceAsync = async () => {
   return await db.allAsync(`
-  select d.name deviceName, b.*
+  select d.name deviceName, d.path devicePath, b.*
 from files b inner join devices d on b.deviceId = d.id
 where b.deviceType = 'backup'
   and b.deleted = 0
@@ -23,20 +23,35 @@ and not exists(
   `)
 }
 
-exports.reportDuplicateFilesOnBackupDevicesAsync = async () => {
+exports.reportFilesOnSourceWithNoBackupAsync = async () => {
   return await db.allAsync(`
-  select d.name deviceName, b.*
-from files b inner join devices d on b.deviceId = d.id
-where b.deviceType = 'backup'
-  and b.deleted = 0
+  select d.name deviceName, d.path devicePath, s.*
+from files s inner join devices d on s.deviceId = d.id
+where s.deviceType = 'source'
+  and s.deleted = 0
 and not exists(
-    select 1 from files b2
-    where b2.deleted = 0 and b2.deviceType ='backup'
-    and b2.hash = b.hash
-    and b2.id != b.id
+    select 1 from files b
+    where b.deleted = 0 and b.deviceType ='backup'
+    and s.hash = b.hash
     )
   `)
 }
+
+exports.reportDuplicateFilesOnDeviceTypeAsync = async (deviceType) => {
+  return await db.allAsync(`
+  select d.name deviceName, b.*
+from files b inner join devices d on b.deviceId = d.id
+where b.deviceType = $deviceType
+  and b.deleted = 0
+and not exists(
+    select 1 from files b2
+    where b2.deleted = 0 and b2.deviceType = $deviceType
+    and b2.hash = b.hash
+    and b2.id != b.id
+    )
+  `, { $deviceType: deviceType })
+}
+
 /*
 Source devices
 ======================================================================================

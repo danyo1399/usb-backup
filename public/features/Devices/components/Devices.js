@@ -11,7 +11,7 @@ import {
   updateBackupDeviceAsync,
   updateSourceDeviceAsync
 } from '../../../queries/index.js'
-import * as globals from '../../../globals.js'
+
 import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
 import { ConfirmDialog } from '../../../components/ConfirmDialog.js'
 import { useFetching } from '../../../hooks.js'
@@ -19,7 +19,8 @@ import { useToast } from '../../../components/Toast.js'
 import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 import constants from '../../../constants.js'
 
-const html = window.html
+import * as globals from '../../../globals.js'
+const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter
 

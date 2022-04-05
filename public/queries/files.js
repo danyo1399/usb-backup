@@ -17,3 +17,16 @@ export async function getFilesByDeviceIdAsync (deviceId) {
   })
   return filesByDeviceId
 }
+
+export async function reportFilesOnSourceWithNoBackupAsync (deviceId) {
+  const { data: { reportFilesOnSourceWithNoBackupAsync } } = await execute({
+    query: `
+            query {
+              reportFilesOnSourceWithNoBackupAsync {
+                id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
+                }
+            }
+        `
+  })
+  return reportFilesOnSourceWithNoBackupAsync
+}

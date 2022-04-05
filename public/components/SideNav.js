@@ -18,10 +18,10 @@ export function SideNav () {
 
               <div class="sidenav-main">
                   <div class="sidenav__menu">
-                  <${SideNavMenuItem} icon="pc" href="${constants.routes.sources}">Source Devices</SideNavMenuItem>
-                  <${SideNavMenuItem} icon="hdd-network" href="${constants.routes.backupDevices}" >Backup Devices</SideNavMenuItem>
-
-                  <${JobsMenuItem}></JobsMenuItem>
+                  <${SideNavMenuItem} icon="pc" href="${constants.routes.sources}">Source Devices<//>
+                  <${SideNavMenuItem} icon="hdd-network" href="${constants.routes.backupDevices}" >Backup Devices<//>
+                  <${SideNavMenuItem} icon="files" href="${constants.routes.getFilesUrl()}" >Files<//>
+                  <${JobsMenuItem}><//>
 
                   </div>
               </div>
