@@ -3,7 +3,7 @@ import * as globals from '../globals.js'
 import { useRowSelector } from '../hooks.js'
 const { html, preactHooks, goober: { css }, classNames } = globals
 
-const { useState, useEffect } = preactHooks
+const { useState, useEffect, useMemo } = preactHooks
 
 function createPathNodes (currentPath) {
   // get rid of leading /
@@ -76,10 +76,10 @@ export function Table ({ node, navigate }) {
 
   `
 
-  const rows = [
+  const rows = useMemo(() => [
     ...(node?.folders || []).map(x => ({ ...x, type: 'folder' })),
     ...(node?.files || []).map(x => ({ ...x, type: 'file' }))
-  ]
+  ], [node])
 
   const { reset, rowClick, selectedRows } = useRowSelector()
   useEffect(() => {
@@ -117,7 +117,7 @@ export function Table ({ node, navigate }) {
 ? html`
       <tr class=${rowClasses(index)} onClick=${() => rowClick(index)}>
         <td>
-          <a class="link" onClick=${(e) => folderClick(row.path, e)}>${row.name}</a>
+          <a key=${row.path} class="link" onClick=${(e) => folderClick(row.path, e)}>${row.name}</a>
         </td>
         <td></td>
         <td></td>
@@ -125,7 +125,7 @@ export function Table ({ node, navigate }) {
       </tr>
       `
             : html`
-      <tr class=${rowClasses(index)} onClick=${() => rowClick(index)}>
+      <tr key=${row.basename} class=${rowClasses(index)} onClick=${() => rowClick(index)}>
         <td>${row.basename}</td><td>${bytesToSize(row.size)}</td>
         <td>${shortDateTimeString(new Date(row.mtimeMs))}</td>
         <td>${row.hash}</td>

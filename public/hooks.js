@@ -2,7 +2,7 @@ import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './queries/devices.js'
 import { jobs$ } from './queries/jobs.js'
-const { useEffect, useState } = globals.preactHooks
+const { useEffect, useState, useMemo } = globals.preactHooks
 
 export function useFormControl (defaultValue) {
   const [value, setValue] = useState(defaultValue)
@@ -164,31 +164,34 @@ export function useFileTree (files) {
   function createNode () {
     return { folders: [], files: [], parent: null }
   }
-  const tree = { '/': createNode() }
-  const folderAddedMap = {}
-  for (const file of files) {
-    const parts = file.relativePath.split('/')
-    const filename = parts.pop()
-    const dirName = parts.join('/')
-    file.basename = filename
-    let previousPath = ''
-    for (const part of parts) {
-      const currentPath = `${previousPath}/${part}`
-      if (!tree[currentPath]) {
-        tree[currentPath] = createNode()
+
+  return useMemo(() => {
+    const tree = { '/': createNode() }
+    const folderAddedMap = {}
+    for (const file of files) {
+      const parts = file.relativePath.split('/')
+      const filename = parts.pop()
+      const dirName = parts.join('/')
+      file.basename = filename
+      let previousPath = ''
+      for (const part of parts) {
+        const currentPath = `${previousPath}/${part}`
+        if (!tree[currentPath]) {
+          tree[currentPath] = createNode()
+        }
+        const parent = !previousPath ? `/${previousPath}` : previousPath
+        tree[currentPath].parent = parent
+        const folderAddedKey = `${parent}-${currentPath}`
+        if (!folderAddedMap[folderAddedKey]) {
+          tree[parent].folders.push({ name: part, path: currentPath })
+          folderAddedMap[folderAddedKey] = true
+        }
+        previousPath = currentPath
       }
-      const parent = !previousPath ? `/${previousPath}` : previousPath
-      tree[currentPath].parent = parent
-      const folderAddedKey = `${parent}-${currentPath}`
-      if (!folderAddedMap[folderAddedKey]) {
-        tree[parent].folders.push({ name: part, path: currentPath })
-        folderAddedMap[folderAddedKey] = true
-      }
-      previousPath = currentPath
+      tree[`/${dirName}`].files.push(file)
     }
-    tree[`/${dirName}`].files.push(file)
-  }
-  return tree
+    return tree
+  }, [files])
 }
 
 export function useApiData (apiFn, defaultValue) {
