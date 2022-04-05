@@ -1,9 +1,10 @@
 
 import Link from '../components/Link.js'
+import PaginationButtons from '../components/PaginationButtons.js'
 import Tabs from '../components/Tabs.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
-import { useApiData } from '../index.js'
+import { useApiData, usePagination } from '../index.js'
 import { reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
@@ -95,6 +96,8 @@ function PendingPage () {
 }
 
 function FileTable ({ data }) {
+  const pagination = usePagination(data, 15)
+  const { page } = pagination
   return html`
   <table className="table">
   <thead>
@@ -105,7 +108,7 @@ function FileTable ({ data }) {
     </tr>
   </thead>
   <tbody>
-    ${data.map(x => html`
+    ${page.map(x => html`
     <tr>
       <td>
         ${x.deviceName}
@@ -120,6 +123,7 @@ function FileTable ({ data }) {
   </tbody>
 </table>
 
+<${PaginationButtons} ...${pagination} />
   `
 }
 function cleanPath (devicePath, relativePath) {

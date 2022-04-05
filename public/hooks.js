@@ -194,6 +194,46 @@ export function useFileTree (files) {
   }, [files])
 }
 
+export function usePagination (items, itemsPerPage) {
+  const [pageNo, setPageNo] = useState(1)
+  const page = items.slice((pageNo - 1) * itemsPerPage, pageNo * itemsPerPage)
+  const lastPageNo = Math.ceil(items.length / itemsPerPage)
+
+  const isLast = pageNo === lastPageNo
+  const hasPrevious = pageNo !== 1
+  const hasNext = pageNo !== lastPageNo
+
+  function nextPage () {
+    setPageNo(x => x < lastPageNo ? x + 1 : x)
+  }
+
+  function previousPage () {
+    setPageNo(x => x > 1 ? x - 1 : x)
+  }
+
+  function firstPage () {
+    setPageNo(1)
+  }
+
+  function lastPage () {
+    setPageNo(lastPageNo)
+  }
+
+  return {
+    page,
+    nextPage,
+    previousPage,
+    firstPage,
+    lastPage,
+    pageNo,
+    setPageNo,
+    lastPageNo,
+    isLast,
+    hasPrevious,
+    hasNext
+  }
+}
+
 export function useApiData (apiFn, defaultValue) {
   const [data, setData] = useState(defaultValue)
 
