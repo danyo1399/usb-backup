@@ -1,9 +1,34 @@
 import { Modal } from './Modal.js'
 import * as globals from '../../globals.js'
-const { useRef } = globals.preactHooks
+const { useRef, useState } = globals.preactHooks
 const { html } = globals
 
 let id = 1
+
+export function useConfirm () {
+  const [show, setShow] = useState(false)
+  const [args, setArgs] = useState()
+  const confirmRef = useRef()
+  function onCancel () {
+    setShow(false)
+    setArgs(null)
+    confirmRef.current = null
+  }
+
+  function prompt (onConfirm, args) {
+    confirmRef.current = onConfirm
+    setArgs(args)
+    setShow(true)
+  }
+
+  function onConfirm () {
+    setShow(false)
+    setArgs(null)
+    confirmRef.current()
+    confirmRef.current = null
+  }
+  return { confirmProps: { show, onCancel, onConfirm, args }, prompt }
+}
 
 export function ConfirmDialog ({ show, onConfirm, onCancel, header, body }) {
   const idRef = useRef(`confirm-dialog-${id++}`)
