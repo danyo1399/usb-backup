@@ -9,7 +9,7 @@ describe('crypto tests', () => {
     it('can copy and hash file', async function () {
       const srcFile = path.resolve(env.tempPath, 'testfile')
       const destFile = path.resolve(env.tempPath, 'testfile.out')
-      await env.createDummyFile('testfile', 1024 * 1024 * 10) // 10mb
+      await env.createDummyFileAsync('testfile', 1024 * 1024 * 10) // 10mb
       const copyHash = await copyAndHashAsync(srcFile, destFile)
 
       const srcHash = await hashFileAsync(srcFile)

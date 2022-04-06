@@ -13,12 +13,12 @@ import {
 } from '../../../queries/index.js'
 
 import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
-import { ConfirmDialog } from '../../../components/ConfirmDialog.js'
+import { ConfirmDialog, useConfirm } from '../../../components/ConfirmDialog.js'
 import { useFetching } from '../../../hooks.js'
 import { useToast } from '../../../components/Toast.js'
 import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 import constants from '../../../constants.js'
-
+ import { createRemoveBackupDuplicatesJobAsync } from '../../../queries/jobs.js'
 import * as globals from '../../../globals.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
@@ -84,9 +84,11 @@ export default function Devices ({ variant }) {
     route(constants.routes.getViewFilesUrl(device.id))
   }
 
-  const [deleting, setDeleting] = useState(null)
+  const { confirmProps: deleteDeviceProps, prompt: deleteDevicePrompt } = useConfirm()
+
+  const { confirmProps: dedupConfirmProps, prompt: dedupConfirmPrompt } = useConfirm()
+
   async function deleteDevice (device) {
-    setDeleting(null)
     await doFetch(async () => {
       await removeDevice(device)
       // we need to set it here too else the toast wont work
@@ -99,8 +101,15 @@ export default function Devices ({ variant }) {
       })
     })
   }
+
   function onDeleteDevice (device) {
-    setDeleting(device)
+    deleteDevicePrompt(() => deleteDevice(device), device)
+  }
+
+  function onDeleteDuplicates () {
+    dedupConfirmPrompt(() => {
+      createRemoveBackupDuplicatesJobAsync(...selectedDevices.map(x => x.id))
+    })
   }
 
   return html`
@@ -118,6 +127,7 @@ export default function Devices ({ variant }) {
         <span class="device-actions__label">Actions:</span> <div class="btn-group mt-3 mb-3" data-hidden=${!anyDevicesSelected} role="group" aria-label="Action Bar">
           <button type="button" class="btn btn-outline-primary" onClick=${onScanDevicesJobAsync}>Scan Devices</button>
           <button type="button" class="btn btn-outline-primary" data-hidden=${variant === 'backup'} onClick=${onCreateBackupJob}>Perform Backup</button>
+          <button type="button" class="btn btn-outline-primary" data-hidden=${variant === 'source'} onClick=${onDeleteDuplicates}>Delete Duplicates</button>
         </div>
         </div>
 
@@ -157,11 +167,15 @@ export default function Devices ({ variant }) {
       />
 
         <${ConfirmDialog}
-        onCancel=${() => setDeleting(null)}
-        onConfirm=${() => deleteDevice(deleting)}
-        show=${deleting}
+        ...${deleteDeviceProps}
         header="Are you sure?"
-        body="Do you want to delete source [${deleting?.name}]"
+        body="Do you want to delete source [${deleteDeviceProps.args?.name}]"
+      / >
+
+      <${ConfirmDialog}
+        ...${dedupConfirmProps}
+        header="Are you sure?"
+        body="Do you want to delete duplicate files"
       / >
 
     `

@@ -16,6 +16,7 @@ const { defaultLogger } = require('../logging')
 const { toGraphqlErrorSection } = require('./utils')
 const { emptyError } = require('../errors')
 const { deviceInfo } = require('../deviceInfo')
+const { createRemoveBackupDuplicatesJobAsync } = require('../jobs/removeBackupDuplicatesJob')
 
 function sourceDeviceMutations () {
   const CreateSourceDeviceRequest = new GraphQLInputObjectType({
@@ -214,11 +215,42 @@ function jobMutations () {
       backupDeviceId: { type: new GraphQLNonNull(GraphQLString) }
     }
   })
+
+  const DeleteDuplicatesRequest = new GraphQLInputObjectType({
+    name: 'DeleteDuplicatesRequest',
+    fields: {
+      backupDeviceIds: {
+        type: new GraphQLNonNull(new GraphQLList(GraphQLString))
+      }
+    }
+  })
+
   return {
     refreshDeviceInfo: {
       type: GenericErrorResponse,
       resolve: async () => {
         await deviceInfo.refresh()
+      }
+    },
+    removeBackupDuplicatesJob: {
+      type: GenericErrorResponse,
+      args: {
+        input: { type: DeleteDuplicatesRequest }
+      },
+      resolve: async (_, args) => {
+        let response
+        const {
+          input: { backupDeviceIds }
+        } = args
+
+        try {
+          const job = await createRemoveBackupDuplicatesJobAsync(...backupDeviceIds)
+          runJobAsync(job)
+        } catch (err) {
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('remove backup duplicates job error', response)
+        }
+        return response || emptyError()
       }
     },
     backupDevices: {
@@ -237,7 +269,7 @@ function jobMutations () {
           runJobAsync(job)
         } catch (err) {
           response = toGraphqlErrorSection(err)
-          defaultLogger.error('edit backup device error', response)
+          defaultLogger.error('backup devices error', response)
         }
         return response || emptyError()
       }

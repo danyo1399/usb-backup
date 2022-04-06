@@ -12,7 +12,7 @@ describe('app tests', () => {
   })
 
   it('throws an error when path already is a source device', async function () {
-    await env.createDummyFile('123.usbb', 10)
+    await env.createDummyFileAsync('123.usbb', 10)
     const promise = app.createSourceDeviceAsync({ name: 'name', path: env.tempPath })
     await expect(promise).rejects.toMatchInlineSnapshot('[Error: existingSource]')
   })

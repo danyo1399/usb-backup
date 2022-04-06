@@ -7,6 +7,7 @@ const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
 const app = require('../src/app')
 const { migrateDbAsync } = require('../src/migration')
+const { createScanDeviceJobAsync } = require('../src/jobs/scanDeviceJob')
 
 const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')
@@ -81,6 +82,12 @@ exports.createDevicesAsync = async (env, sourceDeviceId, backupDeviceId) => {
   return { sourceDevice, backupDevice }
 }
 
+exports.scanDeviceAsync = async (deviceId) => {
+  const scanJob = await createScanDeviceJobAsync({ sourceDeviceIds: [deviceId] })
+  await jobManager.runJobAsync(scanJob)
+  exports.assertJobLogHasNoErrors(scanJob.id)
+}
+
 exports.setupTestEnvironment = () => {
   const id = newId()
   const tempPath = path.resolve(tempRootPath, id).replaceAll('\\', '/')
@@ -123,7 +130,7 @@ exports.setupTestEnvironment = () => {
     })
   }
 
-  const createDummyFile = (filePath, size) => {
+  const createDummyFileAsync = (filePath, size) => {
     return new Promise((resolve, reject) => {
       try {
         const filename = path.join(tempPath, filePath)
@@ -152,5 +159,5 @@ exports.setupTestEnvironment = () => {
     await fs.rm(tempPath, { force: true, recursive: true, maxRetries: 3, retryDelay: 100 })
   })
 
-  return { tempPath, tempPathNormalised, createDummyFolder, setupDb, createDummyFile, createSourcePath, createBackupPath }
+  return { tempPath, tempPathNormalised, createDummyFolder, setupDb, createDummyFileAsync, createSourcePath, createBackupPath }
 }

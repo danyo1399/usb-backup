@@ -6,7 +6,7 @@ import { deviceInfo$ } from '../../../queries/index.js'
 
 const html = globals.html
 
-export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles, onCreateBackupJob }) {
+export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
   if (devices.length === 0) {
     return null
   }

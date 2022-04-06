@@ -17,14 +17,14 @@ describe('path tests', () => {
       })
 
       it('generates unique filename where filename exists', async function () {
-        const filename = await env.createDummyFile('test.txt')
+        const filename = await env.createDummyFileAsync('test.txt')
         const result = await findUniqueFilenameAsync(filename)
         expect(result).toBe(path.join(env.tempPath, 'test 001.txt'))
       })
 
       it('generates unique filename where multiple filenames exists', async function () {
-        const filename = await env.createDummyFile('test.txt')
-        await env.createDummyFile('test 001.txt')
+        const filename = await env.createDummyFileAsync('test.txt')
+        await env.createDummyFileAsync('test 001.txt')
         const result = await findUniqueFilenameAsync(filename)
         expect(result).toBe(path.join(env.tempPath, 'test 002.txt'))
       })

@@ -58,9 +58,9 @@ describe('backup device job', function () {
       ctx.logs = jobManager.getJobLog(ctx.job.id)
     })
 
-    it('create database files records and updates device info', async function () {
+    it('create database files records and updates device info, and files backed up without duplicates', async function () {
       const { sourceDevice, backupDevice } = ctx.state
-      const deviceFiles = await getFilesByDeviceAsync(backupDevice.id)
+      const backupDeviceFiles = await getFilesByDeviceAsync(backupDevice.id)
 
       const updatedSourceDevice = await getDeviceByIdAsync(sourceDevice.id)
       expect(updatedSourceDevice.lastBackupDate).toBeGreaterThan(0)
@@ -69,14 +69,14 @@ describe('backup device job', function () {
       const updatedBackupDevice = await getDeviceByIdAsync(backupDevice.id)
       expect(updatedBackupDevice.lastScanDate).toBeGreaterThan(0)
 
-      for (const file of deviceFiles) {
+      for (const file of backupDeviceFiles) {
         expect(file.deviceId).toEqual(backupDevice.id)
         expect(file.addDate).toBeGreaterThan(1648240150900)
         expect(file.birthtimeMs).toBeLessThanOrEqual(file.addDate)
         expect(file.mtimeMs).toBeLessThanOrEqual(file.addDate)
         expect(file.deviceType).toBe('backup')
       }
-      const fileSnapshotToCompare = deviceFiles.map(({ relativePath, size, hash }) => ({ relativePath, size, hash }))
+      const fileSnapshotToCompare = backupDeviceFiles.map(({ relativePath, size, hash }) => ({ relativePath, size, hash }))
       const tempPath = env.tempPathNormalised.substring(1) // remove leading slash/
       expect(fileSnapshotToCompare).toMatchInlineSnapshot(`
 Array [
@@ -112,6 +112,25 @@ Array [
     it('should backup files to disk', async function () {
       const { backupDevice, job } = ctx.state
 
+      testUtils.assertJobLogHasNoErrors(job.id)
+      const files = glob.sync(`${backupDevice.path}/**/*`, {})
+        .filter(filename => path.extname(filename) !== '') // Remove folders
+
+      expect(files).toMatchInlineSnapshot(`
+Array [
+  "${env.tempPath}/backup/8f4929d058d3f3bfde84945ccff36978.usbb",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/ico.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/ico2.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/subfolder2/ico3.png",
+  "${env.tempPath}/backup${env.tempPathNormalised}/source/subfolder/subfolder2/ico4.jfif",
+]
+`)
+    })
+
+    it('should not change backup files if job ran twice', async function () {
+      const { backupDevice, job } = ctx.state
+      job.id++
+      await jobManager.runJobAsync(job)
       testUtils.assertJobLogHasNoErrors(job.id)
       const files = glob.sync(`${backupDevice.path}/**/*`, {})
         .filter(filename => path.extname(filename) !== '') // Remove folders
