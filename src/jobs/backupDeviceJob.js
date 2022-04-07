@@ -84,7 +84,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
   }
 
   async function handleBackupFileError (error, log, context) {
-    log.error(`failed backing up file ${context.sourceFile.relativePath}. Skipping`, error)
+    log.error(`failed backing up file ${context.sourceFile.relativePath}. Skipping (${error.message})`, error)
 
     if (context.tempFilename) {
       try {
