@@ -169,7 +169,7 @@ export default function Devices ({ variant }) {
         <${ConfirmDialog}
         ...${deleteDeviceProps}
         header="Are you sure?"
-        body="Do you want to delete source [${deleteDeviceProps.args?.name}] ${deleteDeviceProps.args?.description}"
+        body="Do you want to delete device [${deleteDeviceProps.args?.name}] ${deleteDeviceProps.args?.description}"
       / >
 
       <${ConfirmDialog}
