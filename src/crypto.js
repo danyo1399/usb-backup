@@ -1,6 +1,7 @@
 
 const crypto = require('crypto')
 const fs = require('fs-extra')
+const { pipeline } = require('stream')
 
 /**
  * Generates an MD5 hash of the file contents
@@ -54,8 +55,8 @@ exports.copyAndHashAsync = function (src, dest) {
   return new Promise((resolve, reject) => {
     try {
       const shasum = crypto.createHash(algorithm)
-      const srcStream = fs.ReadStream(src)
-      const destStream = fs.WriteStream(dest)
+      const srcStream = fs.createReadStream(src)
+      const destStream = fs.createWriteStream(dest)
 
       srcStream.on('data', function (data) {
         shasum.update(data)
@@ -66,15 +67,8 @@ exports.copyAndHashAsync = function (src, dest) {
         const hash = shasum.digest('hex')
         resolve(hash)
       })
-      srcStream.on('error', function (err) {
-        reject(err)
-      })
 
-      destStream.on('error', function (err) {
-        reject(err)
-      })
-
-      srcStream.pipe(destStream)
+      pipeline(srcStream, destStream, err => err ? reject(err) : resolve())
     } catch (error) {
       return reject(error)
     }

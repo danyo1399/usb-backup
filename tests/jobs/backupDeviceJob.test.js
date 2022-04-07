@@ -55,6 +55,7 @@ describe('backup device job', function () {
   describe('backup all files', function () {
     beforeEach(async function () {
       await jobManager.runJobAsync(ctx.job)
+      testUtils.assertJobLogHasNoErrors(ctx.job.id)
       ctx.logs = jobManager.getJobLog(ctx.job.id)
     })
 
