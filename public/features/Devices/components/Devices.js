@@ -18,7 +18,7 @@ import { useFetching } from '../../../hooks.js'
 import { useToast } from '../../../components/Toast.js'
 import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 import constants from '../../../constants.js'
- import { createRemoveBackupDuplicatesJobAsync } from '../../../queries/jobs.js'
+import { createRemoveBackupDuplicatesJobAsync } from '../../../queries/jobs.js'
 import * as globals from '../../../globals.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks

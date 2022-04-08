@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const { defaultLogger } = require('./logging')
 
 let migrations = [
-  async () => {
+  async function migration000 () {
     await execAsync(`
     CREATE TABLE IF NOT EXISTS devices (
         id TEXT PRIMARY KEY,
@@ -33,12 +33,12 @@ let migrations = [
     create index idx_files_hash on files(hash);
     `)
   },
-  async () => {
+  async function migration001 () {
     await execAsync(`
     create index idx_files_relativePath_mtimeMs on files(relativePath, mtimeMs)
   `)
   },
-  async () => {
+  async function migration002 () {
     await execAsync(`
     create table files_dg_tmp
 (
@@ -83,6 +83,12 @@ create index idx_files_relativePath_mtimeMs
     on files (relativePath, mtimeMs);
 
 
+    `)
+  },
+  async function migration003 () {
+    await execAsync(`
+    alter table devices add freeSpace INTEGER;
+    alter table devices add totalSpace INTEGER;
     `)
   }
 ]

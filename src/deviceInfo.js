@@ -1,4 +1,4 @@
-const { getAllDevicesAsync } = require('./repo')
+const { getAllDevicesAsync, updateDeviceFreeSpace } = require('./repo')
 
 const { EventEmitter } = require('events')
 const { defaultLogger } = require('./logging')
@@ -34,6 +34,10 @@ exports.deviceInfo = {
           const space = await checkDiskSpace(device.path)
           freeSpace = space.free
           totalSpace = space.size
+          await updateDeviceFreeSpace(device.id, space.free, space.size)
+        } else {
+          freeSpace = device.freeSpace
+          totalSpace = device.totalSpace
         }
       } catch (error) {
         defaultLogger.error('Error reading free space', error)

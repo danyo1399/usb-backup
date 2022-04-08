@@ -54,9 +54,17 @@ and exists(
 }
 
 /*
-Source devices
+devices
 ======================================================================================
 */
+
+exports.updateDeviceFreeSpace = async (id, freeSpace, totalSpace) => {
+  await db.runAsync(`
+  update devices set freeSpace = ?, totalSpace = ?
+  where id = ?
+  `, freeSpace, totalSpace, id)
+}
+
 exports.addDeviceAsync = async function ({ deviceType, id, name, description, path }) {
   const lastScanDate = 0
   const lastBackupDate = 0
