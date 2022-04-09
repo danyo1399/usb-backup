@@ -7,7 +7,7 @@ const html = globals.html
 const { useState } = globals.preactHooks
 
 export default function ViewFiles ({ deviceId }) {
-  const files = useApiData(() => getFilesByDeviceIdAsync(deviceId), [])
+  const files = useApiData(getFilesByDeviceIdAsync, deviceId) || []
   const tree = useFileTree(files)
   const [path, setPath] = useState('/')
   const device = useDevice(deviceId)

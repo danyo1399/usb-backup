@@ -36,7 +36,7 @@ export default function Files ({ tab }) {
 function Removed () {
   const styles = css`
   `
-  const data = useApiData(reportFilesOnBackupWithNoSourceAsync, [])
+  const data = useApiData(reportFilesOnBackupWithNoSourceAsync) || []
 
   return html`
   <div class=${styles}>
@@ -80,7 +80,7 @@ function Duplicates () {
   `
 
   const [filter, setFilter] = useState('source')
-  const data = useApiData(filter === 'backup' ? reportDuplicateFilesOnBackupDevicesAsync : reportDuplicateFilesOnSourceDevicesAsync, [])
+  const data = useApiData(filter === 'backup' ? reportDuplicateFilesOnBackupDevicesAsync : reportDuplicateFilesOnSourceDevicesAsync) || []
 
   return html`
   <div class=${styles}>
@@ -102,7 +102,7 @@ function Duplicates () {
 function PendingPage () {
   const styles = css`
   `
-  const data = useApiData(reportFilesOnSourceWithNoBackupAsync, [])
+  const data = useApiData(reportFilesOnSourceWithNoBackupAsync) || []
 
   return html`
   <div class=${styles}>
