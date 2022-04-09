@@ -69,6 +69,19 @@ function deviceMutations () {
   })
 
   return {
+    refreshDeviceInfo: {
+      type: GenericErrorResponse,
+      resolve: async () => {
+        let response
+        try {
+          await deviceInfo.refresh()
+        } catch (err) {
+          response = toGraphqlErrorSection(err)
+        }
+        return response || { error: null }
+      }
+    },
+
     updateBackupDevice: {
       type: GenericErrorResponse,
       args: {
@@ -109,6 +122,7 @@ function deviceMutations () {
         return response
       }
     },
+
     removeDevice: {
       type: GenericErrorResponse,
       args: {
@@ -204,12 +218,6 @@ function jobMutations () {
   })
 
   return {
-    refreshDeviceInfo: {
-      type: GenericErrorResponse,
-      resolve: async () => {
-        await deviceInfo.refresh()
-      }
-    },
     removeBackupDuplicatesJob: {
       type: GenericErrorResponse,
       args: {

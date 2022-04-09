@@ -2,7 +2,7 @@ import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './queries/devices.js'
 import { jobs$ } from './queries/jobs.js'
-const { useEffect, useState, useMemo } = globals.preactHooks
+const { useEffect, useState, useMemo, useCallback } = globals.preactHooks
 
 export function useFormControl (defaultValue) {
   const [value, setValue] = useState(defaultValue)
@@ -133,6 +133,15 @@ export function useIteratorState (getIterator, getItems) {
   return state
 }
 
+export function useEventListener (obj, event, callback) {
+  useEffect(() => {
+    obj.addEventListener(event, callback)
+    return () => {
+      obj.removeEventListener(event, callback)
+    }
+  }, obj, event, callback)
+}
+
 export function useKeyDownMonitor (key) {
   const [state, setState] = useState(false)
   useEffect(() => {
@@ -148,16 +157,25 @@ export function useKeyDownMonitor (key) {
       setState(false)
     }
 
-    window.addEventListener('keydown', keyDown)
-    window.addEventListener('keyup', keyUp)
-    window.addEventListener('blur', blur)
-    return () => {
-      window.removeEventListener('keyup', keyUp)
-      window.removeEventListener('keydown', keyDown)
-      window.removeEventListener('blur', blur)
-    }
+    useEventListener(window, 'keydown', keyDown)
+    useEventListener(window, 'keyup', keyUp)
+    useEventListener(window, 'blur', blur)
   }, [])
   return state
+}
+
+const isVisible = () => {
+  const visibilityState = document.visibilityState
+  return visibilityState == null || visibilityState !== 'hidden'
+}
+export function useOnFocus (callback) {
+  const _callback = useCallback(() => {
+    if (isVisible()) {
+      callback()
+    }
+  }, [callback])
+  useEventListener(document, 'visibilitychange', _callback)
+  useEventListener(window, 'focus', _callback)
 }
 
 export function useFileTree (files) {

@@ -59,6 +59,7 @@ export async function updateSourceDeviceAsync ({ id, name, description, path }) 
     }
   })
 
+  handleResponseError(response)
   return response
 }
 
@@ -173,6 +174,20 @@ export async function updateBackupDeviceAsync ({ id, name, description, path }) 
     }
   })
 
+  handleResponseError(response)
+  return response
+}
+
+export async function refreshDeviceInfoAsync () {
+  const response = await execute({
+    query: `
+    mutation {
+      refreshDeviceInfo {
+        error {code, message}
+      }
+    }`
+  })
+  handleResponseError(response)
   return response
 }
 

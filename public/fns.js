@@ -29,6 +29,7 @@ export function isUnknownError (error) {
 }
 
 export function handleResponseError (response) {
+  if (!response) return
   const data = response.data
 
   for (const x of Object.values(data)) {

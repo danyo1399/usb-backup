@@ -1,6 +1,7 @@
 import { useFetching, useFormControl } from '../../../hooks.js'
 import { useToast, Dialog, Alert, Button } from '../../../components/index.js'
 import * as globals from '../../../globals.js'
+import { refreshDeviceInfoAsync } from '../../../queries/index.js'
 const { html, preactHooks } = globals
 
 const { useEffect } = preactHooks
@@ -58,6 +59,7 @@ export default function ManageDeviceDialog ({
 
       setShow(false)
       loadDevices()
+      refreshDeviceInfoAsync()
       addToast({
         header: 'Success',
         body: 'Device created successfully',
