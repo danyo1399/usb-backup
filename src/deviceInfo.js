@@ -20,15 +20,27 @@ function sendUpdate ({ id, freeSpace, totalSpace, isOnline }) {
 
 async function processPath (path) {
   try {
+    defaultLogger.info(`Getting device info for path ${path}`)
     const id = await getDeviceIdForPathAsync(path)
     if (id) {
-      const { free, size } = await checkDiskSpace(path)
-      // The path could have changed for the device. Lets update it
-      await updateDeviceInfo(id, free, size, path)
+      defaultLogger.info(`found device id ${id} at path ${path}`)
+      let free, size
+      try {
+        const space = await checkDiskSpace(path)
+        free = space.free
+        size = space.size
+        // The path could have changed for the device. Lets update it
+        await updateDeviceInfo(id, free, size, path)
+      } catch (error) {
+        defaultLogger.info('failed to retrieve free space for path', path)
+      }
+
       return sendUpdate({ id, freeSpace: free, totalSpace: size, isOnline: true })
+    } else {
+      defaultLogger.info('No device found at path', path)
     }
   } catch (error) {
-    console.warn('failed to process device info for path ' + path, error)
+    defaultLogger.warn('failed to process device info for path ' + path, error)
   }
 }
 
@@ -51,6 +63,7 @@ const createDeviceInfoService = exports._createDeviceInfoService = () => (
       this.devices = devices.map(device => {
         let deviceInfo = updatedDeviceInfos.find(x => x.id === device.id)
         if (!deviceInfo) {
+          defaultLogger.info('Device not online. Sending last known info', device)
           deviceInfo = sendUpdate({ ...device, isOnline: false })
         }
 

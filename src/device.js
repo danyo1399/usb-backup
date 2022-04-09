@@ -1,13 +1,10 @@
 const _path = require('path')
 const fs = require('fs-extra')
-const util = require('util')
-const glob = util.promisify(require('glob'))
+const { defaultLogger } = require('./logging')
 
-const FILE_SUFFIX = '.usbb'
-const META_FILE_GLOB = `*${FILE_SUFFIX}`
-
+const METAFILE_SUFFIX = '.usbb'
 function getMetaFilePath ({ path, id }) {
-  return _path.join(path, `${id}${FILE_SUFFIX}`)
+  return _path.join(path, `${id}${METAFILE_SUFFIX}`)
 }
 exports.getMetaFilePath = getMetaFilePath
 
@@ -18,12 +15,15 @@ exports.deviceName = (device) => {
 
 exports.getDeviceIdForPathAsync = async (path) => {
   try {
-    const files = await glob(_path.join(path, META_FILE_GLOB))
+    const files = (await fs.readdir(path)).filter(x => x.endsWith(METAFILE_SUFFIX))
     if (files.length > 0) {
       const filename = _path.basename(files[0])
       return filename.slice(0, filename.length - 5)
+    } else {
+      defaultLogger.info('no device found at path', path)
     }
   } catch (error) {
+    defaultLogger.warn(`Error occured reading path ${path}`, error)
     // NOOP Device could be offline
   }
   return null
@@ -45,7 +45,7 @@ exports.isDeviceOnlineAsync = async ({ path, id }) => {
  * Could be used in future to restore a lost database from the meta data files
  */
 exports.createDeviceMetaFileAsync = async (device, files = []) => {
-  const file = _path.join(device.path, `${device.id}${FILE_SUFFIX}`)
+  const file = _path.join(device.path, `${device.id}${METAFILE_SUFFIX}`)
 
   await fs.writeJson(file, { ...device, files })
 }
@@ -61,7 +61,7 @@ exports.loadDeviceMetafileAsync = async (device) => {
  * @returns true if it is, else false
  */
 exports.isExistingDeviceAsync = async (path) => {
-  const files = await glob(_path.join(path, META_FILE_GLOB))
+  const files = (await fs.readdir(path)).filter(x => x.endsWith(METAFILE_SUFFIX))
   return files.length > 0
 }
 
