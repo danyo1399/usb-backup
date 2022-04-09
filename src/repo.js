@@ -58,11 +58,12 @@ devices
 ======================================================================================
 */
 
-exports.updateDeviceFreeSpace = async (id, freeSpace, totalSpace) => {
+// Updates device from device info device query
+exports.updateDeviceInfo = async (id, freeSpace, totalSpace, path) => {
   await db.runAsync(`
-  update devices set freeSpace = ?, totalSpace = ?
+  update devices set freeSpace = ?, totalSpace = ?, path = ?
   where id = ?
-  `, freeSpace, totalSpace, id)
+  `, freeSpace, totalSpace, path, id)
 }
 
 exports.addDeviceAsync = async function ({ deviceType, id, name, description, path }) {

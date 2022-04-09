@@ -144,6 +144,16 @@ Array [
 ]
 `)
   })
+  it('can update space info', async function () {
+    const device = await createSourceDeviceAsync()
+
+    await repo.updateDeviceInfo(device.id, 123, 456)
+
+    const reloadedDevice = await repo.getDeviceByIdAsync(device.id)
+
+    expect(reloadedDevice.freeSpace).toBe(123)
+    expect(reloadedDevice.totalSpace).toBe(456)
+  })
 
   it('can delete a source device', async () => {
     const sourceFile = await createSourceFileAsync()

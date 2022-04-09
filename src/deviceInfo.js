@@ -1,16 +1,70 @@
-const { getAllDevicesAsync, updateDeviceFreeSpace } = require('./repo')
+const { getAllDevicesAsync, updateDeviceInfo } = require('./repo')
 
 const { EventEmitter } = require('events')
 const { defaultLogger } = require('./logging')
-const { isDeviceOnlineAsync } = require('./device')
+const { getDeviceIdForPathAsync } = require('./device')
 const { default: checkDiskSpace } = require('check-disk-space')
-const { createEmitterAsyncIterator } = require('./utils')
+const { createEmitterAsyncIterator, removeDuplicates, prop, map } = require('./utils')
 
 const EVENTS = { DEVICES_UPDATED: 'DEVICES_UPDATED' }
 const eventEmitter = new EventEmitter({ captureRejections: true })
 eventEmitter.on('error', (err) => {
   defaultLogger.error('device info error', err)
 })
+
+function sendUpdate ({ id, freeSpace, totalSpace, isOnline }) {
+  const newDevice = { id, freeSpace, totalSpace, isOnline }
+  eventEmitter.emit(EVENTS.DEVICES_UPDATED, newDevice)
+  return newDevice
+}
+
+async function processPath (path) {
+  const id = await getDeviceIdForPathAsync(path)
+  if (id) {
+    const { free, size } = await checkDiskSpace(path)
+    // The path could have changed for the device. Lets update it
+    await updateDeviceInfo(id, free, size, path)
+    return sendUpdate({ id, freeSpace: free, totalSpace: size, isOnline: true })
+  }
+}
+
+
+const createDeviceInfoService = exports._createDeviceInfoService = () => (
+  {
+    devices: [],
+    async refresh () {
+      const devices = await getAllDevicesAsync()
+
+      // We iterate by unique paths instead of devices so we can
+      // update devices that can be mounted on different paths.
+      // EG a usb drive could be mounted on d:\ or e:\
+      const getDevicePaths = map(prop('path'))
+      const paths = getDevicePaths(devices)
+      const uniquePaths = removeDuplicates(paths)
+      const processPathPromises = uniquePaths.map(p => processPath(p))
+
+      const updatedDeviceInfos = (await Promise.all(processPathPromises)).filter(x => x != null)
+
+      this.devices = devices.map(device => {
+        let deviceInfo = updatedDeviceInfos.find(x => x.id === device.id)
+        if (!deviceInfo) {
+          deviceInfo = sendUpdate({ ...device, isOnline: false })
+        }
+
+        return deviceInfo
+      })
+
+      return this.devices
+    },
+    iterator () {
+      // Send last known device infos while we refresh
+      const iterator = createEmitterAsyncIterator(eventEmitter, EVENTS.DEVICES_UPDATED, { initialItems: this.devices })
+
+
+      this.refresh()
+      return iterator
+    }
+  })
 
 /**
  * Retrives connected device info such as online, free disk space, total size
@@ -19,44 +73,4 @@ eventEmitter.on('error', (err) => {
  * It can take a long time to enumerate devices if some devices are offline network devices as
  * we need to wait for a timeout.
  */
-exports.deviceInfo = {
-  devices: [],
-  async refresh () {
-    const devices = await getAllDevicesAsync()
-    const promises = devices.map(async device => {
-      let freeSpace
-      let totalSpace
-      let isOnline
-      try {
-        isOnline = await isDeviceOnlineAsync(device)
-
-        if (isOnline) {
-          const space = await checkDiskSpace(device.path)
-          freeSpace = space.free
-          totalSpace = space.size
-          await updateDeviceFreeSpace(device.id, space.free, space.size)
-        } else {
-          freeSpace = device.freeSpace
-          totalSpace = device.totalSpace
-        }
-      } catch (error) {
-        defaultLogger.error('Error reading free space', error)
-        // NOOP
-      }
-
-      const newDevice = { id: device.id, freeSpace, totalSpace, isOnline }
-      eventEmitter.emit(EVENTS.DEVICES_UPDATED, newDevice)
-      return newDevice
-    })
-
-    this.devices = await Promise.all(promises)
-    // This isnt right because some could take forever to return
-
-    return this.devices
-  },
-  iterator () {
-    const iterator = createEmitterAsyncIterator(eventEmitter, EVENTS.DEVICES_UPDATED)
-    this.refresh()
-    return iterator
-  }
-}
+exports.deviceInfo = createDeviceInfoService()

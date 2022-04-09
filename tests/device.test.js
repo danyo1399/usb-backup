@@ -1,4 +1,4 @@
-const { isMetafile, isExistingDeviceAsync, isDeviceOnlineAsync, loadDeviceMetafileAsync } = require('../src/device')
+const { isMetafile, isExistingDeviceAsync, isDeviceOnlineAsync, loadDeviceMetafileAsync, getDeviceIdForPathAsync } = require('../src/device')
 const { assertNewMetafileCorrect } = require('./assertions')
 const { setupTestEnvironment, createDevicesAsync, createContext } = require('./common')
 
@@ -25,6 +25,18 @@ describe('device tests', function () {
     it('can load device metafile', async function () {
       const metafile = await loadDeviceMetafileAsync(ctx.sourceDevice)
       assertNewMetafileCorrect(ctx.sourceDevice, metafile)
+    })
+
+    it('can determine device id for path', async function () {
+      const deviceId = await getDeviceIdForPathAsync(ctx.sourceDevice.path)
+
+      expect(deviceId).toBe(ctx.sourceDevice.id)
+    })
+
+    it('returns null when path is not for device', async function () {
+      const deviceId = await getDeviceIdForPathAsync(ctx.sourceDevice.path + 'gibberish')
+
+      expect(deviceId).toBe(null)
     })
   })
 

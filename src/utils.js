@@ -16,7 +16,7 @@ const curry = exports.curry = function (func) {
   }
 }
 
-exports.pipe = (...args) => {
+const pipe = exports.pipe = (...args) => {
   return (...firstArgs) => {
     let result = firstArgs
     args.forEach(fn => {
@@ -43,14 +43,20 @@ exports.runOnce = (fnAsync) => {
   }
 }
 
+exports.removeDuplicates = (arr) => {
+  return Object.keys(arr.reduce((acu, curr) => ({ ...acu, [curr]: null }), {}))
+}
+
+exports.map = curry((fn, arr) => arr.map(fn))
+
 exports.project = curry((props, list) =>
   list.map(x => props.reduce((prev, curr) => ({ ...prev, [curr]: x[curr] }), {})))
 
 exports.identity = (value) => value
 
-exports.prop = name => {
-  return (obj) => obj[name]
-}
+exports.prop = curry((name, obj) => {
+  return obj[name]
+})
 
 exports.newId = function () {
   return crypto.randomBytes(16).toString('hex')

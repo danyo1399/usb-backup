@@ -73,12 +73,16 @@ function convertIteratorToCallback (iterator, cb) {
 }
 exports.convertIteratorToCallback = convertIteratorToCallback
 
+const createBackupDeviceAsync = exports.createBackupDeviceAsync = async (env, backupDeviceId) => {
+  const backupPath = await env.createBackupPath()
+  return await app.createBackupDeviceAsync({ name: 'backup', path: backupPath, id: backupDeviceId })
+}
+
 exports.createDevicesAsync = async (env, sourceDeviceId, backupDeviceId) => {
   const sourcePath = await env.createSourcePath()
-  const backupPath = await env.createBackupPath()
 
   const sourceDevice = await app.createSourceDeviceAsync({ name: 'source', path: sourcePath, id: sourceDeviceId })
-  const backupDevice = await app.createBackupDeviceAsync({ name: 'backup', path: backupPath, id: backupDeviceId })
+  const backupDevice = await createBackupDeviceAsync(env, backupDeviceId)
   return { sourceDevice, backupDevice }
 }
 

@@ -16,6 +16,19 @@ exports.deviceName = (device) => {
   return `${id}: ${name}`
 }
 
+exports.getDeviceIdForPathAsync = async (path) => {
+  try {
+    const files = await glob(_path.join(path, META_FILE_GLOB))
+    if (files.length > 0) {
+      const filename = _path.basename(files[0])
+      return filename.slice(0, filename.length - 5)
+    }
+  } catch (error) {
+    // NOOP Device could be offline
+  }
+  return null
+}
+
 exports.isDeviceOnlineAsync = async ({ path, id }) => {
   const metaFile = getMetaFilePath({ path, id })
   const exists = await fs.pathExists(metaFile)
