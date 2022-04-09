@@ -37,6 +37,9 @@ export const jobs$ = toObservable({
   rxjs.shareReplay(1))
 
 export function getJobLog (jobId) {
+  // We dont use scan because of stack overflow error due to size of the data set
+  const acumulator = { data: [] }
+
   return toObservable({
     query: `subscription ($input: GetJobLogsRequest) {
       jobLogs(input: $input) {
@@ -51,14 +54,14 @@ export function getJobLog (jobId) {
     }
   }).pipe(
     rxjs.map(x => x.data?.jobLogs || []),
-    rxjs.scan((acu, curr) => {
+    rxjs.map(curr => {
       // dont use spread because of perf
-      // We need to wrap it because of ref comparison to trigger state change detection
+      // We need to wrap data because of ref comparison used trigger state change detection
       // we need to mutate because the dataset is too big to recreate the array on each new item
-      const { data } = acu
+      const { data } = acumulator
       data.push(...curr)
       return { data }
-    }, { data: [] }),
+    }),
     rxjs.throttleTime(500),
     rxjs.shareReplay(1)
   )
