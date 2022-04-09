@@ -19,15 +19,18 @@ function sendUpdate ({ id, freeSpace, totalSpace, isOnline }) {
 }
 
 async function processPath (path) {
-  const id = await getDeviceIdForPathAsync(path)
-  if (id) {
-    const { free, size } = await checkDiskSpace(path)
-    // The path could have changed for the device. Lets update it
-    await updateDeviceInfo(id, free, size, path)
-    return sendUpdate({ id, freeSpace: free, totalSpace: size, isOnline: true })
+  try {
+    const id = await getDeviceIdForPathAsync(path)
+    if (id) {
+      const { free, size } = await checkDiskSpace(path)
+      // The path could have changed for the device. Lets update it
+      await updateDeviceInfo(id, free, size, path)
+      return sendUpdate({ id, freeSpace: free, totalSpace: size, isOnline: true })
+    }
+  } catch (error) {
+    console.warn('failed to process device info for path ' + path, error)
   }
 }
-
 
 const createDeviceInfoService = exports._createDeviceInfoService = () => (
   {
@@ -59,7 +62,6 @@ const createDeviceInfoService = exports._createDeviceInfoService = () => (
     iterator () {
       // Send last known device infos while we refresh
       const iterator = createEmitterAsyncIterator(eventEmitter, EVENTS.DEVICES_UPDATED, { initialItems: this.devices })
-
 
       this.refresh()
       return iterator
