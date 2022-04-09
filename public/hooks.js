@@ -139,7 +139,7 @@ export function useEventListener (obj, event, callback) {
     return () => {
       obj.removeEventListener(event, callback)
     }
-  }, obj, event, callback)
+  }, [obj, event, callback])
 }
 
 export function useKeyDownMonitor (key) {
@@ -157,9 +157,14 @@ export function useKeyDownMonitor (key) {
       setState(false)
     }
 
-    useEventListener(window, 'keydown', keyDown)
-    useEventListener(window, 'keyup', keyUp)
-    useEventListener(window, 'blur', blur)
+    window.addEventListener('keydown', keyDown)
+    window.addEventListener('keyup', keyUp)
+    window.addEventListener('blur', blur)
+    return () => {
+      window.removeEventListener('keyup', keyUp)
+      window.removeEventListener('keydown', keyDown)
+      window.removeEventListener('blur', blur)
+    }
   }, [])
   return state
 }
