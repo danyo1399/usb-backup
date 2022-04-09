@@ -18,7 +18,31 @@ const { emptyError } = require('../errors')
 const { deviceInfo } = require('../deviceInfo')
 const { createRemoveBackupDuplicatesJobAsync } = require('../jobs/removeBackupDuplicatesJob')
 
-function sourceDeviceMutations () {
+function deviceMutations () {
+  const CreateBackupDeviceRequest = new GraphQLInputObjectType({
+    name: 'CreateBackupDeviceRequest',
+    fields: {
+      name: { type: GraphQLString },
+      description: { type: GraphQLString },
+      path: { type: GraphQLString }
+    }
+  })
+
+  const AddBackupDeviceResponse = new GraphQLObjectType({
+    name: 'AddBackupDeviceResponse',
+    fields: {
+      device: { type: BackupDevice },
+      error: { type: Error }
+    }
+  })
+
+  const UpdateBackupDeviceRequest = new GraphQLInputObjectType({
+    name: 'UpdateBackupDeviceRequest',
+    fields: {
+      id: { type: GraphQLString },
+      device: { type: CreateBackupDeviceRequest }
+    }
+  })
   const CreateSourceDeviceRequest = new GraphQLInputObjectType({
     name: 'CreateSourceDeviceRequest',
     fields: {
@@ -44,93 +68,6 @@ function sourceDeviceMutations () {
     }
   })
 
-  return {
-    updateSourceDevice: {
-      type: GenericErrorResponse,
-      args: {
-        input: { type: UpdateSourceDeviceRequest }
-      },
-      resolve: async (a, args) => {
-        let response
-        const {
-          input: {
-            id,
-            device: { name, path, description }
-          }
-        } = args
-        try {
-          await app.updateDeviceAsync({ id, name, description, path })
-        } catch (err) {
-          response = toGraphqlErrorSection(err)
-          defaultLogger.error('edit source device', response)
-        }
-        return response || { error: null }
-      }
-    },
-
-    addSourceDevice: {
-      type: AddSourceDeviceResponse,
-      args: {
-        input: { type: CreateSourceDeviceRequest }
-      },
-      resolve: async (a, { input }) => {
-        let response
-        try {
-          const device = await app.createSourceDeviceAsync(input)
-          response = { device: device, error: response }
-        } catch (err) {
-          response = toGraphqlErrorSection(err)
-          defaultLogger.error('add source device error', response)
-        }
-        return response
-      }
-    },
-    removeSourceDevice: {
-      type: GenericErrorResponse,
-      args: {
-        input: { type: GraphQLString }
-      },
-      resolve: async (a, { input: id }) => {
-        let response
-        try {
-          await app.removeDeviceAsync(id)
-          response = { error: null }
-        } catch (err) {
-          response = toGraphqlErrorSection(err)
-          defaultLogger.error('remove backup source error', response)
-        }
-
-        return response
-      }
-    }
-  }
-}
-
-function backupDeviceMutations () {
-  const CreateBackupDeviceRequest = new GraphQLInputObjectType({
-    name: 'CreateBackupDeviceRequest',
-    fields: {
-      name: { type: GraphQLString },
-      description: { type: GraphQLString },
-      path: { type: GraphQLString }
-    }
-  })
-
-  const AddBackupDeviceResponse = new GraphQLObjectType({
-    name: 'AddBackupDeviceResponse',
-    fields: {
-      device: { type: BackupDevice },
-      error: { type: Error }
-    }
-  })
-
-  const UpdateBackupDeviceRequest = new GraphQLInputObjectType({
-    name: 'UpdateBackupDeviceRequest',
-    fields: {
-      id: { type: GraphQLString },
-      device: { type: CreateBackupDeviceRequest }
-    }
-  })
   return {
     updateBackupDevice: {
       type: GenericErrorResponse,
@@ -172,7 +109,7 @@ function backupDeviceMutations () {
         return response
       }
     },
-    removeBackupDevice: {
+    removeDevice: {
       type: GenericErrorResponse,
       args: {
         input: { type: GraphQLString }
@@ -184,9 +121,50 @@ function backupDeviceMutations () {
           response = { error: null }
         } catch (err) {
           response = toGraphqlErrorSection(err)
-          defaultLogger.error('remove backup device error', response)
+          defaultLogger.error('remove device error', response)
         }
 
+        return response
+      }
+    },
+
+    updateSourceDevice: {
+      type: GenericErrorResponse,
+      args: {
+        input: { type: UpdateSourceDeviceRequest }
+      },
+      resolve: async (a, args) => {
+        let response
+        const {
+          input: {
+            id,
+            device: { name, path, description }
+          }
+        } = args
+        try {
+          await app.updateDeviceAsync({ id, name, description, path })
+        } catch (err) {
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('edit source device', response)
+        }
+        return response || { error: null }
+      }
+    },
+
+    addSourceDevice: {
+      type: AddSourceDeviceResponse,
+      args: {
+        input: { type: CreateSourceDeviceRequest }
+      },
+      resolve: async (a, { input }) => {
+        let response
+        try {
+          const device = await app.createSourceDeviceAsync(input)
+          response = { device: device, error: response }
+        } catch (err) {
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('add source device error', response)
+        }
         return response
       }
     }
@@ -300,8 +278,7 @@ function jobMutations () {
 module.exports = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
-    ...sourceDeviceMutations(),
-    ...backupDeviceMutations(),
+    ...deviceMutations(),
     ...jobMutations()
   }
 })

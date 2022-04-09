@@ -5,8 +5,7 @@ import {
   createSourceDeviceAsync,
   getBackupDevicesAsync,
   getSourceDevicesAsync,
-  removeBackupDeviceAsync,
-  removeSourceDeviceAsync,
+  removeDeviceAsync,
   scanDevicesAsync,
   updateBackupDeviceAsync,
   updateSourceDeviceAsync
@@ -36,7 +35,7 @@ export default function Devices ({ variant }) {
   const isSourceDeviceView = variant === 'source'
 
   const deviceQuery = isSourceDeviceView ? getSourceDevicesAsync : getBackupDevicesAsync
-  const removeDevice = isSourceDeviceView ? removeSourceDeviceAsync : removeBackupDeviceAsync
+  const removeDevice = removeDeviceAsync
   const createDevice = isSourceDeviceView ? createSourceDeviceAsync : createBackupDeviceAsync
   const updateDevice = isSourceDeviceView ? updateSourceDeviceAsync : updateBackupDeviceAsync
 

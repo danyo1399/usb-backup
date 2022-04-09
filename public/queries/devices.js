@@ -62,11 +62,11 @@ export async function updateSourceDeviceAsync ({ id, name, description, path }) 
   return response
 }
 
-export async function removeSourceDeviceAsync ({ id }) {
+export async function removeDeviceAsync ({ id }) {
   const response = await execute({
     query: `
         mutation ($input: String) {
-            removeSourceDevice(input: $input) {
+            removeDevice(input: $input) {
                 error {code, message}
             }
         }
@@ -173,24 +173,6 @@ export async function updateBackupDeviceAsync ({ id, name, description, path }) 
     }
   })
 
-  return response
-}
-
-export async function removeBackupDeviceAsync ({ id }) {
-  const response = await execute({
-    query: `
-        mutation ($input: String) {
-            removeBackupDevice(input: $input) {
-                error {code, message}
-            }
-        }
-        `,
-    variables: {
-      input: id
-    }
-  })
-
-  handleResponseError(response)
   return response
 }
 
