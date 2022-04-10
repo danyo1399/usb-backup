@@ -1,13 +1,11 @@
-const { writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync, createFile } = require('../app')
 const { newIdNumber } = require('../utils')
 const {
-  getDeviceByIdAsync,
   deleteFileAsync,
   getFilesByDeviceAsync
 
 } = require('../repo')
 const fs = require('fs-extra')
-const { deviceName, isDeviceOnlineAsync } = require('../device')
+const { assertDeviceOnlineAsync } = require('../device')
 const { appendFilePathToPath } = require('../path')
 
 module.exports.createRemoveBackupDuplicatesJobAsync = async (...backupDeviceIds) => {
@@ -16,16 +14,7 @@ module.exports.createRemoveBackupDuplicatesJobAsync = async (...backupDeviceIds)
   let _abort = false
   async function executeAsync (log) {
     for (const backupDeviceId of backupDeviceIds) {
-      const device = await getDeviceByIdAsync(backupDeviceId)
-      if (!device) {
-        throw new Error(`device with id does not exist ${backupDeviceId}`)
-      }
-
-      if (device.deviceType !== 'backup') throw new Error('Only backup devices can be used to remove duplicates')
-      const isDeviceOnline = await isDeviceOnlineAsync(device)
-      if (!isDeviceOnline) {
-        throw new Error(`Device offline: ${deviceName(device)}`)
-      }
+      const device = await assertDeviceOnlineAsync(backupDeviceId, { deviceType: 'backup' })
       log.info(`Processing device ${device.name}`)
       const files = await getFilesByDeviceAsync(device.id)
       const hashMap = {}

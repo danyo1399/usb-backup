@@ -3,7 +3,7 @@ const { html, preactHooks, bootstrap } = globals
 
 const { useRef, useEffect } = preactHooks
 
-export function Modal ({ id, ariaLabeledBy, children, show, onClose }) {
+export function Modal ({ id, ariaLabeledBy, className, children, show, onClose }) {
   const modalRef = useRef(null)
   const controlRef = useRef(null)
   show = !!show
@@ -33,7 +33,7 @@ export function Modal ({ id, ariaLabeledBy, children, show, onClose }) {
         <!-- Modal -->
         <div
             ref=${modalRef}
-            class="modal fade"
+            class="modal fade ${className || ''}"
             data-bs-backdrop="static"
             id="${id}"
             tabindex="-1"

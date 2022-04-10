@@ -1,8 +1,15 @@
-import * as globals from '../../globals.js'
-import { classNames } from '../globals.js'
+import * as globals from '../globals.js'
 import { Modal } from './Modal.js'
 
+const { classNames } = globals
 const html = globals.html
+const { useState } = globals.preactHooks
+
+export function useDialog () {
+  const [show, setShow] = useState(false)
+
+  return { closeDialog: () => setShow(false), showDialog: () => setShow(true), setShow, dialogProps: { show, onClose: () => setShow(false) } }
+}
 
 export function Dialog ({ children, onClose, title, showCloseButton = true, size, id, ...props }) {
   const ariaLabeledBy = `${id}-label`
@@ -17,6 +24,6 @@ export function Dialog ({ children, onClose, title, showCloseButton = true, size
                 ${children}
             </div>
         </div>
-    </Modal>
+    <//>
   `
 }

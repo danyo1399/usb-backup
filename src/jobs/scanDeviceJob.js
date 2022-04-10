@@ -1,9 +1,9 @@
-const { writeDeviceMetaFileAsync: writeSourceDeviceMetaFileAsync, createFile } = require('../app')
+const { writeDeviceMetaFileAsync } = require('../app')
 const fileTreeWalkerAsync = require('../fileTreeWalker')
 const { index, identity, newIdNumber } = require('../utils')
 const {
   getDeviceByIdAsync,
-  addFileAsync,
+  InsertFileAsync,
   getFileIdsByDeviceAsync,
   deleteFileAsync,
   getFileByFingerprintAsync,
@@ -20,6 +20,7 @@ const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../device')
 const { getFileRelativePath } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')
+const { createFileAsync } = require('../file')
 
 module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan }) => {
   const context = { sourceDeviceIds, useFullScan }
@@ -96,7 +97,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
     }
 
     await updateDeviceScanDateAsync(deviceId)
-    await writeSourceDeviceMetaFileAsync(device)
+    await writeDeviceMetaFileAsync(device)
   }
 }
 
@@ -135,8 +136,9 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
         if (isNewFile || hashChanged || fingerprintChanged) {
           const changeDesc = isNewFile ? 'New file' : hashChanged ? 'Hash changed' : 'Fingerprint changed'
           log.info(`${changeDesc}, creating new file ${filename}`)
-          const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
-          file = await addFileAsync(newFile)
+          const { file: newFile } = await createFileAsync(device, filename, { hash, stat })
+
+          file = newFile
         }
       } else {
         file = await getFileByFingerprintAsync(device.id, relativePath, stat)
@@ -144,13 +146,14 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
           const movedFile = await getMovedFileAsync(filename, stat)
 
           const hash = movedFile?.hash ?? await hashFileAsync(filename)
-          const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
+
+          const { file: newFile } = await createFileAsync(device, filename, { hash, stat })
           if (!movedFile) {
             const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, newFile.deviceType))[0]
             if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
           }
 
-          file = await addFileAsync(newFile)
+          file = newFile
 
           if (movedFile) {
             log.info(`File moved from ${movedFile.fullPath} to ${filename}`)

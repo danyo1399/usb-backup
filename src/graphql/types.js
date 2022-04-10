@@ -45,6 +45,9 @@ exports.SourceDevice = new GraphQLObjectType({
     name: {
       type: GraphQLString
     },
+    deviceType: {
+      type: GraphQLString
+    },
     description: {
       type: GraphQLString
     },
@@ -76,6 +79,9 @@ exports.BackupDevice = new GraphQLObjectType({
       type: GraphQLString
     },
     path: {
+      type: GraphQLString
+    },
+    deviceType: {
       type: GraphQLString
     },
     lastScanDate: {

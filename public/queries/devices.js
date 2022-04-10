@@ -31,7 +31,7 @@ export async function getSourceDevicesAsync () {
     query: `
             query {
                 sourceDevices {
-                id, name, description, path, lastScanDate, lastBackupDate
+                id, name, description, path, lastScanDate, lastBackupDate, deviceType
                 }
             }
         `
@@ -119,6 +119,13 @@ export async function scanDevicesAsync (deviceIds, useFullScan) {
   return response
 }
 
+
+
+/*
+Backup devices
+==================================================================================
+*/
+
 export async function createBackupDevicesJobAsync (sourceDeviceIds, backupDeviceId) {
   const response = await execute({
     query: `
@@ -137,17 +144,12 @@ export async function createBackupDevicesJobAsync (sourceDeviceIds, backupDevice
   return response
 }
 
-/*
-Backup devices
-==================================================================================
-*/
-
 export async function getBackupDevicesAsync () {
   const { data: { backupDevices } } = await execute({
     query: `
                 query {
                     backupDevices {
-                    id, name, description, path, lastScanDate
+                    id, name, description, path, lastScanDate, deviceType
                     }
                 }
             `

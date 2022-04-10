@@ -1,12 +1,7 @@
 const fs = require('fs-extra')
-const path = require('path')
-const { getAllBackupFilesAsync, getFilesByDeviceAsync, getDeviceByIdAsync } = require('../../src/repo')
+const { getFilesByDeviceAsync } = require('../../src/repo')
 const testUtils = require('../common')
-const { createBackupDevicesJobAsync } = require('../../src/jobs/backupDeviceJob')
 const jobManager = require('../../src/jobs/jobManager')
-const { glob } = require('glob')
-const { createScanDeviceJobAsync } = require('../../src/jobs/scanDeviceJob')
-const { getMetaFilePath } = require('../../src/device')
 const { createRemoveBackupDuplicatesJobAsync } = require('../../src/jobs/removeBackupDuplicatesJob')
 
 describe('remove backup duplicates job tests', function () {
@@ -25,7 +20,7 @@ describe('remove backup duplicates job tests', function () {
     const logs = jobManager.getJobLog(job.id)
     expect(logs.filter((x) => x.type === 'error').map((x) => x.message)).toMatchInlineSnapshot(`
 Array [
-  "job failed removeBackupDuplicatesJob: 1, Only backup devices can be used to remove duplicates",
+  "job failed removeBackupDuplicatesJob: 1, incorrect device type. Expected backup, received source",
 ]
 `)
   })

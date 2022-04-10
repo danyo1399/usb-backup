@@ -6,7 +6,6 @@ const fs = require('fs-extra')
 
 const { newId } = require('./utils')
 const { isDeviceOnlineAsync, isExistingDeviceAsync, createDeviceMetaFileAsync } = require('./device')
-const { getFileRelativePath } = require('./path')
 const { raiseError, errorCodes } = require('./errors')
 
 /**
@@ -18,40 +17,6 @@ exports.getFileFingerprint = function ({ deviceId, relativePath, stat: { mtimeMs
   return JSON.stringify([deviceId, relativePath, Math.floor(mtimeMs), size, Math.floor(birthtimeMs)])
 }
 
-/**
- * Creates a file object from a list of required fields and destructuring a file stat object
- * @param {*} param0
- * @returns
- */
-const createFile = exports.createFile = ({ deviceType, deviceId, relativePath, hash, stat: { mtimeMs, birthtimeMs, size } }) => {
-  mtimeMs = Math.floor(mtimeMs)
-  birthtimeMs = Math.floor(birthtimeMs)
-
-  const addDate = Date.now()
-
-  return {
-    deviceType,
-    deviceId,
-    relativePath,
-    mtimeMs,
-    birthtimeMs,
-    size,
-    hash,
-    deleted: 0,
-    addDate
-  }
-}
-
-/*
-Files
-==================================================================================
-*/
-exports.addFileAsync = async (device, filename, hash) => {
-  const relativePath = getFileRelativePath(device.path, filename)
-  const stat = await fs.stat(filename)
-  const newFile = createFile({ deviceType: device.deviceType, deviceId: device.id, relativePath, stat, hash })
-  await repo.addFileAsync(newFile)
-}
 /*
 
 Source Devices

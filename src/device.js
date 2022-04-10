@@ -1,6 +1,7 @@
 const _path = require('path')
 const fs = require('fs-extra')
 const { defaultLogger } = require('./logging')
+const { getDeviceByIdAsync } = require('./repo')
 
 const METAFILE_SUFFIX = '.usbb'
 function getMetaFilePath ({ path, id }) {
@@ -11,6 +12,21 @@ exports.getMetaFilePath = getMetaFilePath
 exports.deviceName = (device) => {
   const { id, name } = device
   return `${id}: ${name}`
+}
+
+exports.assertDeviceOnlineAsync = async (deviceId, { deviceType } = {}) => {
+  const device = await getDeviceByIdAsync(deviceId)
+  if (!device) {
+    throw new Error(`device with id does not exist [${deviceId}]`)
+  }
+
+  if (deviceType != null && device.deviceType !== deviceType) { throw new Error(`incorrect device type. Expected ${deviceType}, received ${device.deviceType}`) }
+
+  const isDeviceOnline = await this.isDeviceOnlineAsync(device)
+  if (!isDeviceOnline) {
+    throw new Error(`Device offline: ${this.deviceName(device)}`)
+  }
+  return device
 }
 
 exports.getDeviceIdForPathAsync = async (path) => {

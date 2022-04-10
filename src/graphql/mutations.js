@@ -17,6 +17,7 @@ const { toGraphqlErrorSection } = require('./utils')
 const { emptyError } = require('../errors')
 const { deviceInfo } = require('../deviceInfo')
 const { createRemoveBackupDuplicatesJobAsync } = require('../jobs/removeBackupDuplicatesJob')
+const { createRestoreBackupFilesToSourceRequest } = require('../jobs/restoreBackupFilesToSourceRequest')
 
 function deviceMutations () {
   const CreateBackupDeviceRequest = new GraphQLInputObjectType({
@@ -198,6 +199,16 @@ function jobMutations () {
     }
   })
 
+  const RestoreBackupFilesToSourceRequest = new GraphQLInputObjectType({
+    name: 'RestoreBackupFilesToSourceRequest',
+    fields: {
+      sourceDeviceId: { type: GraphQLString },
+      backupDeviceId: { type: GraphQLString },
+      relativePath: { type: GraphQLString },
+      paths: { type: new GraphQLList(GraphQLString) }
+    }
+  })
+
   const BackupDevicesRequest = new GraphQLInputObjectType({
     name: 'BackupDevicesRequest',
     fields: {
@@ -218,6 +229,25 @@ function jobMutations () {
   })
 
   return {
+    restoreBackupFilesToSourceRequest: {
+      type: GenericErrorResponse,
+      args: {
+        input: { type: RestoreBackupFilesToSourceRequest }
+      },
+      resolve: async (_, args) => {
+        let response
+        const { input: { sourceDeviceId, backupDeviceId, relativePath, paths } } = args
+
+        try {
+          const job = await createRestoreBackupFilesToSourceRequest(backupDeviceId, sourceDeviceId, relativePath, paths)
+          runJobAsync(job)
+        } catch (err) {
+          response = toGraphqlErrorSection(err)
+          defaultLogger.error('crete copy from backup device job error', response)
+        }
+        return response || emptyError()
+      }
+    },
     removeBackupDuplicatesJob: {
       type: GenericErrorResponse,
       args: {

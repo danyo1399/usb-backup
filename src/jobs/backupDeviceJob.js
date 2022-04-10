@@ -1,4 +1,4 @@
-const { writeDeviceMetaFileAsync, addFileAsync } = require('../app')
+const { writeDeviceMetaFileAsync } = require('../app')
 const { newIdNumber } = require('../utils')
 const fs = require('fs-extra')
 const checkDiskSpace = require('check-disk-space').default
@@ -10,6 +10,7 @@ const { deviceName, isDeviceOnlineAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, findUniqueFilenameAsync, appendFilePathToPath } = require('../path')
 const { copyAndHashAsync } = require('../crypto')
+const { createFileAsync } = require('../file')
 
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
   const id = newIdNumber()
@@ -144,7 +145,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     await fs.utimes(context.tempFilename, editDate, editDate)
 
     await fs.move(context.tempFilename, newTargetFilename)
-    await addFileAsync(context.backupDevice, targetFilename, backupHash)
+    await createFileAsync(context.backupDevice, targetFilename, { hash: backupHash })
     // two files to backup could have the same hash. We only want to copy one of them
     context.addedHashes[backupHash] = true
   }

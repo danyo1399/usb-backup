@@ -171,7 +171,7 @@ exports.deleteFileHardAsync = async function (id) {
     `, id)
 }
 
-exports.addFileAsync = async function ({
+exports.InsertFileAsync = async function ({
   deviceType,
   deviceId,
   relativePath,
@@ -258,17 +258,35 @@ exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutD
   })
 }
 
-exports.getFileByIdAsync = async function (id) {
+exports.getFileByIdAsync = async function (id, { includeDeleted } = {}) {
   const result = await db.getAsync(
         `
-  select * from files where id = ?
-  `, id
+  select * from files where id = ? and (deleted = 0 or 1 = ?)
+  `, id, !!includeDeleted
   )
   return result
 }
 
 exports.getFilesByDeviceAsync = async (id, { includeDeleted } = {}) => {
   return await db.allAsync('select * from files where deviceId = ? and (deleted = 0 or 1 = ?)', id, !!includeDeleted)
+}
+
+exports.getFileByDeviceAndHashAsync = (deviceId, hash) => {
+  return db.getAsync(`
+  select *
+  from files
+  where deviceId = ? and hash = ? and deleted = 0`, deviceId, hash)
+}
+
+exports.findFilesByPathAsync = async (deviceId, path) => {
+  return await db.allAsync(`
+  select *
+  from files
+  where
+    deviceId = $deviceId
+    and relativePath like $path
+    and deleted = 0
+     `, { $deviceId: deviceId, $path: path + '%' })
 }
 
 exports.getFileIdsByDeviceAsync = async (id) => {

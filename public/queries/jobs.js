@@ -21,6 +21,24 @@ export async function createRemoveBackupDuplicatesJobAsync (...backupDeviceIds) 
   return response
 }
 
+export async function restoreBackupFilesToSourceRequestAsync (backupDeviceId, sourceDeviceId, relativePath, paths) {
+  const response = await execute({
+    query: `
+      mutation ($input: RestoreBackupFilesToSourceRequest) {
+        restoreBackupFilesToSourceRequest(input: $input) {
+          error {code, message}
+        }
+      }
+    `,
+    variables: {
+      input: { backupDeviceId, sourceDeviceId, relativePath, paths }
+    }
+  })
+
+  handleResponseError(response)
+  return response
+}
+
 export const jobs$ = toObservable({
   query: `
     subscription {

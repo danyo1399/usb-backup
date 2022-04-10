@@ -257,8 +257,8 @@ export function usePagination (items, itemsPerPage) {
   }
 }
 
-export function useApiData (apiFn, ...args) {
-  const [data, setData] = useState()
+export function useApiData (defaultValue, apiFn, ...args) {
+  const [data, setData] = useState(defaultValue)
 
   useEffect(() => {
     (async () => {

@@ -17,7 +17,7 @@ function createPathNodes (currentPath) {
   }
   return pathNodes
 }
-export default function FileBrowser ({ currentPath, node, navigate }) {
+export default function FileBrowser ({ currentPath, node, navigate, selectedRowsChanged }) {
   const styles = css`
     display: flex;
     flex-direction: column;
@@ -27,12 +27,12 @@ export default function FileBrowser ({ currentPath, node, navigate }) {
   return html`
   <div class=${styles}>
   <${Breadcrumbs} currentPath=${currentPath} selectNode=${navigate}/>
-  <${Table} node=${node} navigate=${navigate}/>
+  <${Table} node=${node} navigate=${navigate} selectedRowsChanged=${selectedRowsChanged}/>
  </div>
   `
 }
 
-export function Table ({ node, navigate }) {
+export function Table ({ node, navigate, selectedRowsChanged }) {
   function folderClick (folder) {
     navigate(folder)
   }
@@ -85,6 +85,17 @@ export function Table ({ node, navigate }) {
   useEffect(() => {
     reset()
   }, [node])
+
+  useEffect(() => {
+    if (selectedRowsChanged) {
+      const indexes = Object.entries(selectedRows).filter(([key, value]) => !!value).map(([key]) => key)
+      const paths = indexes.map(index => {
+        const { type, path, relativePath } = rows[index]
+        return { type, path: path || relativePath }
+      })
+      selectedRowsChanged(paths)
+    }
+  }, [selectedRows, selectedRowsChanged])
 
   function rowClasses (index) {
     return classNames({ selected: selectedRows[index] })

@@ -118,7 +118,7 @@ Array [
     const sourceFile = await createSourceFileAsync()
 
     await repo.deleteFileAsync(sourceFile.id)
-    const file = await repo.getFileByIdAsync(sourceFile.id)
+    const file = await repo.getFileByIdAsync(sourceFile.id, { includeDeleted: true })
 
     expect(file.deleted).toBe(1)
     expect(file.editDate).toBeGreaterThan(sourceFile.editDate)
@@ -126,9 +126,9 @@ Array [
 
   it('marks existing file at path as deleted before inserting new record', async function () {
     const file = createFile('dev', 'source')
-    await repo.addFileAsync(file)
+    await repo.InsertFileAsync(file)
     file.hash = 'newhash'
-    await repo.addFileAsync(file)
+    await repo.InsertFileAsync(file)
 
     const files = await repo.getFilesByDeviceAsync('dev', { includeDeleted: true })
     expect(project(['deleted', 'relativePath'], files)).toMatchInlineSnapshot(`
@@ -193,7 +193,7 @@ function createFile (deviceId, deviceType) {
 async function createSourceFileAsync () {
   const source = await createSourceDeviceAsync()
   const sourceFile = createFile(source.id, 'source')
-  const newFile = await repo.addFileAsync(sourceFile)
+  const newFile = await repo.InsertFileAsync(sourceFile)
   sourceFile.editDate = newFile.editDate
   sourceFile.id = newFile.id
   return sourceFile
@@ -213,7 +213,7 @@ async function createBackupFileAsync () {
     relativePath: 'relativePath',
     size: 101112
   }
-  await repo.addFileAsync(file)
+  await repo.InsertFileAsync(file)
   return file
 }
 
