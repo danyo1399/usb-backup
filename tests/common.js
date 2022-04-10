@@ -8,6 +8,7 @@ const cwd = process.cwd()
 const app = require('../src/app')
 const { migrateDbAsync } = require('../src/migration')
 const { createScanDeviceJobAsync } = require('../src/jobs/scanDeviceJob')
+const { ensureFilePathExistsAsync } = require('../src/path')
 
 const tempRootPath = path.resolve(cwd, 'temp')
 const testDataPath = exports.testDataPath = path.resolve(cwd, 'testdata')
@@ -86,14 +87,19 @@ exports.createDevicesAsync = async (env, sourceDeviceId, backupDeviceId) => {
   return { sourceDevice, backupDevice }
 }
 
-exports.scanDeviceAsync = async (deviceId) => {
-  const scanJob = await createScanDeviceJobAsync({ sourceDeviceIds: [deviceId] })
+exports.scanDeviceAsync = async (...ids) => {
+  const scanJob = await createScanDeviceJobAsync({ sourceDeviceIds: ids })
   await jobManager.runJobAsync(scanJob)
   exports.assertJobLogHasNoErrors(scanJob.id)
 }
 
-exports.setupTestEnvironment = () => {
-  const id = newId()
+exports.clearDirAsync = async (dirPath) => {
+  await fs.rm(dirPath, { force: true, recursive: true })
+  await fs.mkdir(dirPath, { recursive: true })
+}
+
+exports.setupTestEnvironment = (id) => {
+  id = id || newId()
   const tempPath = path.resolve(tempRootPath, id).replaceAll('\\', '/')
   let isDbSetup = false
 
@@ -136,8 +142,8 @@ exports.setupTestEnvironment = () => {
 
   const createDummyFileAsync = (filePath, size) => {
     return new Promise((resolve, reject) => {
-      try {
-        const filename = path.join(tempPath, filePath)
+      const filename = path.join(tempPath, filePath)
+      ensureFilePathExistsAsync(filename).then(() => {
         const data = new Uint8Array(size)
         data.fill(1)
         const stream = fs.createWriteStream(filename)
@@ -146,9 +152,7 @@ exports.setupTestEnvironment = () => {
             reject(err)
           } else resolve(filename)
         })
-      } catch (error) {
-        reject(error)
-      }
+      }).catch(err => reject(err))
     })
   }
 
