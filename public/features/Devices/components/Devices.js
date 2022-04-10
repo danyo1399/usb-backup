@@ -19,6 +19,7 @@ import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 import constants from '../../../constants.js'
 import { createRemoveBackupDuplicatesJobAsync } from '../../../queries/jobs.js'
 import * as globals from '../../../globals.js'
+import ActionBar from '../../../components/ActionBar.js'
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter
@@ -110,25 +111,27 @@ export default function Devices ({ variant }) {
       createRemoveBackupDuplicatesJobAsync(...selectedDevices.map(x => x.id))
     })
   }
+  const items = !anyDevicesSelected
+    ? []
+    : [
+        { label: 'Scan Devices', onClick: onScanDevicesJobAsync },
+        variant === 'source' && { label: 'Perform Backup', onClick: onCreateBackupJob, enabled: variant === 'source' },
+        variant === 'backup' && { label: 'Delete Duplicates', onClick: onDeleteDuplicates }
+      ].filter(Boolean)
 
   return html`
         <h1>${label}s</h1>
         <div>
-        <button
-            type="button"
-            class="btn btn-primary mb-4"
-            onClick=${() => setShowManageDevice(true)}
-        >
-            Create ${label}
-        </button>
+          <button
+              type="button"
+              class="btn btn-primary mb-4"
+              onClick=${() => setShowManageDevice(true)}
+          >
+              Create ${label}
+          </button>
         </div>
-        <div class="device-actions">
-        <span class="device-actions__label">Actions:</span> <div class="btn-group mt-3 mb-3" data-hidden=${!anyDevicesSelected} role="group" aria-label="Action Bar">
-          <button type="button" class="btn btn-outline-primary" onClick=${onScanDevicesJobAsync}>Scan Devices</button>
-          <button type="button" class="btn btn-outline-primary" data-hidden=${variant === 'backup'} onClick=${onCreateBackupJob}>Perform Backup</button>
-          <button type="button" class="btn btn-outline-primary" data-hidden=${variant === 'source'} onClick=${onDeleteDuplicates}>Delete Duplicates</button>
-        </div>
-        </div>
+        <${ActionBar} items=${items} />
+
 
         <${DevicesTable}
             devices=${devices}
