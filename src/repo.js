@@ -15,11 +15,13 @@ exports.reportFilesOnBackupWithNoSourceAsync = async () => {
 from files b inner join devices d on b.deviceId = d.id
 where b.deviceType = 'backup'
   and b.deleted = 0
-and not exists(
+  and not exists(
     select 1 from files s
     where s.deleted = 0 and s.deviceType ='source'
     and s.hash = b.hash
-    )
+  )
+order by
+    b.addDate desc
   `)
 }
 
@@ -29,11 +31,13 @@ exports.reportFilesOnSourceWithNoBackupAsync = async () => {
 from files s inner join devices d on s.deviceId = d.id
 where s.deviceType = 'source'
   and s.deleted = 0
-and not exists(
-    select 1 from files b
-    where b.deleted = 0 and b.deviceType ='backup'
-    and s.hash = b.hash
-    )
+  and not exists(
+      select 1 from files b
+      where b.deleted = 0 and b.deviceType ='backup'
+      and s.hash = b.hash
+  )
+order by
+  s.addDate desc
   `)
 }
 
