@@ -8,7 +8,7 @@ import JobLog from './features/Jobs/components/JobLog.js'
 import LicenceDialog from './components/Licence.js'
 
 import * as globals from './globals.js'
-import Test from './Test.js'
+import Test from './TestPage.js'
 import ViewFiles from './features/Files/pages/ViewFiles.js'
 import Files from './pages/Files.js'
 import { useOnFocus } from './hooks.js'
