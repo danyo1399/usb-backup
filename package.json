@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEV node src/index.js",
     "start:watch": "cross-env NODE_ENV=DEV nodemon --ignore ./public/ src/index.js",
-    "test": "jest",
+    "test": "jest --silent",
     "lint": "standard",
     "test:watch": "jest --watch ",
     "pipeline:qa": "npm run test && npm run lint",
