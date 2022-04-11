@@ -1,6 +1,6 @@
 import { delay } from '../../fns.js'
-import * as globals from '../../globals.js'
-const { html, preactHooks, preact } = globals
+import * as globals from '../globals.js'
+const { html, preactHooks, preact, goober: { css } } = globals
 
 const { useRef, useState, useContext } = preactHooks
 const { createContext } = preact
@@ -46,10 +46,16 @@ export function ToastProvider ({ children }) {
   return html` <${ToastContext.Provider} value=${{ toasts, addToast }}>${children} <//> `
 }
 export function Toast () {
+  const styles = css`
+  .toast--success {
+    background-color: var(--bs-success) !important;
+    color: white;
+  }
+  `
   const { toasts } = useContext(ToastContext)
 
   return html`
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="position-fixed bottom-0 end-0 p-3 ${styles}" style="z-index: 11">
       <div class="toast-container ">
         ${toasts.map(
           (toast) => html`

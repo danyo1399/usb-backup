@@ -62,7 +62,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
           }
 
           if (context.freeSpace < context.sourceFile.size) {
-            log.warn(`Not enough free space. Skipping ${context.sourceFile.relativePath}`)
+            log.error(`Not enough free space. Skipping ${context.sourceFile.relativePath}`)
             continue
           }
 

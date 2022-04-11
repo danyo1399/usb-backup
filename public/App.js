@@ -15,14 +15,24 @@ import { useOnFocus } from './hooks.js'
 import { refreshDeviceInfoAsync } from './queries/index.js'
 const { Router } = globals.preactRouter
 const html = globals.html
+const { css } = globals.goober
 
 const SouceDevices = (props) => html`<${Devices} ...${props} variant="source"/>`
 const BackupDevices = (props) => html`<${Devices} ...${props} variant="backup"/>`
 
 export default function App () {
+  const styles = css`
+  display: flex;
+
+  .main-content {
+    padding: 1rem;
+    width:100%;
+    overflow:auto;
+  }
+  `
   useOnFocus(refreshDeviceInfoAsync)
   return html`
-        <div class="layout">
+        <div class="${styles}">
         <${LicenceDialog}/>
             <${ToastProvider}>
                 <${Toast} />
