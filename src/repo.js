@@ -8,52 +8,58 @@ const db = require('./db')
 Reports
 ==================================================================================
 */
-// TODO not used yet
+
 exports.reportFilesOnBackupWithNoSourceAsync = async () => {
   return await db.allAsync(`
-  select d.name deviceName, d.path devicePath, b.*
-from files b inner join devices d on b.deviceId = d.id
-where b.deviceType = 'backup'
-  and b.deleted = 0
-  and not exists(
-    select 1 from files s
-    where s.deleted = 0 and s.deviceType ='source'
-    and s.hash = b.hash
-  )
-order by
-    b.addDate desc
+  select
+    d.name deviceName, d.path devicePath, b.*
+  from
+    files b inner join devices d on b.deviceId = d.id
+  where b.deviceType = 'backup'
+    and b.deleted = 0
+    and not exists(
+      select 1 from files s
+      where s.deleted = 0 and s.deviceType ='source'
+      and s.hash = b.hash
+    )
+  order by
+      b.addDate desc
   `)
 }
 
 exports.reportFilesOnSourceWithNoBackupAsync = async () => {
   return await db.allAsync(`
-  select d.name deviceName, d.path devicePath, s.*
-from files s inner join devices d on s.deviceId = d.id
-where s.deviceType = 'source'
-  and s.deleted = 0
-  and not exists(
-      select 1 from files b
-      where b.deleted = 0 and b.deviceType ='backup'
-      and s.hash = b.hash
-  )
-order by
-  s.addDate desc
+  select
+    d.name deviceName, d.path devicePath, s.*
+  from
+    files s inner join devices d on s.deviceId = d.id
+  where s.deviceType = 'source'
+    and s.deleted = 0
+    and not exists(
+        select 1 from files b
+        where b.deleted = 0 and b.deviceType ='backup'
+        and s.hash = b.hash
+    )
+  order by
+    s.addDate desc
   `)
 }
 
 exports.reportDuplicateFilesOnDeviceTypeAsync = async (deviceType) => {
   return await db.allAsync(`
-  select d.name deviceName, d.path devicePath, b.*
-from files b inner join devices d on b.deviceId = d.id
-where b.deviceType = $deviceType
-  and b.deleted = 0
-and exists(
-    select 1 from files b2
-    where b2.deleted = 0 and b2.deviceType = $deviceType
-    and b2.hash = b.hash
-    and b2.id != b.id
-    )
-  order by b.hash
+  select
+    d.name deviceName, d.path devicePath, b.*
+  from
+    files b inner join devices d on b.deviceId = d.id
+  where b.deviceType = $deviceType
+    and b.deleted = 0
+  and exists(
+      select 1 from files b2
+      where b2.deleted = 0 and b2.deviceType = $deviceType
+      and b2.hash = b.hash
+      and b2.id != b.id
+      )
+    order by b.hash
   `, { $deviceType: deviceType })
 }
 
@@ -115,8 +121,8 @@ exports.getDeviceByIdAsync = async function (id) {
         from
             devices
         where
-            id = ?`
-  , id)
+            id = ?
+        `, id)
 }
 
 exports.updateDeviceAsync = async function ({ id, name, description, path }) {
@@ -131,9 +137,9 @@ exports.updateDeviceAsync = async function ({ id, name, description, path }) {
 exports.updateDeviceScanDateAsync = async function (id) {
   await db.runAsync(`
     update
-        devices
-        set lastScanDate = ?
-        where id = ?
+      devices
+      set lastScanDate = ?
+      where id = ?
     `, Date.now(), id)
 }
 
@@ -160,8 +166,7 @@ exports.getSourceFilesToBackupAsync = async (sourceDeviceId) => {
 }
 
 exports.deleteFileAsync = async function (id) {
-  await db.runAsync(
-        `
+  await db.runAsync(`
         update files set
         deleted = 1, editDate = ?
         where id= ?
@@ -169,8 +174,7 @@ exports.deleteFileAsync = async function (id) {
 }
 
 exports.deleteFileHardAsync = async function (id) {
-  await db.runAsync(
-        `
+  await db.runAsync(`
         delete from files where id = ?
     `, id)
 }
@@ -190,14 +194,15 @@ exports.InsertFileAsync = async function ({
   let insertResult
   await db.performInTransactionAsync(async () => {
     await db.runAsync(`
-    update files
-    set deleted = 1, editDate = ?
-    where deviceId = ? and relativePath = ?`,
+      update files
+      set deleted = 1, editDate = ?
+      where deviceId = ? and relativePath = ?
+    `,
     editDate, deviceId, relativePath)
 
     insertResult = await db.runAsync(`
-insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
-values(?,?,?,?,?,?,?,?,?,?);
+      insert into files(deviceType, deviceId, relativePath, mtimeMs, birthtimeMs, size, hash, deleted, addDate, editDate)
+      values(?,?,?,?,?,?,?,?,?,?);
 `,
     deviceType,
     deviceId,
@@ -229,25 +234,40 @@ values(?,?,?,?,?,?,?,?,?,?);
 
 exports.getFileByDeviceRelativePathAsync = async function (deviceId, relativePath) {
   return await db.getAsync(`
-  select * from files
-  where deviceId = ? and relativePath = ? and deleted = 0`, deviceId, relativePath)
+    select *
+    from
+      files
+    where
+      deviceId = ? and relativePath = ? and deleted = 0
+  `, deviceId, relativePath)
 }
 
 exports.getFileByFingerprintAsync = async function (deviceId, relativePath, { mtimeMs, birthtimeMs, size }) {
-  return await db.getAsync(
-            `
-  select * from files
-      where deviceId = ? and relativePath = ? and mtimeMs = ? and birthtimeMs = ? and size = ? and deleted = 0`,
-            deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
+  return await db.getAsync(`
+    select
+      *
+    from
+      files
+    where
+      deviceId = ?
+      and relativePath = ?
+      and mtimeMs = ?
+      and birthtimeMs = ?
+      and size = ?
+      and deleted = 0
+      `,
+  deviceId, relativePath, Math.floor(mtimeMs), Math.floor(birthtimeMs), size
   )
 }
 
 exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutDir, birthtimeMs, mtimeMs) {
   return await db.allAsync(`
-    select *
-    from files
-     where
-       deviceId = $deviceId
+    select
+      *
+    from
+      files
+    where
+      deviceId = $deviceId
       and (relativePath = $filename or relativePath like $likeFilename)
       and birthtimeMs = $birthtimeMs
       and mtimeMs = $mtimeMs
@@ -263,8 +283,7 @@ exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutD
 }
 
 exports.getFileByIdAsync = async function (id, { includeDeleted } = {}) {
-  const result = await db.getAsync(
-        `
+  const result = await db.getAsync(`
   select * from files where id = ? and (deleted = 0 or 1 = ?)
   `, id, !!includeDeleted
   )
@@ -277,19 +296,22 @@ exports.getFilesByDeviceAsync = async (id, { includeDeleted } = {}) => {
 
 exports.getFileByDeviceAndHashAsync = (deviceId, hash) => {
   return db.getAsync(`
-  select *
-  from files
-  where deviceId = ? and hash = ? and deleted = 0`, deviceId, hash)
+    select *
+    from
+      files
+    where
+      deviceId = ? and hash = ? and deleted = 0
+  `, deviceId, hash)
 }
 
 exports.findFilesByPathAsync = async (deviceId, path) => {
   return await db.allAsync(`
-  select *
-  from files
-  where
-    deviceId = $deviceId
-    and relativePath like $path
-    and deleted = 0
+    select *
+    from files
+    where
+      deviceId = $deviceId
+      and relativePath like $path
+      and deleted = 0
      `, { $deviceId: deviceId, $path: path + '%' })
 }
 
@@ -304,8 +326,11 @@ exports.getAllBackupFilesAsync = async function () {
 
 exports.getFilesByHashAndDeviceTypeAsync = async (hash, deviceType) => {
   return await db.allAsync(`
-  select d.name deviceName, f.*
-  from files f inner join devices d on f.deviceId = d.id
-  where f.hash = ? and f.deviceType = ? and f.deleted = 0
+    select
+      d.name deviceName, f.*
+    from
+      files f inner join devices d on f.deviceId = d.id
+    where
+      f.hash = ? and f.deviceType = ? and f.deleted = 0
   `, hash, deviceType)
 }
