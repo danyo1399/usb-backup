@@ -10,7 +10,7 @@ This is a port of a .net project i developed and have been using since 2010 that
 
 
 ## Getting started
-Make sure you have node js installed. You get get it from here
+Make sure you have node js version 16 or later installed. You get get it from here
 
 https://nodejs.org/en/
 
