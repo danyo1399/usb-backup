@@ -115,3 +115,4 @@ app.db
 # ide files
 .vscode
 .idea
+junit.xml
