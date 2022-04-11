@@ -25,11 +25,11 @@ describe('ScanDeviceJob', function () {
   function commonTests () {
     it('updating file fingerprint should create a new file', async function () {
       const { sourceDevice, job } = ctx.state
+      const filePath = path.join(sourceDevice.path, 'ico.png')
+      await fs.utimes(filePath, testUtils.testDate2000, testUtils.testDate2000)
       await jobManager.runJobAsync(job)
 
-      const filePath = path.join(sourceDevice.path, 'ico.png')
-      const date = new Date(2000, 0, 1)
-      await fs.utimes(filePath, date, date)
+      await fs.utimes(filePath, testUtils.testDate2001, testUtils.testDate2001)
       job.id++
       await jobManager.runJobAsync(job)
       testUtils.assertJobLogHasNoErrors(job.id)
@@ -38,12 +38,12 @@ describe('ScanDeviceJob', function () {
 Array [
   Object {
     "deleted": 1,
-    "mtimeMs": 1645346484463,
+    "mtimeMs": 946638000000,
     "relativePath": "ico.png",
   },
   Object {
     "deleted": 0,
-    "mtimeMs": 946638000000,
+    "mtimeMs": 978260400000,
     "relativePath": "ico.png",
   },
 ]
@@ -210,7 +210,7 @@ Array [
     it('Updating file contents and not fingerprint should update file', async function () {
       const { sourceDevice, job } = ctx.state
       const tempFilename = path.join(sourceDevice.path, 'test.json')
-      const date = new Date(2000, 0, 1)
+      const date = testUtils.testDate2000
       await fs.writeJson(tempFilename, 'a')
       await fs.utimes(tempFilename, date, date)
 
@@ -251,7 +251,7 @@ Array [
     it('Updating file contents and not fingerprint should not update file', async function () {
       const { sourceDevice, job } = ctx.state
       const tempFilename = path.join(sourceDevice.path, 'test.json')
-      const date = new Date(2000, 0, 1)
+      const date = testUtils.testDate2000
       await fs.writeJson(tempFilename, 'a')
       await fs.utimes(tempFilename, date, date)
 

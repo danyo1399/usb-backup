@@ -94,6 +94,9 @@ exports.appendRelativePath = (...subpaths) => {
 exports.appendFilePathToPath = (filePath, destinationDir) => {
   filePath = filePath.replaceAll('\\', '/')
   destinationDir = destinationDir.replaceAll('\\', '/')
+  if (/^[a-z]:\//i.test(filePath)) {
+    filePath = filePath.substr(3)
+  }
   let fileDir = path.dirname(filePath)
   const filename = path.basename(filePath)
   if (/^[a-z]:\//i.test(fileDir)) {

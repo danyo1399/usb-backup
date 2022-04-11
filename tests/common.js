@@ -98,6 +98,10 @@ exports.clearDirAsync = async (dirPath) => {
   await fs.mkdir(dirPath, { recursive: true })
 }
 
+// dates that are consistent regardless of region
+exports.testDate2000 = new Date(946638000000)
+exports.testDate2001 = new Date(978260400000)
+
 exports.setupTestEnvironment = (id) => {
   id = id || newId()
   const tempPath = path.resolve(tempRootPath, id).replaceAll('\\', '/')
