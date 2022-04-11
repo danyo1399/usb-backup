@@ -5,7 +5,9 @@ as (images/video/audio) from PC's and NAS devices to cheap and affordable usb dr
 This is a port of a .net project i developed and have been using since 2010 that no longer runs on modern hardware.
 
 [![npm version](https://badge.fury.io/js/usb-backup.svg)](https://badge.fury.io/js/usb-backup)
+[![Node.js CI](https://github.com/danyo1399/usb-backup/actions/workflows/node.js.yml/badge.svg)](https://github.com/danyo1399/usb-backup/actions/workflows/node.js.yml)
 [![Join the chat at https://gitter.im/usb-backup/community](https://badges.gitter.im/usb-backup/community.svg)](https://gitter.im/usb-backup/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ## Getting started
 Make sure you have node js installed. You get get it from here
