@@ -2,7 +2,7 @@ import * as globals from '../../../globals.js'
 const html = globals.html
 const { css } = globals.goober
 
-export default function PaginationButtons ({
+export function PaginationButtons ({
   firstPage,
   previousPage,
   nextPage,

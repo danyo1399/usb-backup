@@ -28,15 +28,6 @@ export function isUnknownError (error) {
   return error && Array.isArray(error) === false
 }
 
-export function handleResponseError (response) {
-  if (!response) return
-  const data = response.data
-
-  for (const x of Object.values(data)) {
-    if (x.error && x.error.code) throw x.error
-  }
-}
-
 export function defaultEntityAdapterState () {
   return { items: {}, ids: [] }
 }

@@ -1,4 +1,4 @@
-import { execute } from '../graphql.js'
+import { execute } from './graphql.js'
 
 export async function getFilesByDeviceIdAsync (deviceId) {
   const { data: { filesByDeviceId } } = await execute({

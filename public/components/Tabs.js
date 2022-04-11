@@ -1,11 +1,10 @@
-
-import Link from '../components/Link.js'
+import Link from './Link.js'
 import * as globals from '../globals.js'
 const html = globals.html
 const { css } = globals.goober
 const classNames = globals.classNames
 
-export default function Tabs ({ items, className, selected, ...props }) {
+export function Tabs ({ items, className, selected, ...props }) {
   const styles = css`
   `
   items = items || []

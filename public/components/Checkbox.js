@@ -1,7 +1,6 @@
-
-import * as globals from '../globals.js'
 import { useUniqueId } from '../hooks.js'
 
+import * as globals from '../globals.js'
 const h = globals.html
 const { useState, useEffect } = globals.preactHooks
 

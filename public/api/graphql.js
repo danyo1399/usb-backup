@@ -1,4 +1,4 @@
-import * as globals from './globals.js'
+import * as globals from '../globals.js'
 const { createClient } = globals.graphqlWs
 const rxjs = globals.rxjs
 /*
@@ -75,5 +75,14 @@ export function subscribe (payload) {
       dispose()
       return { done: true, value: undefined }
     }
+  }
+}
+
+export function handleResponseError (response) {
+  if (!response) return
+  const data = response.data
+
+  for (const x of Object.values(data)) {
+    if (x.error && x.error.code) throw x.error
   }
 }

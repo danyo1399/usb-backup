@@ -1,7 +1,7 @@
 import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
-import { getBackupDevicesAsync, getSourceDevicesAsync } from './queries/devices.js'
-import { jobs$ } from './queries/jobs.js'
+import { getBackupDevicesAsync, getSourceDevicesAsync } from './api/devices.js'
+import { jobs$ } from './api/jobs.js'
 const { useEffect, useState, useMemo, useCallback } = globals.preactHooks
 
 export function useFormControl (defaultValue) {

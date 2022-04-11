@@ -8,18 +8,17 @@ import {
   removeDeviceAsync,
   scanDevicesAsync,
   updateBackupDeviceAsync,
-  updateSourceDeviceAsync
-} from '../../../queries/index.js'
+  updateSourceDeviceAsync,
+  createRemoveBackupDuplicatesJobAsync
+} from '../../../api/index.js'
 
 import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
-import { ConfirmDialog, useConfirm } from '../../../components/ConfirmDialog.js'
+import { useToast, ActionBar, ConfirmDialog, useConfirm } from '../../../components/Index.js'
 import { useFetching } from '../../../hooks.js'
-import { useToast } from '../../../components/Toast.js'
 import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
 import constants from '../../../constants.js'
-import { createRemoveBackupDuplicatesJobAsync } from '../../../queries/jobs.js'
 import * as globals from '../../../globals.js'
-import ActionBar from '../../../components/ActionBar.js'
+
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
 const { route } = globals.preactRouter

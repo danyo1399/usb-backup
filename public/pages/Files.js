@@ -1,9 +1,14 @@
-import PaginationButtons from '../components/PaginationButtons.js'
-import Tabs from '../components/Tabs.js'
+import { PaginationButtons, Tabs } from '../components/index.js'
 import constants from '../constants.js'
+import { useApiData, usePagination } from '../hooks.js'
+import {
+  reportDuplicateFilesOnBackupDevicesAsync,
+  reportDuplicateFilesOnSourceDevicesAsync,
+  reportFilesOnBackupWithNoSourceAsync,
+  reportFilesOnSourceWithNoBackupAsync
+} from '../api/files.js'
+
 import * as globals from '../globals.js'
-import { useApiData, usePagination } from '../index.js'
-import { reportDuplicateFilesOnBackupDevicesAsync, reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
 const { useState } = globals.preactHooks
 const { css } = globals.goober

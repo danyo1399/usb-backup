@@ -1,7 +1,7 @@
 import constants from '../../../constants.js'
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
-import { jobs$ } from '../../../queries/jobs.js'
+import { jobs$ } from '../../../api/jobs.js'
 
 const html = globals.html
 const { route } = globals.preactRouter

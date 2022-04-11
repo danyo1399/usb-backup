@@ -1,7 +1,7 @@
 import { useApiData, useFetching, useObservableState } from '../../../hooks.js'
 import { useToast, Dialog, Alert, Button, Checkbox } from '../../../components/index.js'
 import * as globals from '../../../globals.js'
-import { createBackupDevicesJobAsync, deviceInfo$, getBackupDevicesAsync } from '../../../queries/index.js'
+import { createBackupDevicesJobAsync, deviceInfo$, getBackupDevicesAsync } from '../../../api/index.js'
 import { bytesToSize } from '../../../fns.js'
 const { html, preactHooks } = globals
 

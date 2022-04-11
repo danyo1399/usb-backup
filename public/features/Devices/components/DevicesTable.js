@@ -2,7 +2,7 @@ import { toDateString } from '../../../components/index.js'
 import { bytesToSize } from '../../../fns.js'
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
-import { deviceInfo$ } from '../../../queries/index.js'
+import { deviceInfo$ } from '../../../api/index.js'
 
 const html = globals.html
 

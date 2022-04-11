@@ -1,7 +1,7 @@
-import FileBrowser from './components/FileBrowser.js'
+import { FileBrowser } from './components/index.js'
 import * as globals from './globals.js'
 import { useApiData, useFileTree } from './hooks.js'
-import { getFilesByDeviceIdAsync } from './queries/files.js'
+import { getFilesByDeviceIdAsync } from './api/index.js'
 const html = globals.html
 const { useState } = globals.preactHooks
 

@@ -1,7 +1,7 @@
 import { ToastProvider, Toast, SideNav } from './components/index.js'
 import constants from './constants.js'
 import Devices from './features/Devices/index.js'
-import './graphql.js'
+import './api/graphql.js'
 
 import Jobs from './features/Jobs/index.js'
 import JobLog from './features/Jobs/components/JobLog.js'
@@ -12,7 +12,7 @@ import Test from './TestPage.js'
 import ViewFiles from './features/Files/pages/ViewFiles.js'
 import Files from './pages/Files.js'
 import { useOnFocus } from './hooks.js'
-import { refreshDeviceInfoAsync } from './queries/index.js'
+import { refreshDeviceInfoAsync } from './api/index.js'
 const { Router } = globals.preactRouter
 const html = globals.html
 const { css } = globals.goober

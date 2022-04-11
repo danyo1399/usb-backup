@@ -1,6 +1,5 @@
-import { execute, toObservable } from '../graphql.js'
+import { execute, toObservable, handleResponseError } from './graphql.js'
 import * as globals from '../globals.js'
-import { handleResponseError } from '../fns.js'
 const { rxjs } = globals
 
 export async function createRemoveBackupDuplicatesJobAsync (...backupDeviceIds) {

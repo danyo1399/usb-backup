@@ -1,15 +1,19 @@
-import ActionBar from '../../../components/ActionBar.js'
-import { Alert } from '../../../components/Alert.js'
-import { Button } from '../../../components/Button.js'
-import DeviceSelector, { useDeviceSelector } from '../../../components/DeviceSelector.js'
-import { Dialog, useDialog } from '../../../components/Dialog.js'
-import FileBrowser from '../../../components/FileBrowser.js'
-import { useToast } from '../../../components/Toast.js'
+import {
+  FileBrowser,
+  useToast,
+  Dialog,
+  useDialog,
+  ActionBar,
+  Alert,
+  Button,
+  DeviceSelector,
+  useDeviceSelector
+} from '../../../components/index.js'
+
 import * as globals from '../../../globals.js'
-import { useApiData, useFileTree } from '../../../hooks.js'
-import { useDevice, useFetching, useFormControl } from '../../../index.js'
-import { getFilesByDeviceIdAsync } from '../../../queries/files.js'
-import { restoreBackupFilesToSourceRequestAsync } from '../../../queries/jobs.js'
+import { useApiData, useFileTree, useDevice, useFetching, useFormControl } from '../../../hooks.js'
+import { getFilesByDeviceIdAsync, restoreBackupFilesToSourceRequestAsync } from '../../../api/index.js'
+
 const html = globals.html
 const { useState } = globals.preactHooks
 const { css } = globals.goober

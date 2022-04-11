@@ -1,7 +1,7 @@
 import TextFormField from '../../../components/TextFormField.js'
 
 import { useFormControl, useJob, useObservableState } from '../../../hooks.js'
-import { getJobLog } from '../../../queries/jobs.js'
+import { getJobLog } from '../../../api/jobs.js'
 import * as globals from '../../../globals.js'
 const html = globals.html
 const { css } = globals.goober
@@ -18,6 +18,7 @@ function filterType (type, filter) {
         ? ['warn', 'error'].includes(type)
         : type === 'error'
 }
+
 export default function JobLog ({ jobId }) {
   const [log$, setLog$] = useState(null)
   const [pageNo, setPageNo] = useState(1)

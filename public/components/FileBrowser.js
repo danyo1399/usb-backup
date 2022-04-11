@@ -17,7 +17,7 @@ function createPathNodes (currentPath) {
   }
   return pathNodes
 }
-export default function FileBrowser ({ currentPath, node, navigate, selectedRowsChanged }) {
+export function FileBrowser ({ currentPath, node, navigate, selectedRowsChanged }) {
   const styles = css`
     display: flex;
     flex-direction: column;

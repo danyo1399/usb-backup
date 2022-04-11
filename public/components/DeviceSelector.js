@@ -18,7 +18,7 @@ export function useDeviceSelector (type) {
   return { selectedDevice, selectorProps: { devices, selectedDeviceId, setSelectedDeviceId } }
 }
 
-export default function DeviceSelector ({ devices, selectedDeviceId, setSelectedDeviceId, id, label }) {
+export function DeviceSelector ({ devices, selectedDeviceId, setSelectedDeviceId, id, label }) {
   const styles = css``
   const generatedId = useUniqueId('device-selector')
   id = id || generatedId

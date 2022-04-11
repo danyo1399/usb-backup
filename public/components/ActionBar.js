@@ -3,7 +3,7 @@ import * as globals from '../globals.js'
 const html = globals.html
 const { css } = globals.goober
 
-export default function ActionBar ({ items, label }) {
+export function ActionBar ({ items, label }) {
   const styles = css`
   height: 3.5rem;
   display:flex;
