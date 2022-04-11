@@ -1,5 +1,3 @@
-
-import Link from '../components/Link.js'
 import PaginationButtons from '../components/PaginationButtons.js'
 import Tabs from '../components/Tabs.js'
 import constants from '../constants.js'
@@ -7,15 +5,14 @@ import * as globals from '../globals.js'
 import { useApiData, usePagination } from '../index.js'
 import { reportDuplicateFilesOnBackupDevicesAsync, reportDuplicateFilesOnSourceDevicesAsync, reportFilesOnBackupWithNoSourceAsync, reportFilesOnSourceWithNoBackupAsync } from '../queries/files.js'
 const html = globals.html
-const { useEffect, useState } = globals.preactHooks
-const { route } = globals.preactRouter
+const { useState } = globals.preactHooks
 const { css } = globals.goober
 
 const items = [
   { label: 'Pending', key: 'pending', href: constants.routes.getFilesUrl('pending') },
   { label: 'Duplicates', key: 'duplicates', href: constants.routes.getFilesUrl('duplicates') },
   { label: 'Removed', key: 'removed', href: constants.routes.getFilesUrl('removed') },
-  { label: 'Modified', key: 'modified', href: constants.routes.getFilesUrl('modified') },
+  { label: 'Modified', key: 'modified', href: constants.routes.getFilesUrl('modified') }
 ]
 export default function Files ({ tab }) {
   const styles = css`

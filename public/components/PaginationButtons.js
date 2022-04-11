@@ -1,7 +1,6 @@
 import * as globals from '../../../globals.js'
 const html = globals.html
 const { css } = globals.goober
-const { useState, useEffect } = globals.preactHooks
 
 export default function PaginationButtons ({
   firstPage,

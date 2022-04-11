@@ -3,7 +3,7 @@ import * as globals from '../globals.js'
 import { useRowSelector } from '../hooks.js'
 const { html, preactHooks, goober: { css }, classNames } = globals
 
-const { useState, useEffect, useMemo } = preactHooks
+const { useEffect, useMemo } = preactHooks
 
 function createPathNodes (currentPath) {
   // get rid of leading /

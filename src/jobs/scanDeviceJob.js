@@ -3,7 +3,6 @@ const fileTreeWalkerAsync = require('../fileTreeWalker')
 const { index, identity, newIdNumber } = require('../utils')
 const {
   getDeviceByIdAsync,
-  InsertFileAsync,
   getFileIdsByDeviceAsync,
   deleteFileAsync,
   getFileByFingerprintAsync,

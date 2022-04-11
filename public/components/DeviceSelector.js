@@ -1,6 +1,6 @@
 import { useDevices, useUniqueId } from '../hooks.js'
 import * as globals from '../globals.js'
-const { useRef, useState } = globals.preactHooks
+const { useState } = globals.preactHooks
 const { html } = globals
 const { css } = globals.goober
 

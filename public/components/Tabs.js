@@ -2,8 +2,6 @@
 import Link from '../components/Link.js'
 import * as globals from '../globals.js'
 const html = globals.html
-const { useEffect, useState } = globals.preactHooks
-const { route } = globals.preactRouter
 const { css } = globals.goober
 const classNames = globals.classNames
 

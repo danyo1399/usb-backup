@@ -60,7 +60,6 @@ Array [
     await testUtils.sleep(1000)
     await deviceInfo.refresh()
 
-
     expect(deviceInfoList.every(x => x.isOnline === true)).toBe(true)
     expect(deviceInfoList.every(x => x.id === backupDevice.id || x.id === sourceDevice.id)).toBe(true)
     expect(deviceInfoList.every(x => x.freeSpace > 0)).toBe(true)

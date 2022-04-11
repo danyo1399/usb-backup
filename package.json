@@ -7,8 +7,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEV node src/index.js",
     "start:watch": "cross-env NODE_ENV=DEV nodemon --ignore ./public/ src/index.js",
-    "test": "jest ",
+    "test": "jest",
+    "lint": "standard",
     "test:watch": "jest --watch ",
+    "pipeline:qa": "npm run test && npm run lint",
     "pipeline:publish:patch": "npm run test && npm version patch && npm publish",
     "pipeline:publish:minor": "npm run test && npm version minor && npm publish",
     "pipeline:publish:major": "npm run test && npm version major && npm publish"

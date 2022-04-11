@@ -1,7 +1,6 @@
 const testUtils = require('./common')
 const path = require('path')
 const { currentPath, getFileRelativePath, appendSuffixToFilename, findUniqueFilenameAsync, appendFilePathToPath } = require('../src/path')
-const fs = require('fs-extra')
 
 describe('path tests', () => {
   describe('environment required tests', function () {

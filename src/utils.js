@@ -16,7 +16,7 @@ const curry = exports.curry = function (func) {
   }
 }
 
-const pipe = exports.pipe = (...args) => {
+exports.pipe = (...args) => {
   return (...firstArgs) => {
     let result = firstArgs
     args.forEach(fn => {

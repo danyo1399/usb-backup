@@ -2,7 +2,6 @@ import FileBrowser from './components/FileBrowser.js'
 import * as globals from './globals.js'
 import { useApiData, useFileTree } from './hooks.js'
 import { getFilesByDeviceIdAsync } from './queries/files.js'
-const { Router } = globals.preactRouter
 const html = globals.html
 const { useState } = globals.preactHooks
 

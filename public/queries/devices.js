@@ -119,8 +119,6 @@ export async function scanDevicesAsync (deviceIds, useFullScan) {
   return response
 }
 
-
-
 /*
 Backup devices
 ==================================================================================

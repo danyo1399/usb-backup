@@ -14,7 +14,7 @@ exports.createFileAsync = async (device, filePath, { hash, stat } = {}) => {
   return { file }
 }
 
-exports.copyFileAsync = async (src, destination, { overwrite, appendSuffix }) => {
+exports.copyFileAsync = async (src, destination, { overwrite, appendSuffix } = {}) => {
   const tempDest = destination + '.tmp'
   if (overwrite && appendSuffix) throw new Error('overwrite and appendSuffix are mutually exclusive')
   try {

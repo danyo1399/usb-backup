@@ -1,7 +1,8 @@
 const { hashFileAsync } = require('../src/crypto')
-const { createFileAsync } = require('../src/file')
+const { createFileAsync, copyFileAsync } = require('../src/file')
 const { getFilesByDeviceAsync } = require('../src/repo')
 const { setupTestEnvironment, createDevicesAsync, createContext } = require('./common')
+const fs = require('fs-extra')
 
 describe('file tests', function () {
   const ctx = createContext()
@@ -14,10 +15,33 @@ describe('file tests', function () {
     })
 
     describe('copy file tests', function () {
-      it.skip('can copy file', async function () {
-
+      it('can copy file', async function () {
+        const filePath = await env.createDummyFileAsync('test.txt', 1024)
+        const copyPath = filePath + '.copy'
+        await copyFileAsync(filePath, copyPath)
+        const originalHash = await hashFileAsync(filePath)
+        const copyHash = await hashFileAsync(copyPath)
+        expect(originalHash).toEqual(copyHash)
       })
 
+      it('throws an error if the file exists', async function () {
+        const filePath = await env.createDummyFileAsync('test.txt', 1024)
+        const copyPath = filePath + '.copy'
+        await copyFileAsync(filePath, copyPath)
+
+        await expect(copyFileAsync(filePath, copyPath)).rejects.toBeTruthy()
+      })
+
+      it('copies file to new path when file exists', async function () {
+        const filePath = await env.createDummyFileAsync('test.txt', 1024)
+
+        await copyFileAsync(filePath, filePath, { appendSuffix: true })
+
+        const files = await fs.readdir(env.tempPath)
+
+        expect(files).toContain('test.txt')
+        expect(files).toContain('test 001.txt')
+      })
     })
 
     describe('Create file tests', function () {
