@@ -8,11 +8,11 @@ import {
   Button,
   DeviceSelector,
   useDeviceSelector
-} from '../../../components/index.js'
+} from '../../components/index.js'
 
-import * as globals from '../../../globals.js'
-import { useApiData, useFileTree, useDevice, useFetching, useFormControl } from '../../../hooks.js'
-import { getFilesByDeviceIdAsync, restoreBackupFilesToSourceRequestAsync } from '../../../api/index.js'
+import * as globals from '../../globals.js'
+import { useApiData, useFileTree, useDevice, useFetching, useFormControl } from '../../hooks.js'
+import { getFilesByDeviceIdAsync, restoreBackupFilesToSourceRequestAsync } from '../../api/index.js'
 
 const html = globals.html
 const { useState } = globals.preactHooks

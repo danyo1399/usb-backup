@@ -1,8 +1,8 @@
-import TextFormField from '../../../components/TextFormField.js'
+import TextFormField from '../../components/TextFormField.js'
 
-import { useFormControl, useJob, useObservableState } from '../../../hooks.js'
-import { getJobLog } from '../../../api/jobs.js'
-import * as globals from '../../../globals.js'
+import { useFormControl, useJob, useObservableState } from '../../hooks.js'
+import { getJobLog } from '../../api/jobs.js'
+import * as globals from '../../globals.js'
 const html = globals.html
 const { css } = globals.goober
 const { useState, useEffect } = globals.preactHooks

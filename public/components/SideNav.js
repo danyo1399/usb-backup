@@ -1,7 +1,7 @@
 import { Icon } from './Icon.js'
 import constants from '../constants.js'
 import * as globals from '../globals.js'
-import { JobsMenuItem } from '../features/Jobs/index.js'
+import { JobsMenuItem } from '../pages/Jobs/index.js'
 import Link from './Link.js'
 import { theme } from '../theme/index.js'
 

@@ -1,5 +1,5 @@
-import ManageDeviceDialog from './ManageDevice.js'
-import DevicesTable from './DevicesTable.js'
+import ManageDeviceDialog from './components/ManageDeviceDialog.js'
+import DevicesTable from './components/DevicesTable.js'
 import {
   createBackupDeviceAsync,
   createSourceDeviceAsync,
@@ -10,14 +10,14 @@ import {
   updateBackupDeviceAsync,
   updateSourceDeviceAsync,
   createRemoveBackupDuplicatesJobAsync
-} from '../../../api/index.js'
+} from '../../api/index.js'
 
-import StartBackupDevicesJobDialog from './StartBackupDevicesJobDialog.js'
-import { useToast, ActionBar, ConfirmDialog, useConfirm } from '../../../components/Index.js'
-import { useFetching } from '../../../hooks.js'
-import StartScanDevicesJobDialog from './StartScanDevicesJobDialog.js'
-import constants from '../../../constants.js'
-import * as globals from '../../../globals.js'
+import StartBackupDevicesJobDialog from './components/StartBackupDevicesJobDialog.js'
+import { useToast, ActionBar, ConfirmDialog, useConfirm } from '../../components/Index.js'
+import { useFetching } from '../../hooks.js'
+import StartScanDevicesJobDialog from './components/StartScanDevicesJobDialog.js'
+import constants from '../../constants.js'
+import * as globals from '../../globals.js'
 
 const html = globals.html
 const { useEffect, useState } = globals.preactHooks
