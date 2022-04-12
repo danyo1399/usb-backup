@@ -47,7 +47,7 @@ export default function Devices ({ variant }) {
     setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
   }
 
-  async function onScanDevicesJobAsync (useFullScan) {
+  async function onScanDevicesJobAsync () {
     if (selectedDevices.length > 0) {
       setShowScanJobDialog(true)
     }

@@ -9,6 +9,7 @@ import {
 } from '../api/files.js'
 
 import * as globals from '../globals.js'
+import { theme } from '../theme/index.js'
 const html = globals.html
 const { useState } = globals.preactHooks
 const { css } = globals.goober
@@ -76,7 +77,7 @@ function Duplicates () {
       width: 10rem;
     }
     label {
-      font-weight:500;
+      font-weight: ${theme.fontWeight.semibold};
     }
   }
   `

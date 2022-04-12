@@ -1,10 +1,12 @@
 import { bytesToSize, shortDateTimeString } from '../fns.js'
 import * as globals from '../globals.js'
 import { useRowSelector } from '../hooks.js'
+import { theme } from '../theme/index.js'
 const { html, preactHooks, goober: { css }, classNames } = globals
 
 const { useEffect, useMemo } = preactHooks
 
+const colors = theme.colors.fileBrowser
 function createPathNodes (currentPath) {
   // get rid of leading /
   const paths = currentPath === '/' ? [''] : currentPath.split('/')
@@ -37,24 +39,23 @@ export function Table ({ node, navigate, selectedRowsChanged }) {
     navigate(folder)
   }
   const styles = css`
-    border: 1px solid #eaecef;
+    border: 1px solid ${colors.table.border};
     width: 100%;
     border-collapse: collapse;
     border-radius: 2px;
-    background: #fff;
     .table-header-row {
       height:3rem;
-      background-color:#eaecef;
+      background-color:${colors.table.headerBackground};
     }
 
     .selected {
-      background-color:#e0edff;
+      background-color:${colors.table.selectedRow};
     }
 
     .link {
       cursor: pointer;
       text-decoration: none;
-      color: #0076ff;
+      color: ${colors.link};
       &:hover {
         text-decoration: underline;
       }
@@ -68,7 +69,7 @@ export function Table ({ node, navigate, selectedRowsChanged }) {
       padding-right: 3px;
       padding-bottom: 6px;
       padding-left: 3px;
-      border-top: 1px solid #eaecef;
+      border-top: 1px solid ${colors.table.border};
     }
     tr {
       user-select: none;
@@ -157,7 +158,7 @@ export function Breadcrumbs ({ currentPath, selectNode }) {
   .node {
     cursor: pointer;
     text-decoration: none;
-    color: #0076ff;
+    color: ${colors.link};
     &:hover {
       text-decoration: underline;
     }

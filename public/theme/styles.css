@@ -1,0 +1,19 @@
+/*
+ global styles
+*/
+
+h1 {
+  margin-bottom: 2rem;
+}
+
+
+/*
+Utility selectors
+*/
+  *[data-hidden] {
+    display: none;
+  }
+
+  *[data-invisible] {
+    visibility: hidden;
+  }

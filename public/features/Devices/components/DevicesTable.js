@@ -1,5 +1,4 @@
-import { toDateString } from '../../../components/index.js'
-import { bytesToSize } from '../../../fns.js'
+import { bytesToSize, dateString } from '../../../fns.js'
 import * as globals from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
 import { deviceInfo$ } from '../../../api/index.js'
@@ -42,8 +41,8 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
                                 <td>${dev.description}</td>
                                 <td>${dev.path}</td>
                                 <td>${bytesToSize(deviceInfo[dev.id]?.freeSpace)}</td>
-                                <td>${toDateString(dev.lastScanDate)}</td>
-                                ${variant === 'source' && html`<td>${toDateString(dev.lastBackupDate)}</td>`}
+                                <td>${dateString(dev.lastScanDate)}</td>
+                                ${variant === 'source' && html`<td>${dateString(dev.lastBackupDate)}</td>`}
                                 <td>
                                     <div class="dropdown">
                                         <button

@@ -1,4 +1,3 @@
-import { createEntityAdapter, defaultEntityAdapterState } from './fns.js'
 import * as globals from './globals.js'
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './api/devices.js'
 import { jobs$ } from './api/jobs.js'
@@ -280,30 +279,6 @@ export function useObservableState (observable$) {
     return () => subscription?.unsubscribe()
   }, [observable$])
   return state
-}
-
-export function useIdentityTrackedIteratorState (getIterator, getId = x => x.id, getItems) {
-  const [state, setState] = useState(defaultEntityAdapterState())
-  useEffect(() => {
-    const iterator = getIterator();
-
-    (async () => {
-      for await (const newItems of iterator) {
-        setState(oldState => {
-          const adapter = createEntityAdapter(oldState, getId)
-          for (const newItem of getItems(newItems)) {
-            adapter.upsert(newItem)
-          }
-          return adapter.state()
-        })
-      }
-    })()
-    return () => {
-      iterator.return()
-    }
-  }, [])
-
-  return createEntityAdapter(state).items()
 }
 
 let lastId = 1

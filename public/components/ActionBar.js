@@ -1,20 +1,21 @@
-
+import { theme } from '../theme/index.js'
 import * as globals from '../globals.js'
 const html = globals.html
 const { css } = globals.goober
 
+const colors = theme.colors.actionBar
 export function ActionBar ({ items, label }) {
   const styles = css`
   height: 3.5rem;
   display:flex;
   align-items:center;
-  border: 1px solid #dbdbdb;
+  border: 1px solid ${colors.border};
   padding:1rem;
   margin-bottom: 0.5rem;
   border-radius: 5px;
 
   .label {
-    font-weight: var(--font-weight-normal);
+    font-weight: ${theme.fontWeight.normal};
     font-size: 1.1rem;
     margin-right: 1.5rem;
   }

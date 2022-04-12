@@ -3,13 +3,15 @@ import constants from '../constants.js'
 import * as globals from '../globals.js'
 import { JobsMenuItem } from '../features/Jobs/index.js'
 import Link from './Link.js'
+import { theme } from '../theme/index.js'
 
+const colors = theme.colors.sideNav
 const html = globals.html
 const { css } = globals.goober
 
 export function SideNav () {
   const styles = css`
-  background-color: var(--color-black);
+  background-color: ${colors.background};
   height: 100vh;
   width: 18rem;
   top: 0;
@@ -23,14 +25,14 @@ export function SideNav () {
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid ${colors.headerSeperator};
     .icon {
       font-size: 2rem;
       margin-right: 1rem;
     }
     .title {
-      font-size: 1.2rem;
-      font-weight: var(--font-weight-semibold);
+      font-size: 1.4rem;
+      font-weight: ${theme.fontWeight.medium};
     }
     .github {
 
@@ -73,18 +75,18 @@ export function SideNavMenuItem ({ icon, children, href }) {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: white;
+  color: ${colors.text};
   cursor: pointer;
   border-radius: 3px;
   font-size: 1.1rem;
-  font-weight: var(--font-weight-bold);
+  font-weight: ${theme.fontWeight.bold};
   padding: 0.5rem;
   text-decoration: none;
   &.menuitem-active {
-    background-color: var(--color-gray-100);
+    background-color: ${colors.active};
   }
   &:hover {
-    background-color: var(--color-gray-200);
+    background-color: ${colors.hover};
     color: white;
   }
   .icon {
