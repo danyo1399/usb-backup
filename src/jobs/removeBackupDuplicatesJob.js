@@ -8,6 +8,8 @@ const fs = require('fs-extra')
 const { assertDeviceOnlineAsync } = require('../device')
 const { appendFilePathToPath } = require('../path')
 
+// There can be duplicates on backup devices in cases where we are importing an existing usb
+// device that already has duplicate files
 module.exports.createRemoveBackupDuplicatesJobAsync = async (...backupDeviceIds) => {
   const context = { backupDeviceIds }
   const id = newIdNumber()

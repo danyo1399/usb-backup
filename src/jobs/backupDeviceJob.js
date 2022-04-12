@@ -1,16 +1,14 @@
 const { writeDeviceMetaFileAsync } = require('../app')
 const { newIdNumber } = require('../utils')
-const fs = require('fs-extra')
 const checkDiskSpace = require('check-disk-space').default
 const path = require('path')
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
-const { deviceName, isDeviceOnlineAsync } = require('../device')
+const { assertDeviceOnlineAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
-const { ensureFilePathExistsAsync, findUniqueFilenameAsync, appendFilePathToPath } = require('../path')
-const { copyAndHashAsync } = require('../crypto')
-const { createFileAsync } = require('../file')
+const { ensureFilePathExistsAsync, appendFilePathToPath } = require('../path')
+const { createFileAsync, copyFileAsync } = require('../file')
 
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
   const id = newIdNumber()
@@ -21,18 +19,8 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
   const description = `backup up devices ${sources.join(', ')} to device [${backupDevice.name}]`
 
   async function executeAsync (log) {
-    const context = { log, sourceDevice: null, freeSpace: null, addedHashes: {}, backupDevice: null, tempFilename: null, sourceFile: null }
-
-    context.backupDevice = await getDeviceByIdAsync(backupDeviceId)
-    if (!context.backupDevice || context.backupDevice.deviceType !== 'backup') {
-      log.error(`Backup device does not exist ${backupDeviceId}. Exiting`)
-      throw new Error(`Backup device does not exist ${backupDeviceId}`)
-    }
-
-    if ((await isDeviceOnlineAsync(context.backupDevice)) === false) {
-      log.error('Backup device is not online. Exiting')
-      throw new Error('Backup device is not online. Exiting')
-    }
+    const context = { log, sourceDevice: null, freeSpace: null, addedHashes: {}, backupDevice: null, sourceFile: null }
+    context.backupDevice = await assertDeviceOnlineAsync(backupDeviceId, { deviceType: 'backup' })
 
     log.info('Scanning devices before backup')
     await scanDevices(log, [...sourceDeviceIds, backupDeviceId], () => _abort)
@@ -41,9 +29,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       if (_abort) break
 
       log.debug(`Backing up source device ${deviceId}`)
-
-      context.sourceDevice = await tryLoadDeviceAsync(log, deviceId, 'source')
-      if (!context.sourceDevice) continue
+      context.sourceDevice = await assertDeviceOnlineAsync(deviceId, { deviceType: 'source' })
 
       const filesToBackup = await getSourceFilesToBackupAsync(context.sourceDevice.id)
 
@@ -53,7 +39,6 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
 
       for (const f of filesToBackup) {
         context.sourceFile = f
-        context.tempFilename = ''
 
         try {
           if (context.addedHashes[context.sourceFile.hash]) {
@@ -71,6 +56,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
           handleBackupFileError(error, log, context)
         }
       }
+
       const pendingFilesAfterBackup = await getSourceFilesToBackupAsync(context.sourceDevice.id)
       if (pendingFilesAfterBackup.length === 0) {
         log.debug('Updating last backup date')
@@ -87,14 +73,6 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
   async function handleBackupFileError (error, log, context) {
     log.error(`failed backing up file ${context.sourceFile.relativePath}. Skipping (${error.message})`, error)
 
-    if (context.tempFilename) {
-      try {
-        await fs.rm(context.tempFilename, { force: true })
-      } catch (error) {
-        // NOOP
-      }
-    }
-
     // Update free space in case insufficient space caused copy to fail
     try {
       context.freeSpace = (await checkDiskSpace(context.backupDevice.path)).free
@@ -103,49 +81,27 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     }
   }
 
-  async function tryLoadDeviceAsync (log, deviceId, deviceType) {
-    const device = (await getDeviceByIdAsync(deviceId))
-
-    if (!device || device.deviceType !== 'source') {
-      log.error(`${deviceType} device with id does not exist ${deviceId}`)
-      return null
-    }
-
-    const isDeviceOnline = await isDeviceOnlineAsync(device)
-    if (!isDeviceOnline) {
-      log.error(`${deviceType} Device offline: ${deviceName(device)}`)
-      return null
-    }
-    return device
-  }
-
   async function backupFile (log, context) {
     const sourceFilename = path.join(context.sourceDevice.path, context.sourceFile.relativePath)
-    let targetFilename = appendFilePathToPath(sourceFilename, context.backupDevice.path)
+    const targetFilename = appendFilePathToPath(sourceFilename, context.backupDevice.path)
     await ensureFilePathExistsAsync(targetFilename)
-    targetFilename = await findUniqueFilenameAsync(targetFilename)
-    context.tempFilename = targetFilename + '.tmp'
 
     log.info(`Copying file to backup device ${sourceFilename} -> ${targetFilename}`)
 
-    await fs.rm(context.tempFilename, { force: true })
-    const backupHash = await copyAndHashAsync(sourceFilename, context.tempFilename)
+    const { hash: backupHash, basename: newTargetFilename } = await copyFileAsync(sourceFilename, targetFilename, { appendSuffix: true })
 
     context.freeSpace -= context.sourceFile.size
 
     if (backupHash !== context.sourceFile.hash) {
       log.warn(`Source file hash differs from backup file. source ${context.sourceFile.hash}, destination ${backupHash}`)
     }
-    const newTargetFilename = await findUniqueFilenameAsync(targetFilename)
+
     if (newTargetFilename !== targetFilename) {
-      log.warn(`target filename already exists but didnt when we started copying ${newTargetFilename}`)
+      log.warn(`target filename already exists, used unique filename ${newTargetFilename}`)
     }
 
-    const editDate = new Date(context.sourceFile.mtimeMs)
-    await fs.utimes(context.tempFilename, editDate, editDate)
-
-    await fs.move(context.tempFilename, newTargetFilename)
     await createFileAsync(context.backupDevice, targetFilename, { hash: backupHash })
+
     // two files to backup could have the same hash. We only want to copy one of them
     context.addedHashes[backupHash] = true
   }

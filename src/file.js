@@ -2,6 +2,7 @@ const fs = require('fs-extra')
 const { copyAndHashAsync, hashFileAsync } = require('./crypto')
 const { ensureFilePathExistsAsync, findUniqueFilenameAsync, getFileRelativePath } = require('./path')
 const { InsertFileAsync } = require('./repo')
+const path = require('path')
 
 exports.createFileAsync = async (device, filePath, { hash, stat } = {}) => {
   stat = stat || await fs.stat(filePath)
@@ -31,8 +32,8 @@ exports.copyFileAsync = async (src, destination, { overwrite, appendSuffix } = {
       destination = await findUniqueFilenameAsync(destination)
     }
     await fs.move(tempDest, destination, { overwrite })
-
-    return { hash, path: destination }
+    const basename = path.basename(destination)
+    return { hash, path: destination, basename }
   } catch (error) {
     try { await fs.rm(tempDest, { force: true }) } catch (err) {}
 

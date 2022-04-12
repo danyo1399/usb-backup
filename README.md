@@ -53,7 +53,6 @@ The application will create the a data directory where the database will be stor
 
 ## Troubleshooting
 
-
 `Error: listen EADDRINUSE: address already in use`
 
 This means you either have the application already running or something else is listening on the same port. Either shutdown the other instance of the running application or running the application on another port by providing a different port number eg `npx usb-backup 6000`
