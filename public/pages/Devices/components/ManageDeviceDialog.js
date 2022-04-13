@@ -1,10 +1,7 @@
 import { useFetching, useFormControl } from '../../../hooks.js'
 import { useToast, Dialog, Alert, Button } from '../../../components/index.js'
-import * as globals from '../../../globals.js'
+import { html, useEffect } from '../../../globals.js'
 import { refreshDeviceInfoAsync } from '../../../api/index.js'
-const { html, preactHooks } = globals
-
-const { useEffect } = preactHooks
 
 export default function ManageDeviceDialog ({
   show,

@@ -1,6 +1,6 @@
 import * as globals from '../globals.js'
 
-const h = globals.html
+const html = globals.html
 
 const { Link: StaticLink, exec, useRouter } = globals.preactRouter
 
@@ -27,7 +27,7 @@ export function Link ({
   const active = (matches && (activeClass || activeClassName)) || ''
   props.class = inactive + (inactive && active && ' ') + active
 
-  return h`<${StaticLink} ...${props} />`
+  return html`<${StaticLink} ...${props} />`
 }
 
 export default Link

@@ -11,13 +11,10 @@ import Files from './pages/Files/index.js'
 
 import LicenceDialog from './components/Licence.js'
 
-import * as globals from './globals.js'
+import { css, html, Router } from './globals.js'
 import Test from './TestPage.js'
 import { useOnFocus } from './hooks.js'
 import { refreshDeviceInfoAsync } from './api/index.js'
-const { Router } = globals.preactRouter
-const html = globals.html
-const { css } = globals.goober
 
 const SouceDevices = (props) => html`<${Devices} ...${props} variant="source"/>`
 const BackupDevices = (props) => html`<${Devices} ...${props} variant="backup"/>`

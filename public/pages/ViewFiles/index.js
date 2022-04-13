@@ -10,13 +10,9 @@ import {
   useDeviceSelector
 } from '../../components/index.js'
 
-import * as globals from '../../globals.js'
+import { css, html, useState } from '../../globals.js'
 import { useApiData, useFileTree, useDevice, useFetching, useFormControl } from '../../hooks.js'
 import { getFilesByDeviceIdAsync, restoreBackupFilesToSourceRequestAsync } from '../../api/index.js'
-
-const html = globals.html
-const { useState } = globals.preactHooks
-const { css } = globals.goober
 
 export default function ViewFiles ({ deviceId }) {
   const styles = css``

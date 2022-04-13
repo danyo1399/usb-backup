@@ -1,9 +1,7 @@
 import { bytesToSize, dateString } from '../../../fns.js'
-import * as globals from '../../../globals.js'
+import { html } from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
 import { deviceInfo$ } from '../../../api/index.js'
-
-const html = globals.html
 
 export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
   if (devices.length === 0) {

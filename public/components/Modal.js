@@ -1,7 +1,4 @@
-import * as globals from '../../globals.js'
-const { html, preactHooks, bootstrap } = globals
-
-const { useRef, useEffect } = preactHooks
+import { bootstrap, html, useEffect, useRef } from '../globals.js'
 
 export function Modal ({ id, ariaLabeledBy, className, children, show, onClose }) {
   const modalRef = useRef(null)

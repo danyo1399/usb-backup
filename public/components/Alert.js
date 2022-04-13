@@ -1,5 +1,4 @@
-import * as globals from '../../globals.js'
-const html = globals.html
+import { html } from '../globals.js'
 
 export function Alert ({ type, children, dismiss }) {
   return html`

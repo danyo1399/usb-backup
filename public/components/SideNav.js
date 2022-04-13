@@ -1,13 +1,12 @@
 import { Icon } from './Icon.js'
 import constants from '../constants.js'
-import * as globals from '../globals.js'
+
 import { JobsMenuItem } from '../pages/Jobs/index.js'
 import Link from './Link.js'
 import { theme } from '../theme/index.js'
+import { css, html } from '../globals.js'
 
 const colors = theme.colors.sideNav
-const html = globals.html
-const { css } = globals.goober
 
 export function SideNav () {
   const styles = css`

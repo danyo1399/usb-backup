@@ -7,6 +7,8 @@ export const classNames = window.classNames
 export const bootstrap = window.bootstrap
 export const rxjs = window.rxjs
 export const goober = window.goober
-export const { useState, useEffect, useRef, useMemo, useCallback } = preactHooks
+export const { createContext } = preact
+export const { useState, useEffect, useRef, useMemo, useCallback, useContext } = preactHooks
 export const css = goober.css
+export const { Router, useRouter, route } = preactRouter
 goober.setup(preact.h)

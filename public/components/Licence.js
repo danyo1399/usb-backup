@@ -1,7 +1,5 @@
-import * as globals from '../../globals.js'
+import { html, useEffect, useState } from '../globals.js'
 import { Dialog } from './Dialog.js'
-const { useEffect, useState } = globals.preactHooks
-const { html } = globals
 
 const licenceShownKey = 'usb-backup__licenceShown'
 

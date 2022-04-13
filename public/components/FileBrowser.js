@@ -1,10 +1,7 @@
 import { bytesToSize, shortDateTimeString } from '../fns.js'
-import * as globals from '../globals.js'
+import { classNames, css, html, useEffect, useMemo } from '../globals.js'
 import { useRowSelector } from '../hooks.js'
 import { theme } from '../theme/index.js'
-const { html, preactHooks, goober: { css }, classNames } = globals
-
-const { useEffect, useMemo } = preactHooks
 
 const colors = theme.colors.fileBrowser
 function createPathNodes (currentPath) {

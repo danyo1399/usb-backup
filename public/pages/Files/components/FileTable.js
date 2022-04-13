@@ -1,10 +1,7 @@
 
 import { PaginationButtons } from '../../../components/PaginationButtons.js'
-import * as globals from '../../../globals.js'
+import { css, html } from '../../../globals.js'
 import { usePagination } from '../../../hooks.js'
-
-const html = globals.html
-const { css } = globals.goober
 
 export function FileTable ({ data }) {
   const styles = css`

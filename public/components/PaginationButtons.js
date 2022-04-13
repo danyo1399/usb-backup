@@ -1,6 +1,4 @@
-import * as globals from '../../../globals.js'
-const html = globals.html
-const { css } = globals.goober
+import { css, html } from '../globals.js'
 
 export function PaginationButtons ({
   firstPage,

@@ -1,9 +1,5 @@
-import * as globals from '../globals.js'
+import { classNames, html, useState } from '../globals.js'
 import { Modal } from './Modal.js'
-
-const { classNames } = globals
-const html = globals.html
-const { useState } = globals.preactHooks
 
 export function useDialog () {
   const [show, setShow] = useState(false)

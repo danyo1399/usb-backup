@@ -1,7 +1,5 @@
 import { theme } from '../theme/index.js'
-import * as globals from '../globals.js'
-const html = globals.html
-const { css } = globals.goober
+import { css, html } from '../globals.js'
 
 const colors = theme.colors.actionBar
 export function ActionBar ({ items, label }) {

@@ -1,9 +1,6 @@
 import { Modal } from './Modal.js'
-import * as globals from '../../globals.js'
-const { useRef, useState } = globals.preactHooks
-const { html } = globals
-
-let id = 1
+import { useUniqueId } from '../hooks.js'
+import { html, useRef, useState } from '../globals.js'
 
 export function useConfirm () {
   const [show, setShow] = useState(false)
@@ -31,10 +28,10 @@ export function useConfirm () {
 }
 
 export function ConfirmDialog ({ show, onConfirm, onCancel, header, body }) {
-  const idRef = useRef(`confirm-dialog-${id++}`)
+  const id = useUniqueId('confirm-dialog-')
 
   return html`
-        <${Modal} show=${show} id="${idRef.current} onClose=${onCancel}">
+        <${Modal} show=${show} id="${id} onClose=${onCancel}">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">

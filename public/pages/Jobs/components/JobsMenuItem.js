@@ -1,10 +1,8 @@
 import { SideNavMenuItem } from '../../../components/index.js'
 import constants from '../../../constants.js'
-import * as globals from '../../../globals.js'
+import { html } from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
 import { jobs$ } from '../../../api/index.js'
-
-const { html } = globals
 
 export function JobsMenuItem ({ ...props }) {
   const jobs = useObservableState(jobs$) || []

@@ -1,8 +1,5 @@
 import { useUniqueId } from '../hooks.js'
-
-import * as globals from '../globals.js'
-const h = globals.html
-const { useState, useEffect } = globals.preactHooks
+import { html, useEffect, useState } from '../globals.js'
 
 export function Checkbox ({ label, id, checked, onClick, ...props }) {
   const generatedId = useUniqueId()
@@ -22,7 +19,7 @@ export function Checkbox ({ label, id, checked, onClick, ...props }) {
     }, 0)
   }, [checked])
 
-  return h`
+  return html`
   <div class="form-check form-check-inline">
   <input class="form-check-input" type="checkbox" id="${componentId}" checked=${checkState} onClick=${clickHandler} />
   <label class="form-check-label" for="${componentId}">${label}</label>

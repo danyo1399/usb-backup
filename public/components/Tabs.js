@@ -1,8 +1,5 @@
 import Link from './Link.js'
-import * as globals from '../globals.js'
-const html = globals.html
-const { css } = globals.goober
-const classNames = globals.classNames
+import { classNames, css, html } from '../globals.js'
 
 export function Tabs ({ items, className, selected, ...props }) {
   const styles = css`

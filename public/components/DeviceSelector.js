@@ -1,8 +1,5 @@
 import { useDevices, useUniqueId } from '../hooks.js'
-import * as globals from '../globals.js'
-const { useState } = globals.preactHooks
-const { html } = globals
-const { css } = globals.goober
+import { css, html, useState } from '../globals.js'
 
 export function useDeviceSelector (type) {
   const deviceCollections = useDevices()

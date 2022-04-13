@@ -1,7 +1,4 @@
-import * as globals from '../globals.js'
-const { html, preactHooks } = globals
-
-const { useRef } = preactHooks
+import { html, useRef } from '../globals.js'
 
 let id = 1
 function nextId () {

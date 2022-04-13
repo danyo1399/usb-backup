@@ -1,7 +1,5 @@
 import { Dialog, Button, Checkbox } from '../../../components/index.js'
-import * as globals from '../../../globals.js'
-const { html, preactHooks } = globals
-const { useState } = preactHooks
+import { html, useState } from '../../../globals.js'
 
 export default function StartScanDevicesJobDialog ({
   devices,

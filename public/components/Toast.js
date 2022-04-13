@@ -1,9 +1,5 @@
 import { delay } from '../../fns.js'
-import * as globals from '../globals.js'
-const { html, preactHooks, preact, goober: { css } } = globals
-
-const { useRef, useState, useContext } = preactHooks
-const { createContext } = preact
+import { createContext, css, html, useContext, useRef, useState } from '../globals.js'
 
 const ToastContext = createContext(null)
 let nextId = 1

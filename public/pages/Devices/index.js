@@ -17,11 +17,7 @@ import { useToast, ActionBar, ConfirmDialog, useConfirm } from '../../components
 import { useFetching } from '../../hooks.js'
 import StartScanDevicesJobDialog from './components/StartScanDevicesJobDialog.js'
 import constants from '../../constants.js'
-import * as globals from '../../globals.js'
-
-const html = globals.html
-const { useEffect, useState } = globals.preactHooks
-const { route } = globals.preactRouter
+import { html, route, useEffect, useState } from '../../globals.js'
 
 export default function Devices ({ variant }) {
   const { addToast } = useToast()

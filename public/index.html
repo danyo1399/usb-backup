@@ -51,11 +51,12 @@
       const { render } = preact
       import App from '/app.js'
 
-      render(html`<${App} />`, document.body)
+      render(html`<${App} />`, document.getElementById('preact-root'))
     </script>
   </head>
   <body>
+  <div id="preact-root"></div>
 
-
+  </div>
   </body>
 </html>
