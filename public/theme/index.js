@@ -3,10 +3,10 @@ import { palette } from './colors.js'
 const colors = {
   palette,
   sideNav: {
-    active: palette.gray[800],
-    hover: palette.gray[700],
-    background: palette.black,
-    headerSeperator: palette.gray[600],
+    active: palette.zinc[800],
+    hover: palette.zinc[700],
+    background: palette.zinc[900],
+    headerSeperator: palette.zinc[600],
     text: palette.white
   },
   fileBrowser: {
