@@ -2,6 +2,7 @@ import { bytesToSize, dateString } from '../../../fns.js'
 import { html } from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
 import { deviceInfo$ } from '../../../api/index.js'
+import { ActionsTableButton } from '../../../components/Index.js'
 
 export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
   if (devices.length === 0) {
@@ -43,15 +44,10 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
                                 ${variant === 'source' && html`<td>${dateString(dev.lastBackupDate)}</td>`}
                                 <td>
                                     <div class="dropdown">
-                                        <button
-                                            class="btn btn-sm btn-secondary dropdown-toggle"
-                                            type="button"
+                                        <${ActionsTableButton}
                                             id="dropdownMenu2"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
                                         >
-                                            Actions
-                                        </button>
+                                        <//>
                                         <ul
                                             class="dropdown-menu"
                                             aria-labelledby="dropdownMenu2"

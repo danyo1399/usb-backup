@@ -2,6 +2,7 @@ import constants from '../../constants.js'
 import { html, route } from '../../globals.js'
 import { useObservableState } from '../../hooks.js'
 import { jobs$ } from '../../api/jobs.js'
+import { ActionsTableButton } from '../../components/index.js'
 
 export * from './components/JobsMenuItem.js'
 
@@ -42,15 +43,11 @@ export default function Jobs () {
 function Dropdown ({ viewLog, deleteJob, job }) {
   return html`
   <div class="dropdown">
-    <button
-        class="btn btn-sm btn-secondary dropdown-toggle"
-        type="button"
+    <${ActionsTableButton}
         id="jobsDropdownMenu"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
     >
         Actions
-    </button>
+    <//>
     <ul
         class="dropdown-menu"
         aria-labelledby="jobsDropdownMenu"
