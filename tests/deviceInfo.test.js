@@ -94,7 +94,6 @@ Array [
 
     expect(nextItemPromise).resolves.toBeUndefined()
 
-
     expect(deviceInfoList).toHaveLength(2)
     expect(returnValue.done).toBe(true)
   })
