@@ -20,7 +20,9 @@ describe('copy files from backup device job tests', function () {
         expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', '\\test\\', 'c:\\')).toBe('c:/test/test.txt')
         expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', 'test', 'c:\\')).toBe('c:/test/test.txt')
 
-        expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', '\\', '\\\\server\\folder')).toBe('//server/folder/test.txt')
+        if (path.sep === '\\') { // network paths like this are not valid in uxix
+          expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', '\\', '\\\\server\\folder')).toBe('//server/folder/test.txt')
+        }
       })
 
       it('generates destination path for folder path', async function () {
@@ -34,6 +36,10 @@ describe('copy files from backup device job tests', function () {
 
         expect(_getTargetPath('\\f1\\f2\\', 'f1\\f2\\f3\\test.txt', '\\out', 'c:\\devicefolder'))
           .toBe('c:/devicefolder/out/f2/f3/test.txt')
+
+        if (path.sep === '\\') { // network paths like this are not valid in uxix
+          expect(_getTargetPath('\\f2\\', 'f2\\test.txt', '\\', '\\\\server\\folder')).toBe('//server/folder/f2/test.txt')
+        }
       })
     })
   })

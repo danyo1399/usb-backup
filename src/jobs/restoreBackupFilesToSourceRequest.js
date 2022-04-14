@@ -5,7 +5,6 @@ const {
 
 } = require('../repo')
 const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
-const _path = require('path')
 const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
 const { joinPaths: joinPath, endsWithPathSeperator, joinPaths, basename } = require('../path')
