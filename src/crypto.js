@@ -53,6 +53,7 @@ exports.copyAndHashAsync = function (src, dest) {
   // Another algorithms: 'sha1', 'md5', 'sha256', 'sha512' ...
   const algorithm = 'md5'
   return new Promise((resolve, reject) => {
+    let hash
     try {
       const shasum = crypto.createHash(algorithm)
       const srcStream = fs.createReadStream(src)
@@ -64,11 +65,10 @@ exports.copyAndHashAsync = function (src, dest) {
 
       // making digest
       srcStream.on('end', function () {
-        const hash = shasum.digest('hex')
-        resolve(hash)
+        hash = shasum.digest('hex')
       })
 
-      pipeline(srcStream, destStream, err => err ? reject(err) : resolve())
+      pipeline(srcStream, destStream, err => err ? reject(err) : resolve(hash))
     } catch (error) {
       return reject(error)
     }
