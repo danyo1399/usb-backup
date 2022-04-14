@@ -1,11 +1,10 @@
-const { writeDeviceMetaFileAsync } = require('../app')
 const { newIdNumber } = require('../utils')
 const checkDiskSpace = require('check-disk-space').default
 const path = require('path')
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
-const { assertDeviceOnlineAsync } = require('../device')
+const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, appendFilePathToPath } = require('../path')
 const { createFileAsync, copyFileAsync } = require('../file')

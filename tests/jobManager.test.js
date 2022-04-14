@@ -36,18 +36,16 @@ describe('ScanDeviceJob', function () {
 
   describe('getJobLogIterator', function () {
     it('should be able to retrieve logs for job after it has finished running', async function () {
-      const logs = []
       const job = testJob('j1')
       job.id = 1
       await jobManager.runJobAsync(job)
 
       const logsIterator = jobManager.createJobLogsIterator(job.id)
 
-      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
+      const log = await logsIterator.next()
 
-      await testUtils.sleep(100)
-
-      expect(normaliseLogs(logs)).toMatchInlineSnapshot(`
+      await testUtils.sleep(500)
+      expect(normaliseLogs([log])).toMatchInlineSnapshot(`
         Array [
           Object {
             "done": false,
@@ -87,9 +85,10 @@ describe('ScanDeviceJob', function () {
       jobManager.runJobAsync(job2)
 
       const logsIterator = jobManager.createJobLogsIterator(job1.id)
-      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
-      await testUtils.sleep(200)
+      logs.push(await logsIterator.next())
+      logs.push(await logsIterator.next())
+      await testUtils.sleep(500)
 
       expect(normaliseLogs(logs)).toMatchInlineSnapshot(`
 Array [
@@ -135,9 +134,9 @@ Array [
       jobManager.runJobAsync(job)
 
       const logsIterator = jobManager.createJobLogsIterator(job.id)
-      testUtils.convertIteratorToCallback(logsIterator, j => logs.push(j))
 
-      await testUtils.sleep(200)
+      logs.push(await logsIterator.next())
+      logs.push(await logsIterator.next())
 
       expect(normaliseLogs(logs)).toMatchInlineSnapshot(`
 Array [
@@ -182,9 +181,9 @@ Array [
       const jobs = []
       const jobsIterator = jobManager.createJobsIterator()
 
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallbackAsync(jobsIterator, j => jobs.push(j))
 
-      await testUtils.sleep(100)
+      await testUtils.sleep(200)
 
       expect(jobs).toHaveLength(0)
     })
@@ -196,8 +195,7 @@ Array [
 
       const jobsIterator = jobManager.createJobsIterator()
 
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
-
+      jobs.push(await jobsIterator.next())
       await testUtils.sleep(100)
       expect(jobs).toHaveLength(1)
       jobs.forEach(j => { delete j.value.id })
@@ -229,8 +227,7 @@ Array [
       await testUtils.sleep(100)
 
       const jobsIterator = jobManager.createJobsIterator()
-
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+      jobs.push(await jobsIterator.next())
 
       await testUtils.sleep(100)
       expect(jobs).toHaveLength(1)
@@ -261,7 +258,7 @@ Array [
       const jobs = []
       const jobsIterator = jobManager.createJobsIterator()
 
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallbackAsync(jobsIterator, j => jobs.push(j))
 
       await jobManager.runJobAsync(testJob('j1'))
       await testUtils.sleep(100)
@@ -323,7 +320,7 @@ Array [
       const jobsIterator = jobManager.createJobsIterator()
       jobManager.runJobAsync(testJob('j1'))
       jobManager.runJobAsync(testJob('j2'))
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallbackAsync(jobsIterator, j => jobs.push(j))
 
       await testUtils.sleep(500)
 
@@ -424,7 +421,7 @@ Array [
       const jobsIterator = jobManager.createJobsIterator()
       await jobManager.runJobAsync(testJob('j1'))
 
-      testUtils.convertIteratorToCallback(jobsIterator, j => jobs.push(j))
+      testUtils.convertIteratorToCallbackAsync(jobsIterator, j => jobs.push(j))
 
       await jobManager.runJobAsync(testJob('j2'))
       await testUtils.sleep(100)

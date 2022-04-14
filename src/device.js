@@ -1,7 +1,9 @@
 const _path = require('path')
 const fs = require('fs-extra')
 const { defaultLogger } = require('./logging')
-const { getDeviceByIdAsync } = require('./repo')
+const { getDeviceByIdAsync, addDeviceAsync, updateDeviceAsync, getFilesByDeviceAsync, deleteDeviceAsync } = require('./repo')
+const { newId } = require('./utils')
+const { raiseError, errorCodes } = require('./errors')
 
 const METAFILE_SUFFIX = '.usbb'
 function getMetaFilePath ({ path, id }) {
@@ -54,13 +56,14 @@ exports.isDeviceOnlineAsync = async ({ path, id }) => {
 /**
  * Writes the device and files to a json file at the root of the device
  * @param {*} device
- * @param {*} files
  *
  * @description
  * We store a copy of the device details and its files on the backup device
  * Could be used in future to restore a lost database from the meta data files
  */
-exports.createDeviceMetaFileAsync = async (device, files = []) => {
+exports.writeDeviceMetaFileAsync = async (device) => {
+  const files = await getFilesByDeviceAsync(device.id)
+
   const file = _path.join(device.path, `${device.id}${METAFILE_SUFFIX}`)
 
   await fs.writeJson(file, { ...device, files })
@@ -83,4 +86,61 @@ exports.isExistingDeviceAsync = async (path) => {
 
 exports.isMetafile = (path) => {
   return /^[a-f0-9]{32}\.usbb$/.test(path)
+}
+
+exports.createSourceDeviceAsync = async (source) => {
+  source.id = source.id || newId()
+  source.deviceType = 'source'
+  const exists = await fs.pathExists(source.path)
+  if (!exists) {
+    raiseError(errorCodes.devicePathDoesNotExist)
+  }
+
+  if (await this.isExistingDeviceAsync(source.path)) raiseError(errorCodes.existingSource)
+
+  const createdSource = await addDeviceAsync(source)
+
+  await this.writeDeviceMetaFileAsync(source)
+  return createdSource
+}
+
+exports.updateDeviceAsync = async ({ id, name, description, path }) => {
+  const device = await getDeviceByIdAsync(id)
+  if (!device) {
+    raiseError(errorCodes.deviceDoesNotExist)
+  }
+  const hasPathChanged = path !== device.path
+  if (hasPathChanged) {
+    const isDeviceOnline = await this.isDeviceOnlineAsync({ id, path })
+
+    if (!isDeviceOnline) raiseError(errorCodes.pathDoesNotMatchDevice)
+  }
+  await updateDeviceAsync({ id, name, description, path })
+}
+
+exports.removeDeviceAsync = async (id) => {
+  const source = await getDeviceByIdAsync(id)
+  if (!source) {
+    raiseError(errorCodes.deviceDoesNotExist)
+  }
+  await deleteDeviceAsync(source.id)
+}
+
+exports.createBackupDeviceAsync = async (device) => {
+  device.id = device.id || newId()
+  device.deviceType = 'backup'
+  const exists = await fs.exists(device.path)
+  if (!exists) {
+    raiseError(errorCodes.devicePathDoesNotExist)
+  }
+
+  if (await this.isExistingDeviceAsync(device.path)) raiseError(errorCodes.existingSource)
+  // Backup devices must be local hdds on windows because we need to be able to read free space on drive
+  if (process.platform === 'win32' && !device.path.includes(':')) {
+    raiseError(errorCodes.pathNotSupported)
+  }
+  const createdDevice = await addDeviceAsync(device)
+
+  await this.writeDeviceMetaFileAsync(createdDevice)
+  return createdDevice
 }

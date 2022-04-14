@@ -1,4 +1,3 @@
-const { writeDeviceMetaFileAsync } = require('../app')
 const fileTreeWalkerAsync = require('../fileTreeWalker')
 const { index, identity, newIdNumber } = require('../utils')
 const {
@@ -15,7 +14,7 @@ const {
 
 } = require('../repo')
 const fs = require('fs-extra')
-const { deviceName, isDeviceOnlineAsync, isMetafile } = require('../device')
+const { deviceName, isDeviceOnlineAsync, isMetafile, writeDeviceMetaFileAsync } = require('../device')
 const { getFileRelativePath } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')

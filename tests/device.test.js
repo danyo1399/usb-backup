@@ -1,4 +1,4 @@
-const { isMetafile, isExistingDeviceAsync, isDeviceOnlineAsync, loadDeviceMetafileAsync, getDeviceIdForPathAsync } = require('../src/device')
+const { isMetafile, isExistingDeviceAsync, isDeviceOnlineAsync, loadDeviceMetafileAsync, getDeviceIdForPathAsync, createSourceDeviceAsync } = require('../src/device')
 const { assertNewMetafileCorrect } = require('./assertions')
 const { setupTestEnvironment, createDevicesAsync, createContext } = require('./common')
 
@@ -10,6 +10,23 @@ describe('device tests', function () {
     beforeEach(async function () {
       const { backupDevice, sourceDevice } = await createDevicesAsync(env)
       ctx.append({ backupDevice, sourceDevice })
+    })
+
+    it('throws an error when creating device and path is invalid', function () {
+      expect(createSourceDeviceAsync({ name: 'name', path: '' })).rejects.toMatchInlineSnapshot('[Error: Device path does not exist]')
+    })
+
+    it('throws an error when creating device and path already is an existing device', async function () {
+      await env.createDummyFileAsync('123.usbb', 10)
+      const promise = createSourceDeviceAsync({ name: 'name', path: env.tempPath })
+      await expect(promise).rejects.toMatchInlineSnapshot('[Error: existingSource]')
+    })
+
+    it('persists source and meta file when creating a device', async function () {
+      const source = await createSourceDeviceAsync({ name: 'name', path: env.tempPath })
+      const metafile = await loadDeviceMetafileAsync(source)
+
+      assertNewMetafileCorrect(source, metafile)
     })
 
     it('can determine if path is the root of a device path', async function () {

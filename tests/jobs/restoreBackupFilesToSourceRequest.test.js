@@ -5,8 +5,8 @@ const { createBackupDevicesJobAsync } = require('../../src/jobs/backupDeviceJob'
 const jobManager = require('../../src/jobs/jobManager')
 const { allAsync } = require('../../src/db')
 const { project } = require('../../src/utils')
-const { writeDeviceMetaFileAsync } = require('../../src/app')
 const { createRestoreBackupFilesToSourceRequest } = require('../../src/jobs/restoreBackupFilesToSourceRequest')
+const { writeDeviceMetaFileAsync } = require('../../src/device')
 
 describe('copy files from backup device job tests', function () {
   const ctx = testUtils.createContext()

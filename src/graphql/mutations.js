@@ -8,7 +8,6 @@ const {
 } = require('graphql')
 
 const { SourceDevice, BackupDevice, GenericErrorResponse, Error } = require('./types')
-const app = require('../app')
 const { createScanDeviceJobAsync } = require('../jobs/scanDeviceJob')
 const { runJobAsync } = require('../jobs/jobManager')
 const { createBackupDevicesJobAsync } = require('../jobs/backupDeviceJob')
@@ -18,6 +17,7 @@ const { emptyError } = require('../errors')
 const { deviceInfo } = require('../deviceInfo')
 const { createRemoveBackupDuplicatesJobAsync } = require('../jobs/removeBackupDuplicatesJob')
 const { createRestoreBackupFilesToSourceRequest } = require('../jobs/restoreBackupFilesToSourceRequest')
+const { createSourceDeviceAsync, updateDeviceAsync, createBackupDeviceAsync, removeDeviceAsync } = require('../device')
 
 function deviceMutations () {
   const CreateBackupDeviceRequest = new GraphQLInputObjectType({
@@ -97,7 +97,7 @@ function deviceMutations () {
           }
         } = args
         try {
-          await app.updateDeviceAsync({ id, name, description, path })
+          await updateDeviceAsync({ id, name, description, path })
         } catch (err) {
           response = toGraphqlErrorSection(err)
           defaultLogger.error('edit backup device error', response)
@@ -114,7 +114,7 @@ function deviceMutations () {
       resolve: async (a, { input }) => {
         let response
         try {
-          const device = await app.createBackupDeviceAsync(input)
+          const device = await createBackupDeviceAsync(input)
           response = { device: device, error: response }
         } catch (err) {
           response = toGraphqlErrorSection(err)
@@ -132,7 +132,7 @@ function deviceMutations () {
       resolve: async (a, { input: id }) => {
         let response
         try {
-          await app.removeDeviceAsync(id)
+          await removeDeviceAsync(id)
           response = { error: null }
         } catch (err) {
           response = toGraphqlErrorSection(err)
@@ -157,7 +157,7 @@ function deviceMutations () {
           }
         } = args
         try {
-          await app.updateDeviceAsync({ id, name, description, path })
+          await updateDeviceAsync({ id, name, description, path })
         } catch (err) {
           response = toGraphqlErrorSection(err)
           defaultLogger.error('edit source device', response)
@@ -174,7 +174,7 @@ function deviceMutations () {
       resolve: async (a, { input }) => {
         let response
         try {
-          const device = await app.createSourceDeviceAsync(input)
+          const device = await createSourceDeviceAsync(input)
           response = { device: device, error: response }
         } catch (err) {
           response = toGraphqlErrorSection(err)

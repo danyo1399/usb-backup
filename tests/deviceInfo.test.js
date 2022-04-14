@@ -15,8 +15,10 @@ describe('Device info tests', function () {
     const deviceInfoList = []
     await updateDeviceInfo(device.id, 123, 456, 'some new path')
 
-    testUtils.convertIteratorToCallback(deviceInfo.iterator(), (device) => deviceInfoList.push(...device.value))
-    await testUtils.sleep(1000)
+    await testUtils.convertIteratorToCallbackAsync(deviceInfo.iterator(), (device) => {
+      deviceInfoList.push(...device.value)
+      if (deviceInfoList.length > 0) return false
+    })
 
     const updatedDevice = await getDeviceByIdAsync(device.id)
     expect(updatedDevice.path).toBe('some new path')
@@ -35,8 +37,11 @@ Array [
     const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
     const deviceInfoList = []
 
-    testUtils.convertIteratorToCallback(deviceInfo.iterator(), (device) => deviceInfoList.push(...device.value))
-    await testUtils.sleep(1000)
+    await testUtils.convertIteratorToCallbackAsync(deviceInfo.iterator(), (response) => {
+      deviceInfoList.push(...response.value)
+      if (deviceInfoList.length > 1) return false
+    })
+
     deviceInfoList.reverse()
     const source = deviceInfoList.find(x => x.id === sourceDevice.id)
     const backup = deviceInfoList.find(x => x.id === backupDevice.id)
@@ -56,9 +61,13 @@ Array [
     const { backupDevice, sourceDevice } = await testUtils.createDevicesAsync(env)
     const deviceInfoList = []
 
-    testUtils.convertIteratorToCallback(deviceInfo.iterator(), (device) => deviceInfoList.push(...device.value))
-    await testUtils.sleep(1000)
+    const promise = testUtils.convertIteratorToCallbackAsync(deviceInfo.iterator(), (response) => {
+      deviceInfoList.push(...response.value)
+      if (deviceInfoList.length > 3) return false
+    })
+
     await deviceInfo.refresh()
+    await promise
 
     expect(deviceInfoList.every(x => x.isOnline === true)).toBe(true)
     expect(deviceInfoList.every(x => x.id === backupDevice.id || x.id === sourceDevice.id)).toBe(true)
@@ -71,11 +80,20 @@ Array [
     await testUtils.createDevicesAsync(env)
     const deviceInfoList = []
     const iterator = deviceInfo.iterator()
-    testUtils.convertIteratorToCallback(iterator, (device) => deviceInfoList.push(device))
-    await testUtils.sleep(1000)
+
+    await testUtils.convertIteratorToCallbackAsync(iterator, (response) => {
+      deviceInfoList.push(...response.value)
+      if (deviceInfoList.length === 2) return false
+    })
+
     const returnValue = await iterator.return()
+
+    const nextItemPromise = testUtils.waitForPromise(iterator.next(), 2000)
+    expect(returnValue.done).toBe(true)
     await deviceInfo.refresh()
-    await testUtils.sleep(1000)
+
+    expect(nextItemPromise).resolves.toBeUndefined()
+
 
     expect(deviceInfoList).toHaveLength(2)
     expect(returnValue.done).toBe(true)
