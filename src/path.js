@@ -108,10 +108,12 @@ exports.appendFilePathToPath = (filePath, destinationDir) => {
 }
 
 exports.joinPath = (...paths) => {
+  paths = paths.map(x => x.replaceAll('\\', '/'))
   return path.join(...paths).replaceAll('\\', '/')
 }
 
 exports.resolvePath = (...paths) => {
+  paths = paths.map(x => x.replaceAll('\\', '/'))
   return path.resolve(...paths).replaceAll('\\', '/')
 }
 
