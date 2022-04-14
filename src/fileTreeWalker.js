@@ -2,6 +2,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
+const { joinPaths } = require('./path')
 
 const ignoredFolders = [
   '$RECYCLE.BIN', // windows
@@ -39,7 +40,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
       // process files in subpath
       while (filesOrDirectories.length > 0) {
         const name = filesOrDirectories.pop()
-        const fullPath = path.join(subpath, name)
+        const fullPath = joinPaths(subpath, name)
         const basename = path.basename(fullPath)
 
         if (ignoredBaseNames.includes(basename)) {

@@ -1,12 +1,11 @@
 const { newIdNumber } = require('../utils')
 const checkDiskSpace = require('check-disk-space').default
-const path = require('path')
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
 const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
-const { ensureFilePathExistsAsync, appendFilePathToPath } = require('../path')
+const { ensureFilePathExistsAsync, appendFilePathToPath, joinPaths } = require('../path')
 const { createFileAsync, copyFileAsync } = require('../file')
 
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
@@ -81,7 +80,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
   }
 
   async function backupFile (log, context) {
-    const sourceFilename = path.join(context.sourceDevice.path, context.sourceFile.relativePath)
+    const sourceFilename = joinPaths(context.sourceDevice.path, context.sourceFile.relativePath)
     const targetFilename = appendFilePathToPath(sourceFilename, context.backupDevice.path)
     await ensureFilePathExistsAsync(targetFilename)
 

@@ -1,6 +1,12 @@
 const testUtils = require('./common')
-const path = require('path')
-const { currentPath, getFileRelativePath, appendSuffixToFilename, findUniqueFilenameAsync, appendFilePathToPath } = require('../src/path')
+const {
+  currentPath,
+  getFileRelativePath,
+  appendSuffixToFilename,
+  findUniqueFilenameAsync,
+  appendFilePathToPath,
+  joinPaths
+} = require('../src/path')
 
 describe('path tests', () => {
   describe('environment required tests', function () {
@@ -11,21 +17,21 @@ describe('path tests', () => {
 
     describe('find unique filename tests', function () {
       it('generates unique filename where filename does not exist exists', async function () {
-        const result = await findUniqueFilenameAsync(path.join(env.tempPath, 'test.txt'))
-        expect(result).toBe(path.join(env.tempPath, 'test.txt'))
+        const result = await findUniqueFilenameAsync(joinPaths(env.tempPath, 'test.txt'))
+        expect(result).toBe(joinPaths(env.tempPath, 'test.txt'))
       })
 
       it('generates unique filename where filename exists', async function () {
         const filename = await env.createDummyFileAsync('test.txt')
         const result = await findUniqueFilenameAsync(filename)
-        expect(result).toBe(path.join(env.tempPath, 'test 001.txt'))
+        expect(result).toBe(joinPaths(env.tempPath, 'test 001.txt'))
       })
 
       it('generates unique filename where multiple filenames exists', async function () {
         const filename = await env.createDummyFileAsync('test.txt')
         await env.createDummyFileAsync('test 001.txt')
         const result = await findUniqueFilenameAsync(filename)
-        expect(result).toBe(path.join(env.tempPath, 'test 002.txt'))
+        expect(result).toBe(joinPaths(env.tempPath, 'test 002.txt'))
       })
     })
   })

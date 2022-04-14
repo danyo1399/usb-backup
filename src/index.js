@@ -12,6 +12,7 @@ const { schema } = require('./graphql')
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/lib/use/ws')
 const packageJson = require('../package.json')
+const { joinPaths } = require('./path')
 
 const port = Number(process.argv[process.argv.length - 1]) || 3857
 const serverPort = port + 1
@@ -78,9 +79,9 @@ async function setupDb () {
 async function copyApplicationFilesToRootDirectory () {
   if (process.env.NODE_ENV !== 'DEV') {
     const cwd = process.cwd()
-    await fs.copyFile(path.resolve(__dirname, '../README.md'), path.join(cwd, 'README.md'))
-    await fs.copyFile(path.resolve(__dirname, '../assets/run.bat'), path.join(cwd, 'run.bat'))
-    await fs.copyFile(path.resolve(__dirname, '../assets/run.sh'), path.join(cwd, 'run.sh'))
+    await fs.copyFile(path.resolve(__dirname, '../README.md'), joinPaths(cwd, 'README.md'))
+    await fs.copyFile(path.resolve(__dirname, '../assets/run.bat'), joinPaths(cwd, 'run.bat'))
+    await fs.copyFile(path.resolve(__dirname, '../assets/run.sh'), joinPaths(cwd, 'run.sh'))
   }
 }
 

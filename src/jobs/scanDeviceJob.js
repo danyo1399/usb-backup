@@ -15,7 +15,7 @@ const {
 } = require('../repo')
 const fs = require('fs-extra')
 const { deviceName, isDeviceOnlineAsync, isMetafile, writeDeviceMetaFileAsync } = require('../device')
-const { getFileRelativePath } = require('../path')
+const { getFileRelativePath, joinPaths } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')
 const { createFileAsync } = require('../file')
@@ -109,7 +109,7 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
 
     if (files.length === 1 && files[0].hash) {
       const file = files[0]
-      const fullPath = path.join(device.path, file.relativePath)
+      const fullPath = joinPaths(device.path, file.relativePath)
 
       const exists = await fs.pathExists(fullPath)
       if (!exists) {

@@ -78,7 +78,7 @@ exports.getFileRelativePath = function (basePath, filePath) {
  * @returns the combined full path
  */
 exports.appendRelativePath = (...subpaths) => {
-  return path.join(currentPath, ...subpaths)
+  return this.joinPaths(currentPath, ...subpaths)
 }
 
 /**
@@ -104,10 +104,10 @@ exports.appendFilePathToPath = (filePath, destinationDir) => {
   } else {
     fileDir = fileDir.replace(/^\/\/[^/]+/, '')
   }
-  return path.join(destinationDir, fileDir, filename).replaceAll('\\', '/')
+  return this.joinPaths(destinationDir, fileDir, filename).replaceAll('\\', '/')
 }
 
-exports.joinPath = (...paths) => {
+exports.joinPaths = (...paths) => {
   paths = paths.map(x => x.replaceAll('\\', '/'))
   return path.join(...paths).replaceAll('\\', '/')
 }

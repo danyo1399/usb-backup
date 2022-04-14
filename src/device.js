@@ -4,10 +4,11 @@ const { defaultLogger } = require('./logging')
 const { getDeviceByIdAsync, addDeviceAsync, updateDeviceAsync, getFilesByDeviceAsync, deleteDeviceAsync } = require('./repo')
 const { newId } = require('./utils')
 const { raiseError, errorCodes } = require('./errors')
+const { joinPaths } = require('./path')
 
 const METAFILE_SUFFIX = '.usbb'
 function getMetaFilePath ({ path, id }) {
-  return _path.join(path, `${id}${METAFILE_SUFFIX}`)
+  return joinPaths(path, `${id}${METAFILE_SUFFIX}`)
 }
 exports.getMetaFilePath = getMetaFilePath
 
@@ -64,7 +65,7 @@ exports.isDeviceOnlineAsync = async ({ path, id }) => {
 exports.writeDeviceMetaFileAsync = async (device) => {
   const files = await getFilesByDeviceAsync(device.id)
 
-  const file = _path.join(device.path, `${device.id}${METAFILE_SUFFIX}`)
+  const file = joinPaths(device.path, `${device.id}${METAFILE_SUFFIX}`)
 
   await fs.writeJson(file, { ...device, files })
 }

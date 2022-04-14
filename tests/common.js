@@ -7,7 +7,7 @@ const jobManager = require('../src/jobs/jobManager')
 const cwd = process.cwd()
 const { migrateDbAsync } = require('../src/migration')
 const { createScanDeviceJobAsync } = require('../src/jobs/scanDeviceJob')
-const { ensureFilePathExistsAsync } = require('../src/path')
+const { ensureFilePathExistsAsync, joinPaths } = require('../src/path')
 const device = require('../src/device')
 
 const tempRootPath = path.resolve(cwd, 'temp')
@@ -145,13 +145,13 @@ exports.setupTestEnvironment = (id) => {
   const tempPathNormalised = process.platform === 'win32' ? tempPath.substring(2) : tempPath
 
   const createBackupPath = async () => {
-    const backupPath = path.join(tempPath, 'backup')
+    const backupPath = joinPaths(tempPath, 'backup')
     await fs.mkdir(backupPath)
     return backupPath
   }
 
   const createDummyFolder = async () => {
-    const folder = path.join(tempPath, newId())
+    const folder = joinPaths(tempPath, newId())
     await fs.mkdir(folder)
     return folder
   }
@@ -159,7 +159,7 @@ exports.setupTestEnvironment = (id) => {
   const setupDb = ({ maxDbVersion } = {}) => {
     beforeEach(async () => {
       isDbSetup = true
-      await db.setDbFilePath(path.join(tempPath, 'app.db'))
+      await db.setDbFilePath(joinPaths(tempPath, 'app.db'))
       maxDbVersion !== null && await migrateDbAsync(maxDbVersion)
       await db.openDbAsync()
     })
@@ -167,7 +167,7 @@ exports.setupTestEnvironment = (id) => {
 
   const createDummyFileAsync = (filePath, size) => {
     return new Promise((resolve, reject) => {
-      const filename = path.join(tempPath, filePath)
+      const filename = joinPaths(tempPath, filePath)
       ensureFilePathExistsAsync(filename).then(() => {
         const data = new Uint8Array(size)
         data.fill(1)
