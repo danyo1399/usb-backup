@@ -35,7 +35,7 @@ module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan 
     _abort = true
   }
 
-  return { id, executeAsync, context, description, abort, name: 'scanDeviceJob' }
+  return { id, executeAsync, context, description, abort, name: 'scanDeviceJob', allowConcurrent: true }
 }
 
 const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsAborting, useFullScan) {

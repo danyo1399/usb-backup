@@ -154,7 +154,7 @@ Array [
 
       const promise = jobManager.runJobAsync(job)
       const state = jobManager.getJobState(job)
-      expect(state.status).toBe('pending')
+      expect(state.status).toBe('running')
       await promise
 
       const updatedSourceDevice = await getDeviceByIdAsync(sourceDevice.id)

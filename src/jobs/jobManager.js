@@ -127,7 +127,7 @@ exports.runJobAsync = async (job) => {
 
     jobEmitter.emit(JOB_EVENTS.jobUpdated, id)
 
-    await waitForTurnToRunAsync(id)
+    if (!job.allowConcurrent) await waitForTurnToRunAsync(id)
 
     log.info(`starting job ${job.name}: ${job.id}`)
     state.status = JOB_STATUSES.running
