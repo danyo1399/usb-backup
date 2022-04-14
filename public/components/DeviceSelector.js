@@ -1,14 +1,19 @@
-import { useDevices, useUniqueId } from '../hooks.js'
+import { useDevices, useObservableState, useUniqueId } from '../hooks.js'
 import { css, html, useState } from '../globals.js'
+import { deviceInfo$ } from '../api/devices.js'
 
-export function useDeviceSelector (type) {
+export function useDeviceSelector (type, includeOffline = false) {
   const deviceCollections = useDevices()
-  const devices = type === 'source'
+  const deviceInfos = useObservableState(deviceInfo$, {})
+  let devices = type === 'source'
     ? deviceCollections?.sources
     : type === 'backup'
       ? deviceCollections?.backups
       : deviceCollections.all || []
 
+  if (!includeOffline) {
+    devices = devices.filter(x => deviceInfos[x.id].isOnline)
+  }
   const [selectedDeviceId, setSelectedDeviceId] = useState()
 
   const selectedDevice = devices.find(x => x.id === selectedDeviceId)

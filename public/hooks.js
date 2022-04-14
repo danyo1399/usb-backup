@@ -269,8 +269,8 @@ export function useApiData (defaultValue, apiFn, ...args) {
   return data
 }
 
-export function useObservableState (observable$) {
-  const [state, setState] = useState()
+export function useObservableState (observable$, defaultValue) {
+  const [state, setState] = useState(defaultValue)
 
   useEffect(() => {
     const subscription = observable$?.subscribe(value => {
