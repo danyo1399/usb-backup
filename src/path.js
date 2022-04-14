@@ -112,6 +112,8 @@ exports.joinPaths = (...paths) => {
   return path.join(...paths).replaceAll('\\', '/')
 }
 
+exports.basename = (aPath) => path.basename(aPath.replaceAll('\\', '/'))
+
 exports.resolvePath = (...paths) => {
   paths = paths.map(x => x.replaceAll('\\', '/'))
   return path.resolve(...paths).replaceAll('\\', '/')

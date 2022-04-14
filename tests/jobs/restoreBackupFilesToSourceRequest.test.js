@@ -31,6 +31,9 @@ describe('copy files from backup device job tests', function () {
 
         expect(_getTargetPath('/f1/f2/', 'f1/f2/f3/test.txt', '/out/', 'c:/devicefolder'))
           .toBe('c:/devicefolder/out/f2/f3/test.txt')
+
+        expect(_getTargetPath('\\f1\\f2\\', 'f1\\f2\\f3\\test.txt', '\\out', 'c:\\devicefolder'))
+          .toBe('c:/devicefolder/out/f2/f3/test.txt')
       })
     })
   })
