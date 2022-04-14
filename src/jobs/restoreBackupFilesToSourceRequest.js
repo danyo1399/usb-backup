@@ -4,7 +4,7 @@ const {
   getFileByDeviceAndHashAsync
 
 } = require('../repo')
-const { assertDeviceOnlineAsync } = require('../device')
+const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
 const _path = require('path')
 const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
@@ -40,11 +40,14 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
           log.warn(`Skipping file as another file with the same hash exists on source. ${sourcePath}, ${file.hash}`)
           continue
         }
+        log.debug(`copying file ${sourcePath} -> ${targetPath}`)
         const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
         log.info(`copied file from ${sourcePath} to ${newPath}`)
         await createFileAsync(sourceDevice, newPath, { hash: hash })
       }
     }
+
+    await writeDeviceMetaFileAsync(sourceDevice)
   }
 
   async function abort () {
