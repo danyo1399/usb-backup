@@ -8,6 +8,7 @@ const { assertDeviceOnlineAsync } = require('../device')
 const _path = require('path')
 const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
+const { joinPath, endsWithPathSeperator } = require('../path')
 
 exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceDeviceId, copyToRelativePath, sourcePaths) => {
   const description = 'Copy files from backup device'
@@ -21,7 +22,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
     const sourceDevice = await assertDeviceOnlineAsync(sourceDeviceId, { deviceType: 'source' })
 
     // remove any leading slashes
-    sourcePaths = sourcePaths.map(p => p.startsWith('/') || p.startsWith('\\') ? p.substr(1) : p)
+    sourcePaths = sourcePaths.map(x => x.replaceAll('\\', '/')).map(p => p.startsWith('/') ? p.substr(1) : p)
     for (const path of sourcePaths) {
       if (_abort) break
       const files = await findFilesByPathAsync(backupDeviceId, path)
@@ -29,7 +30,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
         if (_abort) break
         const sourcePath = _path.join(backupDevice.path, file.relativePath)
         const existingFile = await getFileByDeviceAndHashAsync(sourceDeviceId, file.hash)
-        const targetPath = _path.join(sourceDevice.path, copyToRelativePath, file.relativePath)
+        const targetPath = _getTargetPath(path, file.relativePath, copyToRelativePath, sourceDevice.path)
         const sourceFileExists = await fs.pathExists(sourcePath)
         if (!sourceFileExists) {
           log.error(`backup file does not exist on device ${sourcePath}`)
@@ -39,9 +40,9 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
           log.warn(`Skipping file as another file with the same hash exists on source. ${sourcePath}, ${file.hash}`)
           continue
         }
-        const { hash, path } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
-        log.info(`copied file from ${sourcePath} to ${path}`)
-        await createFileAsync(sourceDevice, path, { hash: hash })
+        const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
+        log.info(`copied file from ${sourcePath} to ${newPath}`)
+        await createFileAsync(sourceDevice, newPath, { hash: hash })
       }
     }
   }
@@ -51,4 +52,13 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
   }
 
   return { id, executeAsync, context, description, abort, name }
+}
+
+const _getTargetPath = exports._getTargetPath = (srcPath, fileRelativePath, copyToRelativePath, devicePath) => {
+  const isFile = !endsWithPathSeperator(srcPath)
+  if (isFile) {
+    return joinPath(devicePath, copyToRelativePath, _path.basename(srcPath))
+  } else {
+    return joinPath(devicePath, copyToRelativePath, _path.basename(srcPath), fileRelativePath.substr(srcPath.length - 1))
+  }
 }

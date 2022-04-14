@@ -106,3 +106,13 @@ exports.appendFilePathToPath = (filePath, destinationDir) => {
   }
   return path.join(destinationDir, fileDir, filename).replaceAll('\\', '/')
 }
+
+exports.joinPath = (...paths) => {
+  return path.join(...paths).replaceAll('\\', '/')
+}
+
+exports.resolvePath = (...paths) => {
+  return path.resolve(...paths).replaceAll('\\', '/')
+}
+
+exports.endsWithPathSeperator = (path) => path.endsWith('/') || path.endsWith('\\')
