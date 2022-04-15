@@ -1,7 +1,7 @@
 const { newIdNumber } = require('../utils')
 const {
   findFilesByPathAsync,
-  getFileByDeviceAndHashAsync
+  getFilesByHashAndDeviceTypeAsync
 
 } = require('../repo')
 const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
@@ -28,7 +28,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
       for (const file of files) {
         if (_abort) break
         const sourcePath = joinPaths(backupDevice.path, file.relativePath)
-        const existingFile = await getFileByDeviceAndHashAsync(sourceDeviceId, file.hash)
+        const existingFile = await getFilesByHashAndDeviceTypeAsync(file.hash, 'source')
         const targetPath = _getTargetPath(path, file.relativePath, copyToRelativePath, sourceDevice.path)
         const sourceFileExists = await fs.pathExists(sourcePath)
         if (!sourceFileExists) {
@@ -36,7 +36,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
           continue
         }
         if (existingFile) {
-          log.warn(`Skipping file as another file with the same hash exists on source. ${sourcePath}, ${file.hash}`)
+          log.warn(`Skipping file as another file with the same hash exists on a source device. ${sourcePath}, ${file.hash}`)
           continue
         }
         log.debug(`copying file ${sourcePath} -> ${targetPath}`)
