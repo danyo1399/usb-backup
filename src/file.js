@@ -3,6 +3,7 @@ const { copyAndHashAsync, hashFileAsync } = require('./crypto')
 const { ensureFilePathExistsAsync, findUniqueFilenameAsync, getFileRelativePath } = require('./path')
 const { InsertFileAsync } = require('./repo')
 const path = require('path')
+const { defaultLogger } = require('./logging')
 
 exports.createFileAsync = async (device, filePath, { hash, stat } = {}) => {
   stat = stat || await fs.stat(filePath)
@@ -13,6 +14,45 @@ exports.createFileAsync = async (device, filePath, { hash, stat } = {}) => {
 
   const file = await InsertFileAsync(newFile)
   return { file }
+}
+
+exports.isVideoFile = (filename) => {
+  const ext = path.extname(filename)
+  return ['.mp4', '.mkv', '.avi'].some(x => x === ext)
+}
+
+const bufferSizeToCheck = 1024 * 50 // 50 KB
+/**
+ * check for file with allocated blank space at end of file often
+ * representing not all of a files contents have been written
+ */
+exports.hasZeroDataAtEndAsync = async (filePath, { stat } = {}) => {
+  stat = stat || await fs.stat(filePath)
+  if (stat.isFile() === false) return
+  let fileHandle
+  try {
+    if (stat.size <= bufferSizeToCheck) return
+    fileHandle = await fs.open(filePath, 'r')
+    const { buffer } = await fs.read(fileHandle, Buffer.alloc(bufferSizeToCheck), 0, bufferSizeToCheck, stat.size - 1 - bufferSizeToCheck)
+
+    // all of files contents might not have copied
+    return buffer.every(x => x === 0)
+  } catch (error) {
+    defaultLogger.error(`Error occurred reading file tail. ${error?.message}`)
+    // NOOP
+  } finally {
+    try {
+      fileHandle && await fs.close(fileHandle)
+    } catch (error) {
+    // NOOP
+    }
+  }
+}
+
+exports.areFileFingerprintsEqual = (f1, f2) => {
+  return f1.relativePath === f2.relativePath &&
+    Math.floor(f1.birthtimeMs) === Math.floor(f2.birthtimeMs) &&
+    Math.floor(f1.mtimeMs) === Math.floor(f2.mtimeMs)
 }
 
 exports.copyFileAsync = async (src, destination, { overwrite, appendSuffix } = {}) => {

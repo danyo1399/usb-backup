@@ -7,7 +7,7 @@ const {
 const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
 const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
-const { joinPaths: joinPath, endsWithPathSeperator, joinPaths, basename } = require('../path')
+const { joinPaths: joinPath, endsWithPathSeparator, joinPaths, basename } = require('../path')
 
 exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceDeviceId, copyToRelativePath, sourcePaths) => {
   const description = 'Copy files from backup device'
@@ -57,7 +57,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
 }
 
 const _getTargetPath = exports._getTargetPath = (srcPath, fileRelativePath, copyToRelativePath, devicePath) => {
-  const isFile = !endsWithPathSeperator(srcPath)
+  const isFile = !endsWithPathSeparator(srcPath)
   if (isFile) {
     return joinPath(devicePath, copyToRelativePath, basename(srcPath))
   } else {

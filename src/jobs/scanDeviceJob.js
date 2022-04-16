@@ -18,7 +18,7 @@ const { deviceName, isDeviceOnlineAsync, isMetafile, writeDeviceMetaFileAsync } 
 const { getFileRelativePath, joinPaths } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')
-const { createFileAsync } = require('../file')
+const { createFileAsync, areFileFingerprintsEqual } = require('../file')
 
 module.exports.createScanDeviceJobAsync = async ({ sourceDeviceIds, useFullScan }) => {
   const context = { sourceDeviceIds, useFullScan }
@@ -119,50 +119,50 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
     }
     return movedFile
   }
+
+  async function doFullScanAsync (filename, relativePath, stat) {
+    const hash = await hashFileAsync(filename)
+    const existingFile = await getFileByDeviceRelativePathAsync(device.id, relativePath)
+
+    const isNewFile = existingFile == null
+    const hashChanged = !!existingFile && existingFile.hash !== hash
+    const fingerprintChanged = !!existingFile && !areFileFingerprintsEqual({ relativePath, ...stat }, existingFile)
+
+    if (isNewFile || hashChanged || fingerprintChanged) {
+      const changeDesc = isNewFile ? 'New file' : hashChanged ? 'Hash changed' : 'Fingerprint changed'
+      log.info(`${changeDesc}, creating new file ${filename}`)
+      const { file: newFile } = await createFileAsync(device, filename, { hash, stat })
+
+      return newFile.id
+    }
+    return existingFile.id
+  }
+  async function doFastScanAsync (filename, relativePath, stat) {
+    let file = await getFileByFingerprintAsync(device.id, relativePath, stat)
+    if (!file) {
+      const movedFile = await getMovedFileAsync(filename, stat)
+      const hash = movedFile?.hash ?? await hashFileAsync(filename)
+      file = (await createFileAsync(device, filename, { hash, stat })).file
+
+      if (movedFile) {
+        log.info(`File moved from ${movedFile.fullPath} to ${filename}`)
+        await deleteFileHardAsync(movedFile.id)
+      } else {
+        const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, file.deviceType))[0]
+        if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
+        log.info(`${device.deviceType} file added ${filename}`)
+      }
+    }
+    return file.id
+  }
   return async ({ filename, stat }) => {
     const relativePath = getFileRelativePath(device.path, filename)
-    let file
-    if (isMetafile(relativePath) === false) {
-      if (useFullScan) {
-        const matchingFingerprintFile = await getFileByFingerprintAsync(device.id, relativePath, stat)
-        const hash = await hashFileAsync(filename)
-        file = matchingFingerprintFile ?? await getFileByDeviceRelativePathAsync(device.id, relativePath)
-        const isNewFile = file == null
-        const hashChanged = file?.hash !== hash
-        const fingerprintChanged = matchingFingerprintFile == null
+    if (isMetafile(relativePath)) return
 
-        if (isNewFile || hashChanged || fingerprintChanged) {
-          const changeDesc = isNewFile ? 'New file' : hashChanged ? 'Hash changed' : 'Fingerprint changed'
-          log.info(`${changeDesc}, creating new file ${filename}`)
-          const { file: newFile } = await createFileAsync(device, filename, { hash, stat })
-
-          file = newFile
-        }
-      } else {
-        file = await getFileByFingerprintAsync(device.id, relativePath, stat)
-        if (!file) {
-          const movedFile = await getMovedFileAsync(filename, stat)
-
-          const hash = movedFile?.hash ?? await hashFileAsync(filename)
-
-          const { file: newFile } = await createFileAsync(device, filename, { hash, stat })
-          if (!movedFile) {
-            const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, newFile.deviceType))[0]
-            if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
-          }
-
-          file = newFile
-
-          if (movedFile) {
-            log.info(`File moved from ${movedFile.fullPath} to ${filename}`)
-            await deleteFileHardAsync(movedFile.id)
-          } else {
-            log.info(`${device.deviceType} file added ${filename}`)
-          }
-        }
-      }
-
-      return file.id
+    if (useFullScan) {
+      return await doFullScanAsync(filename, relativePath, stat)
+    } else {
+      return await doFastScanAsync(filename, relativePath, stat)
     }
   }
 }

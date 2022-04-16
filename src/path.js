@@ -8,11 +8,11 @@ const currentPath = exports.currentPath = path.resolve(process.cwd())
  */
 const appendSuffixToFilename = exports.appendSuffixToFilename = (filename, suffix) => {
   const ext = path.extname(filename)
-  const seperator = filename.includes('/') ? '/' : filename.includes('\\') ? '\\' : path.sep
+  const separator = filename.includes('/') ? '/' : filename.includes('\\') ? '\\' : path.sep
 
   let dirName = path.dirname(filename)
   if (dirName === '.') dirName = ''
-  else if (dirName.endsWith(seperator) === false) dirName = `${dirName}${seperator}`
+  else if (dirName.endsWith(separator) === false) dirName = `${dirName}${separator}`
 
   const basename = path.basename(filename)
   const basenameWithoutPrefix = basename.slice(0, basename.length - ext.length)
@@ -21,7 +21,7 @@ const appendSuffixToFilename = exports.appendSuffixToFilename = (filename, suffi
 
 /**
  * Given a specific path for a file, if a file with the same name exists append a incrementing suffix
- * till we find a filename that doesnt exist.
+ * till we find a filename that doesn't exist.
  *
  * This is useful when we are writing to a backup device and there could already be a file at the path
  * @param {*} filename
@@ -59,13 +59,13 @@ exports.ensureFilePathExistsAsync = async (fullFilePath) => {
  * @param {*} filePath the full path of the file
  * @returns the relative path of the file from the root directory
  */
-exports.getFileRelativePath = function (basePath, filePath) {
-  const rpath = path.resolve(basePath.replaceAll('\\', '/'))
-  const fpath = path.resolve(filePath.replaceAll('\\', '/'))
-  if (fpath.startsWith(rpath) === false) {
-    throw new Error(`Path mismatch ${rpath}, ${fpath}`)
+exports.getFileRelativePath = (basePath, filePath) => {
+  const resolvedBasePath = this.resolvePaths(basePath)
+  const resolvedFilePath = this.resolvePaths(filePath)
+  if (resolvedFilePath.startsWith(resolvedBasePath) === false) {
+    throw new Error(`Path mismatch ${resolvedBasePath}, ${resolvedFilePath}`)
   }
-  const result = fpath.slice(rpath.length).replaceAll('\\', '/')
+  const result = resolvedFilePath.slice(resolvedBasePath.length).replaceAll('\\', '/')
 
   // root directories have slash whereas subdirectories dont.
   if (result.startsWith('/')) return result.slice(1)
@@ -74,11 +74,11 @@ exports.getFileRelativePath = function (basePath, filePath) {
 
 /**
  * Appends n number of paths the the current working directory
- * @param  {...string} subpaths
+ * @param  {...string} subPaths
  * @returns the combined full path
  */
-exports.appendRelativePath = (...subpaths) => {
-  return this.joinPaths(currentPath, ...subpaths)
+exports.appendRelativePath = (...subPaths) => {
+  return this.joinPaths(currentPath, ...subPaths)
 }
 
 /**
@@ -86,7 +86,7 @@ exports.appendRelativePath = (...subpaths) => {
  * end of another path stripping windows drive letters
  * eg
  * c:\folder1\folder2\test.txt
- * being appeneded to d:\folder3
+ * being appended to d:\folder3
  * becomes
  * d:\folder3\folder1\folder2\test.txt
  *
@@ -114,9 +114,9 @@ exports.joinPaths = (...paths) => {
 
 exports.basename = (aPath) => path.basename(aPath.replaceAll('\\', '/'))
 
-exports.resolvePath = (...paths) => {
+exports.resolvePaths = (...paths) => {
   paths = paths.map(x => x.replaceAll('\\', '/'))
   return path.resolve(...paths).replaceAll('\\', '/')
 }
 
-exports.endsWithPathSeperator = (path) => path.endsWith('/') || path.endsWith('\\')
+exports.endsWithPathSeparator = (path) => path.endsWith('/') || path.endsWith('\\')
