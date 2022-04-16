@@ -70,7 +70,7 @@ describe('path tests', () => {
     expect(appendSuffixToFilename('c:\\folder.ext\\test.txt', '1')).toBe('c:\\folder.ext\\test1.txt')
   })
 
-  it('calculate relatiev path from two paths', function () {
+  it('calculate relative path from two paths', function () {
     expect(getFileRelativePath('c:\\test\\test2\\', 'c:/test/test2/file.txt')).toEqual('file.txt')
 
     expect(getFileRelativePath('c:\\test\\test2', 'c:/test/test2/file.txt')).toEqual('file.txt')
@@ -92,7 +92,7 @@ describe('path tests', () => {
     expect(getFileRelativePath('/', '/test/test2/file.txt')).toEqual('test/test2/file.txt')
 
     expect(() => {
-      getFileRelativePath('/differentroot', '/test/test2/file.txt')
+      getFileRelativePath('/different-root', '/test/test2/file.txt')
     }).toThrowError()
   })
 })

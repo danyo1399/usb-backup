@@ -69,7 +69,7 @@ Array [
       sourceFile.deviceId, sourceFile.size, 'file.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
 
     const differentFilenameResult = await repo.findSimilarFilesAsync(
-      sourceFile.deviceId, sourceFile.size, 'somefile.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
+      sourceFile.deviceId, sourceFile.size, 'some-file.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
 
     const differentCaseResult = await repo.findSimilarFilesAsync(
       sourceFile.deviceId, sourceFile.size, 'FILE.txt', sourceFile.birthtimeMs, sourceFile.mtimeMs)
@@ -127,7 +127,7 @@ Array [
   it('marks existing file at path as deleted before inserting new record', async function () {
     const file = createFile('dev', 'source')
     await repo.InsertFileAsync(file)
-    file.hash = 'newhash'
+    file.hash = 'new-hash'
     await repo.InsertFileAsync(file)
 
     const files = await repo.getFilesByDeviceAsync('dev', { includeDeleted: true })

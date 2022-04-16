@@ -1,23 +1,33 @@
 {
-    "version": "0.2",
-    "ignorePaths": [],
-    "dictionaryDefinitions": [],
-    "dictionaries": [],
-    "words": [
-        "danyo",
-        "QLJSON",
-        "tabindex",
-        "usbb"
-    ],
-    "ignoreWords": [
-        "autoincrement",
-        "Metafile",
-        "QLID",
-        "diskstation",
-        "semibold",
-        "preact",
-        "labelledby",
-        "uniqueid"
-    ],
-    "import": []
+  "language": "en-gb",
+  "version": "0.2",
+  "ignorePaths": [],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "anymore",
+    "danyo",
+    "devicefolder",
+    "dummyfolder",
+    "fullproof",
+    "jfif",
+    "QLJSON",
+    "someserver",
+    "tabindex",
+    "testdata",
+    "testfile",
+    "testimg",
+    "usbb"
+  ],
+  "ignoreWords": [
+    "autoincrement",
+    "Metafile",
+    "QLID",
+    "diskstation",
+    "semibold",
+    "preact",
+    "labelledby",
+    "uniqueid"
+  ],
+  "import": []
 }

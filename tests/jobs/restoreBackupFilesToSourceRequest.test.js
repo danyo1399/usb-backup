@@ -7,6 +7,8 @@ const { allAsync } = require('../../src/db')
 const { project } = require('../../src/utils')
 const { createRestoreBackupFilesToSourceRequest, _getTargetPath } = require('../../src/jobs/restoreBackupFilesToSourceRequest')
 const { writeDeviceMetaFileAsync } = require('../../src/device')
+const { joinPaths } = require('../../src/path')
+const { basename } = require('path')
 
 describe('copy files from backup device job tests', function () {
   describe('stateless tests', function () {
@@ -20,7 +22,7 @@ describe('copy files from backup device job tests', function () {
         expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', '\\test\\', 'c:\\')).toBe('c:/test/test.txt')
         expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', 'test', 'c:\\')).toBe('c:/test/test.txt')
 
-        if (path.sep === '\\') { // network paths like this are not valid in uxix
+        if (path.sep === '\\') { // network paths like this are not valid in unix
           expect(_getTargetPath('\\folder\\test.txt', 'folder\\test.txt', '\\', '\\\\server\\folder')).toBe('//server/folder/test.txt')
         }
       })
@@ -37,7 +39,7 @@ describe('copy files from backup device job tests', function () {
         expect(_getTargetPath('\\f1\\f2\\', 'f1\\f2\\f3\\test.txt', '\\out', 'c:\\devicefolder'))
           .toBe('c:/devicefolder/out/f2/f3/test.txt')
 
-        if (path.sep === '\\') { // network paths like this are not valid in uxix
+        if (path.sep === '\\') { // network paths like this are not valid in unix
           expect(_getTargetPath('\\f2\\', 'f2\\test.txt', '\\', '\\\\server\\folder')).toBe('//server/folder/f2/test.txt')
         }
       })
@@ -113,6 +115,20 @@ Array [
   "testfile2",
 ]
 `)
+    })
+
+    it('does not copy file if it already exists on another device', async function () {
+      await testUtils.createSourceDeviceAsync(env, 'source-2')
+      const testFile = await env.createDummyFileAsync('backup/testfile', 1024)
+      await fs.copyFile(testFile, joinPaths(env.tempPath, 'source-2', basename(testFile)))
+      await testUtils.scanDeviceAsync('source-2', ctx.backupDevice.id, ctx.sourceDevice.id)
+
+      const job = await createRestoreBackupFilesToSourceRequest(ctx.backupDevice.id, ctx.sourceDevice.id, '/', ['testfile'])
+      await jobManager.runJobAsync(job)
+      testUtils.assertJobLogHasNoErrors(job.id)
+
+      const files = await fs.readdir(ctx.sourceDevice.path)
+      expect(files.some(x => x === 'testfile')).toBe(false)
     })
 
     it('can copy files from backup to source', async function () {

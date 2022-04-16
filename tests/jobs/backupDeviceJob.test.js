@@ -19,7 +19,7 @@ describe('backup device job', function () {
     ctx.append({ backupDevice, sourceDevice, job })
   })
 
-  it('shouldnt backup anything if device offline', async function () {
+  it('shouldn\'t backup anything if device offline', async function () {
     const { backupDevice, job } = ctx.state
     await fs.rm(backupDevice.path, { recursive: true, force: true })
 
@@ -30,7 +30,7 @@ describe('backup device job', function () {
     expect(getAllBackupFilesAsync()).resolves.toHaveLength(0)
   })
 
-  it('shouldnt try to backup deleted source files', async function () {
+  it('shouldn\'t try to backup deleted source files', async function () {
     const { sourceDevice, job } = ctx.state
 
     const scanJob = await createScanDeviceJobAsync({ sourceDeviceIds: [sourceDevice.id] })

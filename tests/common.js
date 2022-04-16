@@ -77,7 +77,7 @@ exports.convertIteratorToCallbackAsync = convertIteratorToCallbackAsync
 /**
  * Supports a real edge case where i need to test noting is emitted after cancel is called.
  * its not fullproof by any means.
- * not really sure how to better handle this given theres no way to cancel a promise.
+ * not really sure how to better handle this given there's no way to cancel a promise.
  * @param {*} promise
  * @param {*} timeoutMs
  * @returns
@@ -98,6 +98,11 @@ exports.waitForPromise = (promise, timeoutMs) => {
 exports.createBackupDeviceAsync = async (env, backupDeviceId) => {
   const backupPath = await env.createBackupPath()
   return await device.createBackupDeviceAsync({ name: 'backup', path: backupPath, id: backupDeviceId })
+}
+exports.createSourceDeviceAsync = async (env, name) => {
+  const path = joinPaths(env.tempPath, name)
+  await fs.mkdir(path)
+  return await device.createSourceDeviceAsync({ id: name, name, path })
 }
 
 exports.createDevicesAsync = async (env, sourceDeviceId, backupDeviceId) => {

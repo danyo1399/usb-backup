@@ -7,7 +7,7 @@ describe('crypto tests', () => {
   describe('env required tests', function () {
     const env = testUtils.setupTestEnvironment()
 
-    // Saw a sparatic issue copying small file onto network drive getting file does not exist error when
+    // Saw a sporadic issue copying small file onto network drive getting file does not exist error when
     // trying to update file after it was copied to a network device.
     it('finishes writing file before resolving promise', async function () {
       const srcFile = path.resolve(env.tempPath, 'testfile')

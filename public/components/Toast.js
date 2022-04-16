@@ -27,7 +27,7 @@ export function ToastProvider ({ children }) {
   }
 
   // we delay to give time for scrollbar to pop in before showing toast.
-  // Dialogs hide the scrollbar while visible
+  // Dialog's hide the scrollbar while visible
   const addToast = delay(function _addToast (toast) {
     toast.id = nextId++
     setToasts((list) => [...list, toast])

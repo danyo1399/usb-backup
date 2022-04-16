@@ -28,7 +28,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
       for (const file of files) {
         if (_abort) break
         const sourcePath = joinPaths(backupDevice.path, file.relativePath)
-        const existingFile = await getFilesByHashAndDeviceTypeAsync(file.hash, 'source')[0]
+        const existingFile = (await getFilesByHashAndDeviceTypeAsync(file.hash, 'source'))[0]
         const targetPath = _getTargetPath(path, file.relativePath, copyToRelativePath, sourceDevice.path)
         const sourceFileExists = await fs.pathExists(sourcePath)
         if (!sourceFileExists) {
