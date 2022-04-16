@@ -272,6 +272,7 @@ exports.findSimilarFilesAsync = async function (deviceId, size, filenameWithoutD
       and birthtimeMs = $birthtimeMs
       and mtimeMs = $mtimeMs
       and size = $size
+      and deleted = 0
   `, {
     $size: size,
     $deviceId: deviceId,
