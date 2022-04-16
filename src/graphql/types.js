@@ -4,8 +4,11 @@ const {
   GraphQLID,
   GraphQLFloat,
   GraphQLNonNull,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLEnumType
 } = require('graphql')
+
+exports.DeviceType = new GraphQLEnumType({ name: 'DeviceType', values: { source: { value: 'source' }, backup: { value: 'backup' } } })
 
 exports.File = new GraphQLObjectType({
   name: 'File',
@@ -23,7 +26,7 @@ exports.ReportFile = new GraphQLObjectType({
   fields: {
     id: { type: GraphQLInt },
     deviceId: { type: GraphQLString },
-    deviceType: { type: GraphQLString },
+    deviceType: { type: this.DeviceType },
     deviceName: { type: GraphQLString },
     devicePath: { type: GraphQLString },
     size: { type: GraphQLFloat },
@@ -46,7 +49,7 @@ exports.SourceDevice = new GraphQLObjectType({
       type: GraphQLString
     },
     deviceType: {
-      type: GraphQLString
+      type: this.DeviceType
     },
     description: {
       type: GraphQLString
@@ -82,7 +85,7 @@ exports.BackupDevice = new GraphQLObjectType({
       type: GraphQLString
     },
     deviceType: {
-      type: GraphQLString
+      type: this.DeviceType
     },
     lastScanDate: {
       type: GraphQLFloat
