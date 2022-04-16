@@ -55,7 +55,7 @@ export const jobs$ = toObservable({
 
 export function getJobLog (jobId) {
   // We dont use scan because of stack overflow error due to size of the data set
-  const acumulator = { data: [] }
+  const accumulator = { data: [] }
 
   return toObservable({
     query: `subscription ($input: GetJobLogsRequest) {
@@ -75,7 +75,7 @@ export function getJobLog (jobId) {
       // dont use spread because of perf
       // We need to wrap data because of ref comparison used trigger state change detection
       // we need to mutate because the dataset is too big to recreate the array on each new item
-      const { data } = acumulator
+      const { data } = accumulator
       data.push(...curr)
       return { data }
     }),

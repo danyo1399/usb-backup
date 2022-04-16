@@ -42,7 +42,7 @@ exports.getDeviceIdForPathAsync = async (path) => {
       defaultLogger.info('no device found at path', path)
     }
   } catch (error) {
-    defaultLogger.warn(`Error occured reading path ${path}`, error)
+    defaultLogger.warn(`Error occurred reading path ${path}`, error)
     // NOOP Device could be offline
   }
   return null
@@ -76,7 +76,7 @@ exports.loadDeviceMetafileAsync = async (device) => {
 }
 
 /**
- * Deternines if the specific path is the root folder of a device
+ * Determines if the specific path is the root folder of a device
  * @param {*} path
  * @returns true if it is, else false
  */
@@ -136,7 +136,7 @@ exports.createBackupDeviceAsync = async (device) => {
   }
 
   if (await this.isExistingDeviceAsync(device.path)) raiseError(errorCodes.existingSource)
-  // Backup devices must be local hdds on windows because we need to be able to read free space on drive
+  // Backup devices must be local hdd's on windows because we need to be able to read free space on drive
   if (process.platform === 'win32' && !device.path.includes(':')) {
     raiseError(errorCodes.pathNotSupported)
   }

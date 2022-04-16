@@ -8,10 +8,10 @@ const { defaultLogger } = require('./logging')
 const fs = require('fs-extra')
 const { appendRelativePath, ensureFilePathExistsAsync } = require('./path')
 
-const defaultDbpath = appendRelativePath('data', 'app.db')
+const defaultDbPath = appendRelativePath('data', 'app.db')
 
 let db
-let dbPath = defaultDbpath
+let dbPath = defaultDbPath
 
 const closeDb = exports.closeDbAsync = function () {
   return new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ exports.deleteDbAsync = async function () {
 }
 
 exports.setDbFilePath = function (filename) {
-  dbPath = filename || defaultDbpath
+  dbPath = filename || defaultDbPath
 }
 
 exports.getDbFilePath = () => {

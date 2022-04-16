@@ -24,7 +24,7 @@ export function SideNav () {
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid ${colors.headerSeperator};
+    border-bottom: 1px solid ${colors.headerSeparator};
     .icon {
       font-size: 2rem;
       margin-right: 1rem;

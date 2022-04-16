@@ -43,6 +43,6 @@ export function FileTable ({ data }) {
 function cleanPath (devicePath, relativePath) {
   devicePath = devicePath.replaceAll('\\', '/')
   relativePath = relativePath.replaceAll('\\', '/')
-  const seperator = devicePath.endsWith('/') ? '' : '/'
-  return `${devicePath}${seperator}${relativePath}`
+  const separator = devicePath.endsWith('/') ? '' : '/'
+  return `${devicePath}${separator}${relativePath}`
 }

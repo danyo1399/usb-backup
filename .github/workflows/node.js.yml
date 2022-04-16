@@ -30,6 +30,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - run: npm run lint
+    - run: npm run spell
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1

@@ -10,7 +10,8 @@
     "test": "jest --silent",
     "lint": "standard",
     "test:watch": "jest --watch ",
-    "pipeline:qa": "npm run test && npm run lint",
+    "spell": "cspell \"src/**/*.js\" && cspell \"public/**/*.js\"",
+    "pipeline:qa": "npm run test && npm run lint && npm run spell",
     "pipeline:publish:patch": "npm run test && npm version patch && npm publish",
     "pipeline:publish:minor": "npm run test && npm version minor && npm publish",
     "pipeline:publish:major": "npm run test && npm version major && npm publish"
@@ -44,6 +45,7 @@
     "apollo-server-hapi": "^3.6.3",
     "check-disk-space": "^3.3.0",
     "cross-env": "^7.0.3",
+    "cspell": "^5.19.7",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
     "graphql": "^16.3.0",

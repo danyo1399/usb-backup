@@ -33,7 +33,7 @@ export default function ViewFiles ({ deviceId }) {
 
   return html`
   <div class=${styles}>
-    <h1>Veiw Files</h1>
+    <h1>View Files</h1>
     <h5>Viewing files for device ${device?.name}</h5>
     <p>${device?.description}</p>
 

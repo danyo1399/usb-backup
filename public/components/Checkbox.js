@@ -11,7 +11,7 @@ export function Checkbox ({ label, id, checked, onClick, ...props }) {
     onClick && onClick()
   }
 
-  // hacky workaroudn to
+  // hacky work around to
   // https://github.com/preactjs/preact/issues/3486
   useEffect(() => {
     setTimeout(() => {

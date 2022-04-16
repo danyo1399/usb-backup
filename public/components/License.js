@@ -1,24 +1,24 @@
 import { html, useEffect, useState } from '../globals.js'
 import { Dialog } from './Dialog.js'
 
-const licenceShownKey = 'usb-backup__licenceShown'
+const licenseShownKey = 'usb-backup__licenseShown'
 
-export default function LicenceDialog () {
+export default function LicenseDialog () {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    const licenceShown = window.localStorage.getItem(licenceShownKey)
-    if (!licenceShown) {
+    const licenseShown = window.localStorage.getItem(licenseShownKey)
+    if (!licenseShown) {
       setShow(true)
     }
   }, [])
 
   function onAgree () {
-    window.localStorage.setItem(licenceShownKey, '1')
+    window.localStorage.setItem(licenseShownKey, '1')
     setShow(false)
   }
 
   return html`
-  <${Dialog} show=${show} id="licence-dialog" title="MIT Licence" size="modal-lg" showCloseButton=${false}>
+  <${Dialog} show=${show} id="license-dialog" title="MIT License" size="modal-lg" showCloseButton=${false}>
     <div class="modal-body">
         <p >
 MIT License

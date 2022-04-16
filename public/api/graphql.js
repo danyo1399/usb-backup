@@ -12,7 +12,7 @@ const client = createClient({
 export function execute (payload) {
   return new Promise((resolve, reject) => {
     const rejectWithLog = (err) => {
-      console.error('Api error occured', err)
+      console.error('Api error occurred', err)
       reject(err[0])
     }
     let result

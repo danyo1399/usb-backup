@@ -81,7 +81,7 @@ export default function Devices ({ variant }) {
 
   const { confirmProps: deleteDeviceProps, prompt: deleteDevicePrompt } = useConfirm()
 
-  const { confirmProps: dedupConfirmProps, prompt: dedupConfirmPrompt } = useConfirm()
+  const { confirmProps: deleteDuplicatesConfirmProps, prompt: deleteDuplicatesConfirmPrompt } = useConfirm()
 
   async function deleteDevice (device) {
     await doFetch(async () => {
@@ -102,7 +102,7 @@ export default function Devices ({ variant }) {
   }
 
   function onDeleteDuplicates () {
-    dedupConfirmPrompt(() => {
+    deleteDuplicatesConfirmPrompt(() => {
       createRemoveBackupDuplicatesJobAsync(...selectedDevices.map(x => x.id))
     })
   }
@@ -170,7 +170,7 @@ export default function Devices ({ variant }) {
       / >
 
       <${ConfirmDialog}
-        ...${dedupConfirmProps}
+        ...${deleteDuplicatesConfirmProps}
         header="Are you sure?"
         body="Do you want to delete duplicate files"
       / >

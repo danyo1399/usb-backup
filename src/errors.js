@@ -23,15 +23,15 @@ exports.raiseError = ({ code, message }) => {
 }
 
 /**
- * Creates a default error section when no error occured
+ * Creates a default error section when no error occurred
  * @returns non error response
  */
 exports.emptyError = () => ({ error: null })
 
 exports.errorCodes = {
-  unexpectedError: { code: 'unexpectedError', message: 'An unexpected error occured' },
+  unexpectedError: { code: 'unexpectedError', message: 'An unexpected error occurred' },
   existingSource: { code: 'existingSource', message: 'existingSource' },
-  pathNotSupported: { code: 'pathNotSupported', message: 'The backup device path must look similar to x:\\path\\pathtobackup' },
+  pathNotSupported: { code: 'pathNotSupported', message: 'The backup device path must look similar to x:\\path\\backup' },
   devicePathDoesNotExist: { code: 'devicePathDoesNotExist', message: 'Device path does not exist' },
   deviceIsNotOnline: { code: 'deviceIsNotOnline', message: 'Device is not online' },
   deviceDoesNotExist: { code: 'deviceDoesNotExist', message: 'Device does not exist' },

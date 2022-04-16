@@ -9,14 +9,14 @@ import ViewFiles from './pages/ViewFiles/index.js'
 import Devices from './pages/Devices/index.js'
 import Files from './pages/Files/index.js'
 
-import LicenceDialog from './components/Licence.js'
+import LicenseDialog from './components/License.js'
 
 import { css, html, Router } from './globals.js'
 import Test from './TestPage.js'
 import { useOnFocus } from './hooks.js'
 import { refreshDeviceInfoAsync } from './api/index.js'
 
-const SouceDevices = (props) => html`<${Devices} ...${props} variant="source"/>`
+const SourceDevices = (props) => html`<${Devices} ...${props} variant="source"/>`
 const BackupDevices = (props) => html`<${Devices} ...${props} variant="backup"/>`
 
 export default function App () {
@@ -32,13 +32,13 @@ export default function App () {
   useOnFocus(refreshDeviceInfoAsync)
   return html`
         <div class="${styles}">
-        <${LicenceDialog}/>
+        <${LicenseDialog}/>
             <${ToastProvider}>
                 <${Toast} />
                 <${SideNav} />
                 <div class="main-content">
                     <${Router}>
-                        <${SouceDevices} path=${constants.routes.sources} />
+                        <${SourceDevices} path=${constants.routes.sources} />
                         <${BackupDevices} path=${constants.routes.backupDevices} />
                         <${Jobs} path=${constants.routes.jobs} />
                         <${JobLog} path=${constants.routes.jobLog} />

@@ -21,10 +21,10 @@ const ignoredBaseNames = [...ignoredFolders]
  * @param {*} path
  * @param {*} callback The callback function to call for each file found
  * The parameters are
- * err - an error occured processing the file
+ * err - an error occurred processing the file
  * an object containing file (the file full path), path (the folder name), stat, abort (function to call to abort processing)
  *
- * If an error occurs depending on the error file may or may not be populated eg the error occured reading a directory.
+ * If an error occurs depending on the error file may or may not be populated eg the error occurred reading a directory.
  */
 async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
   const directories = []

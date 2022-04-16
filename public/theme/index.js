@@ -6,7 +6,7 @@ const colors = {
     active: palette.zinc[800],
     hover: palette.zinc[700],
     background: palette.zinc[900],
-    headerSeperator: palette.zinc[600],
+    headerSeparator: palette.zinc[600],
     text: palette.white
   },
   fileBrowser: {

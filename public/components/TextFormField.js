@@ -2,7 +2,7 @@ import { html, useRef } from '../globals.js'
 
 let id = 1
 function nextId () {
-  return `textformfield-${id++}`
+  return `text-form-field-${id++}`
 }
 export default function TextFormField ({ id, label, className, ...props }) {
   const idRef = useRef(id || nextId())

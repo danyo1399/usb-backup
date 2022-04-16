@@ -82,7 +82,7 @@ const createDeviceInfoService = exports._createDeviceInfoService = () => (
   })
 
 /**
- * Retrives connected device info such as online, free disk space, total size
+ * Retrieves connected device info such as online, free disk space, total size
  *
  * Remarks:
  * It can take a long time to enumerate devices if some devices are offline network devices as
