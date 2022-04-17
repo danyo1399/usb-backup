@@ -10,4 +10,3 @@ export async function getVersionAsync () {
   })
   return version
 }
-
