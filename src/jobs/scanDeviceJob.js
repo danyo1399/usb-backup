@@ -138,23 +138,25 @@ const scanFileHoc = ({ device, log, useFullScan }) => {
     return existingFile.id
   }
   async function doFastScanAsync (filename, relativePath, stat) {
-    let file = await getFileByFingerprintAsync(device.id, relativePath, stat)
-    if (!file) {
-      const movedFile = await getMovedFileAsync(filename, stat)
-      const hash = movedFile?.hash ?? await hashFileAsync(filename)
-      file = (await createFileAsync(device, filename, { hash, stat })).file
+    const file = await getFileByFingerprintAsync(device.id, relativePath, stat)
+    if (file) return file.id
 
-      if (movedFile) {
-        log.info(`File moved from ${movedFile.fullPath} to ${filename}`)
-        await deleteFileHardAsync(movedFile.id)
-      } else {
-        const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, file.deviceType))[0]
-        if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
-        log.info(`${device.deviceType} file added ${filename}`)
-      }
+    const movedFile = await getMovedFileAsync(filename, stat)
+    const hash = movedFile?.hash ?? await hashFileAsync(filename)
+
+    if (movedFile) {
+      log.info(`File moved from ${movedFile.fullPath} to ${filename}`)
+      await deleteFileHardAsync(movedFile.id)
+    } else {
+      const existingFile = (await getFilesByHashAndDeviceTypeAsync(hash, device.deviceType))[0]
+      if (existingFile) log.warn(`Another file exists with same hash: ${existingFile.deviceName} - ${existingFile.relativePath}`)
+      log.info(`${device.deviceType} file added ${filename}`)
     }
-    return file.id
+
+    // insert file after duplicate file hash check so new file is not flagged as duplicate.
+    return (await createFileAsync(device, filename, { hash, stat })).file.id
   }
+
   return async ({ filename, stat }) => {
     const relativePath = getFileRelativePath(device.path, filename)
     if (isMetafile(relativePath)) return

@@ -6,41 +6,73 @@ describe('repo tests', () => {
   const env = setupTestEnvironment()
   env.setupDb()
 
-  it('can get source device by id', async function () {
-    const source = await createSourceDeviceAsync()
-    expect(source.path).toEqual('c:/test')
+  describe('device tests', function () {
+    it('can update space info', async function () {
+      const device = await createSourceDeviceAsync()
+
+      await repo.updateDeviceInfo(device.id, 123, 456)
+
+      const reloadedDevice = await repo.getDeviceByIdAsync(device.id)
+
+      expect(reloadedDevice.freeSpace).toBe(123)
+      expect(reloadedDevice.totalSpace).toBe(456)
+    })
+
+    it('can delete a source device', async () => {
+      const sourceFile = await createSourceFileAsync()
+      await repo.deleteDeviceAsync(sourceFile.deviceId)
+      const source = await repo.getDeviceByIdAsync(sourceFile.deviceId)
+      const deletedSourceFile = await repo.getFileByIdAsync(sourceFile.id)
+
+      expect(source).toBeUndefined()
+      expect(deletedSourceFile).toBeUndefined()
+    })
+
+    it('can delete a backup device', async () => {
+      const file = await createBackupFileAsync()
+      await repo.deleteDeviceAsync(file.deviceId)
+      const device = await repo.getDeviceByIdAsync(file.deviceId)
+      const deletedFile = await repo.getFileByIdAsync(file.id)
+
+      expect(device).toBeUndefined()
+      expect(deletedFile).toBeUndefined()
+    })
+    it('can get source device by id', async function () {
+      const source = await createSourceDeviceAsync()
+      expect(source.path).toEqual('c:/test')
+    })
+
+    it('can get backup device by id', async function () {
+      const source = await createBackupDeviceAsync()
+      expect(source.path).toEqual('c:/test')
+    })
+
+    it('can create a source device', async () => {
+      const { id } = await createSourceDeviceAsync()
+      const sources = await repo.getDevicesAsync('source')
+      const source = sources[0]
+
+      expect(id).toBeTruthy()
+      expect(sources).toHaveLength(1)
+      expect(source.id).toEqual(id)
+      expect(source.path).toEqual('c:/test')
+      expect(source.name).toEqual('name')
+    })
+
+    it('can create a backup device', async () => {
+      const { id } = await createBackupDeviceAsync()
+      const devices = await repo.getDevicesAsync('backup')
+      const aDevice = devices[0]
+
+      expect(id).toBeTruthy()
+      expect(devices).toHaveLength(1)
+      expect(aDevice.id).toEqual(id)
+      expect(aDevice.path).toEqual('c:/test')
+      expect(aDevice.name).toEqual('name')
+    })
   })
 
-  it('can get backup device by id', async function () {
-    const source = await createBackupDeviceAsync()
-    expect(source.path).toEqual('c:/test')
-  })
-
-  it('can create a source device', async () => {
-    const { id } = await createSourceDeviceAsync()
-    const sources = await repo.getDevicesAsync('source')
-    const source = sources[0]
-
-    expect(id).toBeTruthy()
-    expect(sources).toHaveLength(1)
-    expect(source.id).toEqual(id)
-    expect(source.path).toEqual('c:/test')
-    expect(source.name).toEqual('name')
-  })
-
-  it('can create a backup device', async () => {
-    const { id } = await createBackupDeviceAsync()
-    const devices = await repo.getDevicesAsync('backup')
-    const aDevice = devices[0]
-
-    expect(id).toBeTruthy()
-    expect(devices).toHaveLength(1)
-    expect(aDevice.id).toEqual(id)
-    expect(aDevice.path).toEqual('c:/test')
-    expect(aDevice.name).toEqual('name')
-  })
-
-  it('getSourceFilesToBackupAsync', async function () {
+  it('returns the source file to backup when file has not been backed up', async function () {
     const sourceFile = await createSourceFileAsync()
     const files = await repo.getSourceFilesToBackupAsync(sourceFile.deviceId)
     expect(files).toMatchInlineSnapshot(`
@@ -103,15 +135,19 @@ Array [
     expect(file).toBeUndefined()
   })
 
-  it('can load a source file by id', async function () {
+  it('returns the id of the created file that can be loaded by id', async function () {
     const sourceFile = await createSourceFileAsync()
 
     const file = await repo.getFileByIdAsync(sourceFile.id)
-    const doesNotExistFile = await repo.getFileByIdAsync('an invalid id')
+
     expect(file.editDate).toBeGreaterThan(0)
 
-    expect(doesNotExistFile).toBeUndefined()
     expect(file).toEqual(sourceFile)
+  })
+
+  it('returns undefined when loading file by id and the file does not exist', async function () {
+    const doesNotExistFile = await repo.getFileByIdAsync('an invalid id')
+    expect(doesNotExistFile).toBeUndefined()
   })
 
   it('can delete a source file', async function () {
@@ -143,36 +179,6 @@ Array [
   },
 ]
 `)
-  })
-  it('can update space info', async function () {
-    const device = await createSourceDeviceAsync()
-
-    await repo.updateDeviceInfo(device.id, 123, 456)
-
-    const reloadedDevice = await repo.getDeviceByIdAsync(device.id)
-
-    expect(reloadedDevice.freeSpace).toBe(123)
-    expect(reloadedDevice.totalSpace).toBe(456)
-  })
-
-  it('can delete a source device', async () => {
-    const sourceFile = await createSourceFileAsync()
-    await repo.deleteDeviceAsync(sourceFile.deviceId)
-    const source = await repo.getDeviceByIdAsync(sourceFile.deviceId)
-    const deletedSourceFile = await repo.getFileByIdAsync(sourceFile.id)
-
-    expect(source).toBeUndefined()
-    expect(deletedSourceFile).toBeUndefined()
-  })
-
-  it('can delete a backup device', async () => {
-    const file = await createBackupFileAsync()
-    await repo.deleteDeviceAsync(file.deviceId)
-    const device = await repo.getDeviceByIdAsync(file.deviceId)
-    const deletedFile = await repo.getFileByIdAsync(file.id)
-
-    expect(device).toBeUndefined()
-    expect(deletedFile).toBeUndefined()
   })
 })
 
