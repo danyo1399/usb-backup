@@ -8,6 +8,7 @@ const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, appendFilePathToPath, joinPaths } = require('../path')
 const { createFileAsync, copyFileAsync } = require('../file')
 
+const minFreeSpace = 1024 * 1024 * 100 // 100 mb
 exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) => {
   const id = newIdNumber()
   let _abort = false
@@ -44,7 +45,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
             continue
           }
 
-          if (context.freeSpace < context.sourceFile.size) {
+          if (context.freeSpace < (context.sourceFile.size - minFreeSpace)) {
             log.error(`Not enough free space. Skipping ${context.sourceFile.relativePath}`)
             continue
           }
