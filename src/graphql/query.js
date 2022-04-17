@@ -17,6 +17,13 @@ const FilesByDeviceIdRequest = new GraphQLInputObjectType({
 module.exports = new GraphQLObjectType({
   name: 'Query',
   fields: {
+    version: {
+      type: GraphQLString,
+      resolve: async () => {
+        const pkg = require('../../package.json')
+        return pkg.version
+      }
+    },
     sourceDevices: {
       type: new GraphQLList(SourceDevice),
       resolve: async () => {

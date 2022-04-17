@@ -5,6 +5,8 @@ import { JobsMenuItem } from '../pages/Jobs/index.js'
 import Link from './Link.js'
 import { theme } from '../theme/index.js'
 import { css, html } from '../globals.js'
+import { useApiData } from '../hooks.js'
+import { getVersionAsync } from '../api/index.js'
 
 const colors = theme.colors.sideNav
 
@@ -18,6 +20,16 @@ export function SideNav () {
   min-width: 18rem;
   color: white;
   padding: 0.5rem 1rem 1rem 1rem;
+  .footer {
+    position:absolute;
+    bottom:0;
+    font-size:1.2rem;
+    font-weight:${theme.fontWeight.semibold};
+    width: 100%;
+    left: 0;
+    padding: 1rem;
+    text-align: center;
+  }
   .header {
     display: grid;
     grid-template-columns: 3rem auto;
@@ -47,6 +59,7 @@ export function SideNav () {
 
   }
   `
+  const version = useApiData('', getVersionAsync)
   return html`<div class=${styles}>
               <div class="header">
                   <${Icon} name="hdd" className="icon"/>
@@ -65,6 +78,9 @@ export function SideNav () {
                   <${JobsMenuItem}><//>
 
                   </div>
+              </div>
+              <div class="footer">
+                <span> V${version}</span>
               </div>
           </div>`
 }
