@@ -19,9 +19,8 @@ exports.isIgnoredFile = (filename) => {
 }
 
 function isExplicitIgnoredDirectory (fullPath) {
-  const isRootFolder = path.dirname(fullPath) === fullPath
   const basename = exports.basename(fullPath).toUpperCase()
-  return IGNORED_FOLDERS.some(x => x.toUpperCase() === basename) && isRootFolder
+  return IGNORED_FOLDERS.some(x => x.toUpperCase() === basename)
 }
 
 exports.isIgnoredPath = (fullPath) => {
@@ -31,7 +30,6 @@ exports.isIgnoredPath = (fullPath) => {
 // Ignores folders starting with . in addition to ignored folders
 exports.isIgnoredDirectory = (fullPath) => {
   const basename = this.basename(fullPath).toUpperCase()
-  // all ignored directories by name are on device root
   return basename.startsWith('.') || isExplicitIgnoredDirectory(fullPath)
 }
 

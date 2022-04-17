@@ -33,7 +33,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
         // we need to ignore the directory before stat as it could fail
         // this has a side effect any files with the name of ignored directory is excluded too
         if (isIgnoredPath(fullPath)) {
-          logger.debug(`Ignoring path ${fullPath}`)
+          logger.warn(`Ignoring path ${fullPath}`)
           continue
         }
 
@@ -44,13 +44,13 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
           if (stat.isDirectory()) {
             // ignored files and unix hidden folders
             if (isIgnoredDirectory(fullPath)) {
-              logger.debug(`Ignoring folder ${fullPath}`)
+              logger.warn(`Ignoring folder ${fullPath}`)
             } else {
               directories.push(fullPath)
             }
           } else if (stat.isFile()) {
             if (isIgnoredFile(fullPath)) {
-              logger.debug(`Ignoring file ${fullPath}`)
+              logger.warn(`Ignoring file ${fullPath}`)
             } else {
               try {
                 await callback(null, { filename: fullPath, stat, path: subpath, abort })
