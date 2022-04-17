@@ -26,3 +26,8 @@ export function dateString (timestamp) {
   const day = date.getDate().toString().padStart(2, '0')
   return `${date.getFullYear()}-${month}-${day}`
 }
+
+let nextId = 1
+export function newNumberId () {
+  return nextId++
+}

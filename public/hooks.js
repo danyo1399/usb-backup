@@ -1,7 +1,7 @@
-import * as globals from './globals.js'
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './api/devices.js'
 import { jobs$ } from './api/jobs.js'
-const { useEffect, useState, useMemo, useCallback } = globals.preactHooks
+import { newNumberId as newIdNumber } from './fns.js'
+import { useCallback, useEffect, useMemo, useRef, useState } from './globals.js'
 
 export function useFormControl (defaultValue) {
   const [value, setValue] = useState(defaultValue)
@@ -259,12 +259,24 @@ export function usePagination (items, itemsPerPage) {
 
 export function useApiData (defaultValue, apiFn, ...args) {
   const [data, setData] = useState(defaultValue)
-
+  const loadingKeyRef = useRef(null)
   useEffect(() => {
     (async () => {
+      /*
+      covers scenario where final user selection is not shown to user
+        - select a
+        - loading a
+        - select b
+        - loading b
+        - b loaded show b
+        - a loaded show a
+      */
+      const loadingKey = loadingKeyRef.current = newIdNumber()
       setData(defaultValue)
       const response = await apiFn(...args)
-      setData(response)
+      if (loadingKeyRef.current === loadingKey) {
+        setData(response)
+      }
     })()
   }, [apiFn, ...args])
 
