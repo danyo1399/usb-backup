@@ -3,6 +3,7 @@ this module contains the database queries for the application
 
  */
 const db = require('./db')
+const { isIgnoredFile } = require('./path')
 
 /*
 Reports
@@ -10,7 +11,7 @@ Reports
 */
 
 exports.reportFilesOnBackupWithNoSourceAsync = async () => {
-  return await db.allAsync(`
+  const files = await db.allAsync(`
   select
     d.name deviceName, d.path devicePath, b.*
   from
@@ -25,10 +26,11 @@ exports.reportFilesOnBackupWithNoSourceAsync = async () => {
   order by
       b.addDate desc
   `)
+  return files.filter(x => isIgnoredFile(x.relativePath) === false)
 }
 
 exports.reportFilesOnSourceWithNoBackupAsync = async () => {
-  return await db.allAsync(`
+  const files = await db.allAsync(`
   select
     d.name deviceName, d.path devicePath, s.*
   from
@@ -43,6 +45,7 @@ exports.reportFilesOnSourceWithNoBackupAsync = async () => {
   order by
     s.addDate desc
   `)
+  return files.filter(x => isIgnoredFile(x.relativePath) === false)
 }
 
 exports.reportDuplicateFilesOnDeviceTypeAsync = async (deviceType) => {

@@ -1,19 +1,7 @@
 const fs = require('fs-extra')
-const path = require('path')
 const { FileTreeWalkerPathError } = require('./errors')
 const { defaultLogger } = require('./logging')
-const { joinPaths } = require('./path')
-
-const ignoredFolders = [
-  '$RECYCLE.BIN', // windows
-  'System Volume Information', // windows
-  '#recycle' // synology diskstation recycle bin
-]
-const ignoredFiles = [
-  'Thumbs.db', // windows folder image db
-  '.DS_Store' // custom mac metadata file
-]
-const ignoredBaseNames = [...ignoredFolders]
+const { joinPaths, isIgnoredDirectory, isIgnoredPath, isIgnoredFile } = require('./path')
 
 /**
  * Walks the directory structure calling the callback for each file found
@@ -41,9 +29,10 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
       while (filesOrDirectories.length > 0) {
         const name = filesOrDirectories.pop()
         const fullPath = joinPaths(subpath, name)
-        const basename = path.basename(fullPath)
 
-        if (ignoredBaseNames.includes(basename)) {
+        // we need to ignore the directory before stat as it could fail
+        // this has a side effect any files with the name of ignored directory is excluded too
+        if (isIgnoredPath(fullPath)) {
           logger.debug(`Ignoring path ${fullPath}`)
           continue
         }
@@ -54,20 +43,20 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
 
           if (stat.isDirectory()) {
             // ignored files and unix hidden folders
-            if (basename.startsWith('.')) {
+            if (isIgnoredDirectory(fullPath)) {
               logger.debug(`Ignoring folder ${fullPath}`)
             } else {
               directories.push(fullPath)
             }
           } else if (stat.isFile()) {
-            if (!ignoredFiles.includes(basename)) {
+            if (isIgnoredFile(fullPath)) {
+              logger.debug(`Ignoring file ${fullPath}`)
+            } else {
               try {
                 await callback(null, { filename: fullPath, stat, path: subpath, abort })
               } catch (error) {
                 logger.error('file tree walker callback threw an exception, ignoring', error)
               }
-            } else {
-              logger.debug(`Ignoring file ${fullPath}`)
             }
           }
         } catch (error) {

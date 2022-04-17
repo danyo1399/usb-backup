@@ -1,12 +1,44 @@
 const fs = require('fs-extra')
 const path = require('path')
 
+const IGNORED_FOLDERS = [
+  '$RECYCLE.BIN', // windows
+  'System Volume Information', // windows
+  '#recycle' // synology diskstation recycle bin
+]
+const IGNORED_FILES = [
+  'Thumbs.db', // windows folder image db
+  '.DS_Store' // custom mac metadata file
+]
+
 const currentPath = exports.currentPath = path.resolve(process.cwd())
+
+exports.isIgnoredFile = (filename) => {
+  const basename = this.basename(filename).toUpperCase()
+  return IGNORED_FILES.some(x => x.toUpperCase() === basename)
+}
+
+function isExplicitIgnoredDirectory (fullPath) {
+  const isRootFolder = path.dirname(fullPath) === fullPath
+  const basename = exports.basename(fullPath).toUpperCase()
+  return IGNORED_FOLDERS.some(x => x.toUpperCase() === basename) && isRootFolder
+}
+
+exports.isIgnoredPath = (fullPath) => {
+  return isExplicitIgnoredDirectory(fullPath)
+}
+
+// Ignores folders starting with . in addition to ignored folders
+exports.isIgnoredDirectory = (fullPath) => {
+  const basename = this.basename(fullPath).toUpperCase()
+  // all ignored directories by name are on device root
+  return basename.startsWith('.') || isExplicitIgnoredDirectory(fullPath)
+}
 
 /**
  * Appends a suffix to a filename before the extension
  */
-const appendSuffixToFilename = exports.appendSuffixToFilename = (filename, suffix) => {
+exports.appendSuffixToFilename = (filename, suffix) => {
   const ext = path.extname(filename)
   const separator = filename.includes('/') ? '/' : filename.includes('\\') ? '\\' : path.sep
 
@@ -34,7 +66,7 @@ exports.findUniqueFilenameAsync = async (filename) => {
   }
 
   for (let i = 1; ;i++) {
-    const newFilename = appendSuffixToFilename(filename, ` ${i.toString().padStart(3, '0')}`)
+    const newFilename = this.appendSuffixToFilename(filename, ` ${i.toString().padStart(3, '0')}`)
     if ((await fs.pathExists(newFilename)) === false) {
       return newFilename
     }
@@ -113,6 +145,7 @@ exports.joinPaths = (...paths) => {
 }
 
 exports.basename = (aPath) => path.basename(aPath.replaceAll('\\', '/'))
+exports.dirname = (aPath) => path.dirname(aPath.replaceAll('\\', '/'))
 
 exports.resolvePaths = (...paths) => {
   paths = paths.map(x => x.replaceAll('\\', '/'))
