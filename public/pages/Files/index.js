@@ -8,8 +8,8 @@ import { RemovedTab } from './components/RemovedTab.js'
 
 const items = [
   { label: 'Pending', key: 'pending', href: constants.routes.getFilesUrl('pending') },
-  { label: 'Duplicates', key: 'duplicates', href: constants.routes.getFilesUrl('duplicates') },
   { label: 'Removed', key: 'removed', href: constants.routes.getFilesUrl('removed') },
+  { label: 'Duplicates', key: 'duplicates', href: constants.routes.getFilesUrl('duplicates') },
   { label: 'Modified', key: 'modified', href: constants.routes.getFilesUrl('modified') }
 ]
 export default function Files ({ tab }) {
