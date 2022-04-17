@@ -6,7 +6,7 @@ import { usePagination } from '../../../hooks.js'
 export function FileTable ({ data }) {
   const styles = css`
   .path-cell {
-    overflow-wrap: anywhere
+    overflow-wrap: anywhere;
   }
   `
   const pagination = usePagination(data, 15)
