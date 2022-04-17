@@ -12,9 +12,9 @@
     "test:watch": "jest --watch ",
     "spell": "cspell \"src/**/*.js\" && cspell \"public/**/*.js\" && cspell \"tests/**/*.js\"",
     "pipeline:qa": "npm run test && npm run lint && npm run spell",
-    "pipeline:publish:patch": "npm run test && npm version patch && npm publish",
-    "pipeline:publish:minor": "npm run test && npm version minor && npm publish",
-    "pipeline:publish:major": "npm run test && npm version major && npm publish"
+    "pipeline:publish:patch": "npm run pipeline:qa && npm version patch && npm publish",
+    "pipeline:publish:minor": "npm run pipeline:qa && npm version minor && npm publish",
+    "pipeline:publish:major": "npm run pipeline:qa && npm version major && npm publish"
   },
   "repository": {
     "type": "git",
