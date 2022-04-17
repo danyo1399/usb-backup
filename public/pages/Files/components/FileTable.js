@@ -11,6 +11,8 @@ export function FileTable ({ data }) {
   `
   const pagination = usePagination(data, 15)
   const { page } = pagination
+
+  if (!data) return html`Loading...`
   return html`
   <table className="table ${styles}">
   <thead>

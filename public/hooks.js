@@ -217,6 +217,7 @@ export function useFileTree (files) {
 }
 
 export function usePagination (items, itemsPerPage) {
+  items = items || []
   const [pageNo, setPageNo] = useState(1)
   const page = items.slice((pageNo - 1) * itemsPerPage, pageNo * itemsPerPage)
   const lastPageNo = Math.ceil(items.length / itemsPerPage)
@@ -261,6 +262,7 @@ export function useApiData (defaultValue, apiFn, ...args) {
 
   useEffect(() => {
     (async () => {
+      setData(defaultValue)
       const response = await apiFn(...args)
       setData(response)
     })()

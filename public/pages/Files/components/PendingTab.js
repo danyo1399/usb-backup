@@ -6,7 +6,7 @@ import { FileTable } from './FileTable.js'
 export function PendingTab () {
   const styles = css`
   `
-  const data = useApiData([], reportFilesOnSourceWithNoBackupAsync)
+  const data = useApiData(null, reportFilesOnSourceWithNoBackupAsync)
 
   return html`
   <div class=${styles}>
