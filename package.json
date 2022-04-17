@@ -13,7 +13,6 @@
     "spell": "cspell \"src/**/*.js\" && cspell \"public/**/*.js\" && cspell \"tests/**/*.js\"",
     "pipeline:qa": "npm run test && npm run lint && npm run spell",
     "pipeline:publish:patch-beta": "npm run pipeline:qa && npm version patch && npm publish --tag beta",
-    "pipeline:publish:patch": "npm run pipeline:qa && npm version patch && npm publish",
     "pipeline:publish:minor": "npm run pipeline:qa && npm version minor && npm publish",
     "pipeline:publish:major": "npm run pipeline:qa && npm version major && npm publish"
   },
