@@ -220,8 +220,7 @@ export function usePagination (items, itemsPerPage) {
   items = items || []
   const [pageNo, setPageNo] = useState(1)
   const page = items.slice((pageNo - 1) * itemsPerPage, pageNo * itemsPerPage)
-  const lastPageNo = Math.ceil(items.length / itemsPerPage)
-
+  const lastPageNo = Math.ceil(items.length / itemsPerPage) || 1
   const isLast = pageNo === lastPageNo
   const hasPrevious = pageNo !== 1
   const hasNext = pageNo !== lastPageNo
