@@ -5,7 +5,7 @@ const {
 } = require('../repo')
 const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
-const { ensureFilePathExistsAsync, appendFilePathToPath, joinPaths } = require('../path')
+const { ensureFilePathExistsAsync, appendFilePathToPath, joinPaths, basename } = require('../path')
 const { createFileAsync, copyFileAsync } = require('../file')
 
 const minFreeSpace = 1024 * 1024 * 100 // 100 mb
@@ -87,7 +87,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
 
     log.info(`Copying file to backup device ${sourceFilename} -> ${targetFilename}`)
 
-    const { hash: backupHash, basename: newTargetFilename } = await copyFileAsync(sourceFilename, targetFilename, { appendSuffix: true })
+    const { hash: backupHash, basename: newBaseName } = await copyFileAsync(sourceFilename, targetFilename, { appendSuffix: true })
 
     context.freeSpace -= context.sourceFile.size
 
@@ -95,8 +95,8 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       log.warn(`Source file hash differs from backup file. source ${context.sourceFile.hash}, destination ${backupHash}`)
     }
 
-    if (newTargetFilename !== targetFilename) {
-      log.warn(`target filename already exists, used unique filename ${newTargetFilename}`)
+    if (newBaseName !== basename(targetFilename)) {
+      log.warn(`target filename already exists, used unique filename ${newBaseName}`)
     }
 
     await createFileAsync(context.backupDevice, targetFilename, { hash: backupHash })
