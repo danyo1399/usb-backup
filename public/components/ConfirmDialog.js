@@ -1,53 +1,28 @@
-import { Modal } from './Modal.js'
-import { useUniqueId } from '../hooks.js'
-import { html, useRef, useState } from '../globals.js'
+import { html } from '../globals.js'
+import { useDialog } from './Dialog/index.js'
 
 export function useConfirm () {
-  const [show, setShow] = useState(false)
-  const [args, setArgs] = useState()
-  const confirmRef = useRef()
-  function onCancel () {
-    setShow(false)
-    setArgs(null)
-    confirmRef.current = null
+  const { showDialog } = useDialog()
+
+  function prompt (title, body, onConfirm) {
+    showDialog(DialogContent, { title, props: { body, onConfirm } })
   }
 
-  function prompt (onConfirm, args) {
-    confirmRef.current = onConfirm
-    setArgs(args)
-    setShow(true)
-  }
-
-  function onConfirm () {
-    setShow(false)
-    setArgs(null)
-    confirmRef.current()
-    confirmRef.current = null
-  }
-  return { confirmProps: { show, onCancel, onConfirm, args }, prompt }
+  return { prompt }
 }
 
-export function ConfirmDialog ({ show, onConfirm, onCancel, header, body }) {
-  const id = useUniqueId('confirm-dialog-')
-
+function DialogContent ({ body, onConfirm, closeDialog }) {
+  function _onConfirm () {
+    onConfirm()
+    closeDialog()
+  }
   return html`
-        <${Modal} show=${show} id="${id} onClose=${onCancel}">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${header}</h5>
-                        <button type="button" class="btn-close" onClick=${onCancel} aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>${body}</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onClick=${onCancel}>Cancel</button>
-                        <button type="button" class="btn btn-primary" onClick=${onConfirm}>Confirm</button>
-                    </div>
-                </div>
-            </div>
-        <//>
-
-    `
+    <div class="modal-body">
+      <p>${body}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onClick=${closeDialog}>Cancel</button>
+      <button type="button" class="btn btn-primary" onClick=${_onConfirm}>Confirm</button>
+    </div>
+  `
 }

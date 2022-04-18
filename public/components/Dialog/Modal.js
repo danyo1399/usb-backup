@@ -1,9 +1,10 @@
-import { bootstrap, html, useEffect, useRef } from '../globals.js'
+import { bootstrap, html, useEffect, useRef } from '../../globals.js'
+import { useId } from '../../hooks.js'
 
-export function Modal ({ id, ariaLabeledBy, className, children, show, onClose }) {
+export function Modal ({ id, ariaLabeledBy, className, children, onClose }) {
   const modalRef = useRef(null)
   const controlRef = useRef(null)
-  show = !!show
+  id = useId('modal', id)
   useEffect(() => {
     if (modalRef.current && controlRef.current === null) {
       const myModal = new bootstrap.Modal(modalRef.current)
@@ -13,18 +14,10 @@ export function Modal ({ id, ariaLabeledBy, className, children, show, onClose }
           onClose && onClose()
         }
       )
-
+      myModal.show()
       controlRef.current = myModal
     }
   }, [])
-
-  useEffect(() => {
-    if (show) {
-      controlRef.current?.show()
-    } else {
-      controlRef.current?.hide()
-    }
-  }, [show])
 
   return html`
         <!-- Modal -->
@@ -37,7 +30,7 @@ export function Modal ({ id, ariaLabeledBy, className, children, show, onClose }
             aria-labelledby="${ariaLabeledBy}"
             aria-hidden="true"
         >
-        ${children}
+        ${children({ closeDialog: () => controlRef.current.hide() })}
         </div>
     `
 }

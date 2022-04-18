@@ -1,4 +1,4 @@
-import { useDevices, useObservableState, useUniqueId } from '../hooks.js'
+import { useDevices, useObservableState, useId } from '../hooks.js'
 import { css, html, useState } from '../globals.js'
 import { deviceInfo$ } from '../api/devices.js'
 
@@ -22,8 +22,8 @@ export function useDeviceSelector (type, includeOffline = false) {
 
 export function DeviceSelector ({ devices, selectedDeviceId, setSelectedDeviceId, id, label }) {
   const styles = css``
-  const generatedId = useUniqueId('device-selector')
-  id = id || generatedId
+  id = useId('device-selector', id)
+
   label = label || 'Devices'
   return html`
       <div class=${styles}>

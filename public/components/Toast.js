@@ -14,7 +14,11 @@ let nextId = 1
  */
 export function useToast () {
   const { addToast } = useContext(ToastContext)
-  return { addToast }
+  return {
+    addToast ({ header, body, permanent, type }) {
+      addToast({ header, body, permanent, type })
+    }
+  }
 }
 
 export function ToastProvider ({ children }) {

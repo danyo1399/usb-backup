@@ -13,20 +13,19 @@ import {
 } from '../../api/index.js'
 
 import StartBackupDevicesJobDialog from './components/StartBackupDevicesJobDialog.js'
-import { useToast, ActionBar, ConfirmDialog, useConfirm } from '../../components/Index.js'
+import { useToast, ActionBar, useConfirm } from '../../components/Index.js'
 import { useFetching } from '../../hooks.js'
 import StartScanDevicesJobDialog from './components/StartScanDevicesJobDialog.js'
 import constants from '../../constants.js'
 import { html, route, useEffect, useState } from '../../globals.js'
+import { useDialog } from '../../components/index.js'
 
 export default function Devices ({ variant }) {
   const { addToast } = useToast()
-  const [showManageDevice, setShowManageDevice] = useState(false)
-  const [showBackupJobDialog, setShowBackupJobDialog] = useState(false)
-  const [showScanJobDialog, setShowScanJobDialog] = useState(false)
   const [devices, setDevices] = useState([])
-  const [editingDevice, setEditingDevice] = useState(null)
   const { doFetch } = useFetching()
+  const { prompt } = useConfirm()
+  const { showDialog } = useDialog()
 
   const isSourceDeviceView = variant === 'source'
 
@@ -43,9 +42,16 @@ export default function Devices ({ variant }) {
     setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
   }
 
-  async function onScanDevicesJobAsync () {
+  async function onScanDevicesJob () {
     if (selectedDevices.length > 0) {
-      setShowScanJobDialog(true)
+      showDialog(StartScanDevicesJobDialog, {
+        showCloseButton: true,
+        title: 'Create a Scan Devices Job',
+        props: {
+          createJob: createScanDevicesJobAsync,
+          devices: selectedDevices
+        }
+      })
     }
   }
 
@@ -66,22 +72,14 @@ export default function Devices ({ variant }) {
     loadDevicesAsync()
   }, [])
 
-  function onEditDevice (device) {
-    setEditingDevice(device)
-    setShowManageDevice(true)
-  }
-
-  function onCreateBackupJob () {
-    setShowBackupJobDialog(true)
+  function onManageDevice (device) {
+    const title = device ? 'Edit Device' : 'Create Device'
+    showDialog(ManageDeviceDialog, { title, showCloseButton: true, props: { createDevice, updateDevice, loadDevices: loadDevicesAsync, device } })
   }
 
   function viewFiles (device) {
     route(constants.routes.getViewFilesUrl(device.id))
   }
-
-  const { confirmProps: deleteDeviceProps, prompt: deleteDevicePrompt } = useConfirm()
-
-  const { confirmProps: deleteDuplicatesConfirmProps, prompt: deleteDuplicatesConfirmPrompt } = useConfirm()
 
   async function deleteDevice (device) {
     await doFetch(async () => {
@@ -98,18 +96,35 @@ export default function Devices ({ variant }) {
   }
 
   function onDeleteDevice (device) {
-    deleteDevicePrompt(() => deleteDevice(device), device)
+    prompt(
+      'Are you sure?',
+      `Do you want to delete device [${device.name}] ${device.description}`,
+      () => deleteDevice(device)
+    )
   }
 
   function onDeleteDuplicates () {
-    deleteDuplicatesConfirmPrompt(() => {
-      createRemoveBackupDuplicatesJobAsync(...selectedDevices.map(x => x.id))
+    prompt(
+      'Are you sure?',
+      `Do you want to proceed and delete duplicate files on ${selectedDevices.map(x => ` [${x.name}]`)}`,
+      async () => {
+        await createRemoveBackupDuplicatesJobAsync(...selectedDevices.map(x => x.id))
+        addToast({ header: 'Success', body: 'Delete duplicates job created successfully', type: 'success' })
+      }
+    )
+  }
+
+  function onCreateBackupJob () {
+    showDialog(StartBackupDevicesJobDialog, {
+      title: 'Create Backup Job',
+      size: 'modal-xl',
+      props: { sourceDevices: selectedDevices }
     })
   }
   const items = !anyDevicesSelected
     ? []
     : [
-        { label: 'Scan Devices', onClick: onScanDevicesJobAsync },
+        { label: 'Scan Devices', onClick: onScanDevicesJob },
         variant === 'source' && { label: 'Perform Backup', onClick: onCreateBackupJob, enabled: variant === 'source' },
         variant === 'backup' && { label: 'Delete Duplicates', onClick: onDeleteDuplicates }
       ].filter(Boolean)
@@ -120,13 +135,12 @@ export default function Devices ({ variant }) {
           <button
               type="button"
               class="btn btn-primary mb-4"
-              onClick=${() => setShowManageDevice(true)}
+              onClick=${() => onManageDevice(null)}
           >
               Create ${label}
           </button>
         </div>
         <${ActionBar} items=${items} />
-
 
         <${DevicesTable}
             devices=${devices}
@@ -134,46 +148,9 @@ export default function Devices ({ variant }) {
             selected=${selectedDevicesMap}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
-            editDevice=${onEditDevice}
+            editDevice=${onManageDevice}
             loadDevices=${loadDevicesAsync}
             viewFiles=${viewFiles}
         />
-        <${ManageDeviceDialog}
-            show=${showManageDevice}
-            createDevice=${createDevice}
-            updateDevice=${updateDevice}
-            editingDevice=${editingDevice}
-            setShow=${setShowManageDevice}
-            onCreateBackupJob=${onCreateBackupJob}
-            loadDevices=${loadDevicesAsync}
-            onClose=${() => setEditingDevice(undefined)}
-        />
-        <${StartScanDevicesJobDialog}
-        show=${showScanJobDialog}
-        setShow=${setShowScanJobDialog}
-        onClose=${() => setShowScanJobDialog(false)}
-        createJob=${createScanDevicesJobAsync}
-        devices=${selectedDevices}  />
-
-        <${StartBackupDevicesJobDialog}
-        show=${showBackupJobDialog}
-        setShow=${setShowBackupJobDialog}
-        onClose=${() => setShowBackupJobDialog(false)}
-        sourceDevices=${selectedDevices}
-
-      />
-
-        <${ConfirmDialog}
-        ...${deleteDeviceProps}
-        header="Are you sure?"
-        body="Do you want to delete device [${deleteDeviceProps.args?.name}] ${deleteDeviceProps.args?.description}"
-      / >
-
-      <${ConfirmDialog}
-        ...${deleteDuplicatesConfirmProps}
-        header="Are you sure?"
-        body="Do you want to delete duplicate files"
-      / >
-
     `
 }

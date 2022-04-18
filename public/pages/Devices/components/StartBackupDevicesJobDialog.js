@@ -1,14 +1,12 @@
 import { useApiData, useFetching, useObservableState } from '../../../hooks.js'
-import { useToast, Dialog, Alert, Button, Checkbox } from '../../../components/index.js'
-import { html, useEffect, useState } from '../../../globals.js'
+import { useToast, Alert, Button, Checkbox } from '../../../components/index.js'
+import { html, useState } from '../../../globals.js'
 import { createBackupDevicesJobAsync, deviceInfo$, getBackupDevicesAsync } from '../../../api/index.js'
 import { bytesToSize } from '../../../fns.js'
 
 export default function StartBackupDevicesJobDialog ({
   sourceDevices,
-  show,
-  setShow,
-  onClose
+  closeDialog
 }) {
   const { error, doFetch, resetFetchState, fetching } = useFetching()
   const { addToast } = useToast()
@@ -21,37 +19,20 @@ export default function StartBackupDevicesJobDialog ({
   const deviceInfo = useObservableState(deviceInfo$) || {}
   const backupDevices = useApiData([], getBackupDevicesAsync).filter(dev => deviceInfo[dev.id]?.isOnline)
 
-  useEffect(() => {
-    resetFetchState()
-  }, [show])
-
   async function _createJob () {
     await doFetch(async () => {
       await createBackupDevicesJobAsync(sourceDevices.map(x => x.id), selectedBackupDeviceId)
-
-      setShow(false)
       addToast({
         header: 'Success',
         body: 'Backup Job successfully started',
         type: 'success'
       })
+      closeDialog()
     })
   }
 
-  function _onClose () {
-    setShow(false)
-    onClose && onClose()
-  }
-
   return html`
-    <${Dialog}
-    size="modal-lg"
-    id="createBackupDeviceModal"
-    show=${show}
-    onClose=${_onClose}
-    title="Create Backup Job" >
-
-<div class="modal-body">
+  <div class="modal-body">
     <div class="mb-2">
     </div>
     ${unknownError &&
@@ -95,18 +76,17 @@ export default function StartBackupDevicesJobDialog ({
 
       `)}
     </tbody>
-</table>
-
+  </table>
 </div>
 <div class="modal-footer">
     <${Button}
         hidden=${fetching}
         className="btn-secondary"
-        onClick=${() => setShow(false)}
+        onClick=${closeDialog}
         >Cancel<//
     >
     <${Button} fetching=${fetching} disabled=${!selectedBackupDeviceId} onClick=${_createJob} >Create Job<//>
 </div>
-<//>
+
     `
 }

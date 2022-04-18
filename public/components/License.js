@@ -1,24 +1,27 @@
-import { html, useEffect, useState } from '../globals.js'
-import { Dialog } from './Dialog.js'
+import { html, useEffect } from '../globals.js'
+import { useDialog } from './Dialog/index.js'
 
 const licenseShownKey = 'usb-backup__licenseShown'
 
 export default function LicenseDialog () {
-  const [show, setShow] = useState(false)
+  const { showDialog } = useDialog()
+
   useEffect(() => {
     const licenseShown = window.localStorage.getItem(licenseShownKey)
     if (!licenseShown) {
-      setShow(true)
+      showDialog(LicenceDialogContent, { title: 'MIT License', size: 'modal-lg' })
     }
   }, [])
+  return null
+}
 
+function LicenceDialogContent ({ closeDialog }) {
   function onAgree () {
     window.localStorage.setItem(licenseShownKey, '1')
-    setShow(false)
+    closeDialog()
   }
 
   return html`
-  <${Dialog} show=${show} id="license-dialog" title="MIT License" size="modal-lg" showCloseButton=${false}>
     <div class="modal-body">
         <p >
 MIT License
@@ -51,7 +54,5 @@ SOFTWARE.
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" onClick=${onAgree}>I Agree</button>
     </div>
-<///>
-
 `
 }

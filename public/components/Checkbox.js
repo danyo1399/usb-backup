@@ -1,9 +1,8 @@
-import { useUniqueId } from '../hooks.js'
+import { useId } from '../hooks.js'
 import { html, useEffect, useState } from '../globals.js'
 
 export function Checkbox ({ label, id, checked, onClick, ...props }) {
-  const generatedId = useUniqueId()
-  const componentId = id || generatedId
+  const componentId = useId('checkbox', id)
   const [checkState, setCheckState] = useState(checked)
 
   function clickHandler (evt) {

@@ -28,6 +28,6 @@ export function dateString (timestamp) {
 }
 
 let nextId = 1
-export function newNumberId () {
+export function newIdNumber () {
   return nextId++
 }

@@ -1,6 +1,6 @@
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './api/devices.js'
 import { jobs$ } from './api/jobs.js'
-import { newNumberId as newIdNumber } from './fns.js'
+import { newIdNumber as newIdNumber } from './fns.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from './globals.js'
 
 export function useFormControl (defaultValue) {
@@ -295,7 +295,7 @@ export function useObservableState (observable$, defaultValue) {
 }
 
 let lastId = 1
-export function useUniqueId (prefix) {
+export function useId (prefix, defaultValue) {
   const [state] = useState(lastId++)
-  return `${prefix || 'uniqueid'}-${state}`
+  return defaultValue || `${prefix || 'uniqueid'}-${state}`
 }

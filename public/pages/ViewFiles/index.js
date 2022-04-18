@@ -1,13 +1,12 @@
 import {
   FileBrowser,
   useToast,
-  Dialog,
-  useDialog,
   ActionBar,
   Alert,
   Button,
   DeviceSelector,
-  useDeviceSelector
+  useDeviceSelector,
+  useDialog
 } from '../../components/index.js'
 
 import { css, html, useState } from '../../globals.js'
@@ -23,11 +22,14 @@ export default function ViewFiles ({ deviceId }) {
   const node = tree[path]
   const [selected, setSelected] = useState([])
   const device = useDevice(deviceId)
-  const dialogState = useDialog()
 
+  const { showDialog } = useDialog()
+  function showCopyDialog () {
+    showDialog(RestoreFilesDialog, { title: 'Copy to Source Device', showCloseButton: true, props: { device, selected } })
+  }
   const actionBarItems = selected.length > 0 && device?.deviceType === 'backup'
     ? [
-        { label: 'Copy to Source Device', onClick: dialogState.showDialog }
+        { label: 'Copy to Source Device', onClick: showCopyDialog }
       ]
     : []
 
@@ -39,12 +41,11 @@ export default function ViewFiles ({ deviceId }) {
 
     <${ActionBar} items=${actionBarItems} />
     <${FileBrowser} tree=${tree} currentPath=${path} node=${node} navigate=${setPath} selectedRowsChanged=${setSelected} />
-    <${RestoreFilesDialog} state=${dialogState} selected=${selected} device=${device}/>
   </div>
   `
 }
 
-function RestoreFilesDialog ({ state, selected, device }) {
+function RestoreFilesDialog ({ closeDialog, selected, device }) {
   const styles = css``
 
   const { error, doFetch, resetFetchState, fetching } = useFetching()
@@ -65,53 +66,47 @@ function RestoreFilesDialog ({ state, selected, device }) {
       })
       await restoreBackupFilesToSourceRequestAsync(device.id, deviceSelector.selectorProps.selectedDeviceId, relativePathState.value, paths)
       addToast({ header: 'Job Enqueued', body: 'Restore backup job successfully enqueued', type: 'success' })
-      state.closeDialog()
+      closeDialog()
     })
   }
 
   return html`
-      <${Dialog} className=${styles}
-      id="restoreBackupFilesDialog"
-      ...${state.dialogProps}
-      title='restore backup files'
-    >
-      <form onSubmit=${copyToSourceDevice}>
+      <form class=${styles} onSubmit=${copyToSourceDevice}>
         <div class="modal-body">
-        <div class="mb-2">
-            ${device && `${device?.name}`}
-        </div>
-        ${error &&
-        html`<${Alert}
-            type="alert-danger"
-            dismiss=${resetFetchState}>
-              Something went wrong (${error.message})
-            <//>`}
-        <div class="mb-3">
-          <${DeviceSelector} ...${deviceSelector.selectorProps}/>
+          <div class="mb-2">
+              ${device && `${device?.name}`}
+          </div>
+          ${error &&
+          html`<${Alert}
+              type="alert-danger"
+              dismiss=${resetFetchState}>
+                Something went wrong (${error.message})
+              <//>`}
+          <div class="mb-3">
+            <${DeviceSelector} ...${deviceSelector.selectorProps}/>
 
-        </div>
-        <div class="mb-3">
-            <label for="relative-path" class="form-label">Relative path</label>
-            <input
-                type="text"
-                ...${relativePathState.attributes}
-                class="form-control"
-                id="relative-path"
-                placeholder=""
-                required
-            />
-        </div>
+          </div>
+          <div class="mb-3">
+              <label for="relative-path" class="form-label">Relative path</label>
+              <input
+                  type="text"
+                  ...${relativePathState.attributes}
+                  class="form-control"
+                  id="relative-path"
+                  placeholder=""
+                  required
+              />
+          </div>
         </div>
         <div class="modal-footer">
           <${Button}
               hidden=${fetching}
               className="btn-secondary"
-              onClick=${state.closeDialog}
+              onClick=${closeDialog}
               >Cancel<//
           >
           <${Button} fetching=${fetching} type="submit">Create Job<//>
         </div>
       </form>
-    <//>
   `
 }
