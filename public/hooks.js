@@ -1,6 +1,6 @@
 import { getBackupDevicesAsync, getSourceDevicesAsync } from './api/devices.js'
 import { jobs$ } from './api/jobs.js'
-import { newIdNumber as newIdNumber } from './fns.js'
+import { newIdNumber } from './fns.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from './globals.js'
 
 export function useFormControl (defaultValue) {

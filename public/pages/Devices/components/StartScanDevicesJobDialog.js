@@ -1,4 +1,4 @@
-import { Button, Checkbox} from '../../../components/index.js'
+import { Button, Checkbox } from '../../../components/index.js'
 import { html, useState } from '../../../globals.js'
 
 export default function StartScanDevicesJobDialog ({
