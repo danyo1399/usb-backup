@@ -74,7 +74,7 @@ const createDeviceInfoService = exports._createDeviceInfoService = () => (
     },
     iterator () {
       // Send last known device infos while we refresh
-      const iterator = createEmitterAsyncIterator(eventEmitter, EVENTS.DEVICES_UPDATED, { initialItems: this.devices })
+      const iterator = createEmitterAsyncIterator(eventEmitter, [EVENTS.DEVICES_UPDATED], { initialItems: this.devices })
 
       this.refresh()
       return iterator

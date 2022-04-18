@@ -141,9 +141,17 @@ const createAsyncIterator = exports.createAsyncIterator = (getNewItems, offNewIt
  *
  * The iterator can start with an initial list of items to emit
  */
-exports.createEmitterAsyncIterator = (emitter, eventName, { getNewItems, initialItems } = {}) => {
+exports.createEmitterAsyncIterator = (emitter, eventNames, { getNewItems, initialItems } = {}) => {
   let pendingItems = initialItems || []
-  emitter.on(eventName, eventHandler)
+
+  const eventHandlers = []
+  for (const name of eventNames) {
+    const handler = (...args) => {
+      eventHandler(name, ...args)
+    }
+    eventHandlers.push({ name, handler })
+    emitter.on(name, handler)
+  }
 
   function getPendingItems () {
     const newItems = pendingItems
@@ -152,12 +160,14 @@ exports.createEmitterAsyncIterator = (emitter, eventName, { getNewItems, initial
   }
 
   function dispose () {
-    emitter.off(eventName, eventHandler)
+    for (const { name, handler } of eventHandlers) {
+      emitter.off(name, handler)
+    }
   }
 
-  function eventHandler (...eventPayload) {
+  function eventHandler (eventName, ...eventPayload) {
     if (getNewItems) {
-      const newItems = getNewItems(...eventPayload)
+      const newItems = getNewItems(eventName, ...eventPayload)
       pendingItems.push(...newItems)
     } else {
       const newItem = eventPayload[0]

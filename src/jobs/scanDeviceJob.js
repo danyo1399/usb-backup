@@ -74,7 +74,7 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
         if (err) {
           return
         }
-        log.debug(`Processing file ${filename}`)
+
         const fileId = await processFileAsync({ filename, stat })
         fileId != null && scannedFileIds.push(fileId)
       } catch (error) {

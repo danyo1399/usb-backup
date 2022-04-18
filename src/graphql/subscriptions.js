@@ -8,6 +8,7 @@ const Job = new GraphQLObjectType({
   name: 'Job',
   fields: {
     id: { type: GraphQLString },
+    deleted: { type: GraphQLBoolean },
     name: { type: GraphQLString },
     status: { type: GraphQLString },
     description: { type: GraphQLString },

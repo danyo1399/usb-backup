@@ -1,9 +1,13 @@
-
-let jobIds = []
-let jobStates = {}
+const EventEmitter = require('events')
+const { createEmitterAsyncIterator, createEmitterWithCallbackAsyncIterator } = require('../utils')
+const { logLevels, createLogger, defaultLogger } = require('../logging')
 
 const JOB_STATUSES = exports.JOB_STATUSES = { pending: 'pending', success: 'success', failed: 'failed', cancelled: 'cancelled', running: 'running' }
 const ACTIVE_STATUSES = ['pending', 'running']
+const MAX_JOBS = 5
+
+let jobIds = []
+let jobStates = {}
 
 exports.reset = () => {
   jobIds = []
@@ -11,14 +15,11 @@ exports.reset = () => {
   jobEmitter.removeAllListeners()
 }
 
-const EventEmitter = require('events')
-const { createEmitterAsyncIterator, createEmitterWithCallbackAsyncIterator } = require('../utils')
-const { logLevels, createLogger, defaultLogger } = require('../logging')
 class JobEmitter extends EventEmitter {
 
 }
 
-const JOB_EVENTS = { jobUpdated: 'jobUpdated', jobFinished: 'jobFinished', logAdded: 'logAdded' }
+const JOB_EVENTS = { jobDeleted: 'jobDeleted', jobUpdated: 'jobUpdated', jobFinished: 'jobFinished', logAdded: 'logAdded' }
 
 const jobEmitter = exports.jobEmitter = new JobEmitter({ captureRejections: true })
 jobEmitter.addListener('error', (err) => {
@@ -55,6 +56,9 @@ function createJobLogger (state) {
 }
 
 function getJobInfo (jobId) {
+  if (!jobStates[jobId]) {
+    return { id: jobId, deleted: true }
+  }
   const { job: { name, id, context, description }, errorCount, status } = jobStates[jobId]
   return { name, id, context, description, status, errorCount, active: ACTIVE_STATUSES.includes(status) }
 }
@@ -82,9 +86,9 @@ exports.createJobLogsIterator = (jobId) => {
 exports.createJobsIterator = () => {
   const initialItems = jobIds.map(getJobInfo)
 
-  const iterator = createEmitterAsyncIterator(jobEmitter, JOB_EVENTS.jobUpdated, { getNewItems, initialItems })
+  const iterator = createEmitterAsyncIterator(jobEmitter, [JOB_EVENTS.jobUpdated, JOB_EVENTS.jobDeleted], { getNewItems, initialItems })
 
-  function getNewItems (id) {
+  function getNewItems (eventName, id) {
     return [getJobInfo(id)]
   }
 
@@ -118,10 +122,15 @@ async function waitForTurnToRunAsync (id) {
 exports.runJobAsync = async (job) => {
   let state, log
   const id = job.id
+
   // we should fail fast as we dont have a logger yet. something's wrong
   if (jobStates[id]) throw new Error(`job id exists: ${id}`)
+
+  if (jobIds.length >= MAX_JOBS) {
+    this.deleteJob(jobIds[0])
+  }
   try {
-    state = jobStates[id] = { errorCount: null, job, logs: [], context: job.context, description: job.description, status: JOB_STATUSES.pending }
+    state = jobStates[id] = { errorCount: null, job, logs: [], context: job.context, description: job.description, completed: false, status: JOB_STATUSES.pending }
     jobIds.push(id)
     log = createJobLogger(state)
 
@@ -145,6 +154,7 @@ exports.runJobAsync = async (job) => {
     }
   } finally {
     if (state) {
+      state.completed = true
       state.errorCount = state.logs.filter(x => x.type === logLevels.error).length
     }
     jobEmitter.emit(JOB_EVENTS.jobUpdated, id)
@@ -152,9 +162,13 @@ exports.runJobAsync = async (job) => {
   }
 }
 
-exports.deleteJob = ({ id }) => {
-  jobIds = jobIds.filter(x => x !== id)
-  delete jobStates[id]
+exports.deleteJob = (id) => {
+  const state = jobStates[id]
+  if (state?.completed) {
+    jobIds = jobIds.filter(x => x !== id)
+    delete jobStates[id]
+    jobEmitter.emit(JOB_EVENTS.jobDeleted, id)
+  }
 }
 
 exports.getJobLog = (id, { start = 0, length = Number.MAX_VALUE } = {}) => {

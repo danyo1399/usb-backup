@@ -42,7 +42,7 @@ export const jobs$ = toObservable({
   query: `
     subscription {
       jobs {
-        id, name, context, status, active, description, errorCount
+        id, name, context, status, active, description, errorCount, deleted
       }
     }
 `
@@ -50,7 +50,7 @@ export const jobs$ = toObservable({
   rxjs.map(x => x.data.jobs),
   rxjs.mergeAll(),
   rxjs.scan((acc, curr) => ({ ...acc, [curr.id]: curr }), {}),
-  rxjs.map(x => Object.values(x)),
+  rxjs.map(x => Object.values(x).filter(x => !x.deleted)),
   rxjs.shareReplay(1))
 
 export function getJobLog (jobId) {
