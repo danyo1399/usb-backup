@@ -39,7 +39,6 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
           log.warn(`Skipping file as another file with the same hash exists on a source device. ${sourcePath}, ${file.hash}`)
           continue
         }
-        log.debug(`copying file ${sourcePath} -> ${targetPath}`)
         const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
         log.info(`copied file from ${sourcePath} to ${newPath}`)
         await createFileAsync(sourceDevice, newPath, { hash: hash })
