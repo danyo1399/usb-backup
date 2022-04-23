@@ -2,9 +2,9 @@ import { bytesToSize, dateString } from '../../../fns.js'
 import { html } from '../../../globals.js'
 import { useObservableState } from '../../../hooks.js'
 import { deviceInfo$ } from '../../../api/index.js'
-import { ActionsTableButton } from '../../../components/Index.js'
+import { ActionsTableButton, Checkbox } from '../../../components/index.js'
 
-export default function DevicesTable ({ devices, variant, selected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
+export default function DevicesTable ({ devices, variant, selected, selectAll, allSelected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
   if (devices.length === 0) {
     return null
   }
@@ -15,7 +15,7 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col"></th>
+                        <th scope="col"><${Checkbox} checked=${allSelected} onClick=${selectAll} ><//></th>
                         <th scope="col">Online</th>
                         <th scope="col">Name</th>
                         <th scope="col">Description</th>

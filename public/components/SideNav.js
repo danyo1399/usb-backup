@@ -59,7 +59,7 @@ export function SideNav () {
 
   }
   `
-  const version = useApiData('', getVersionAsync)
+  const { data: version } = useApiData('', getVersionAsync)
   return html`<div class=${styles}>
               <div class="header">
                   <${Icon} name="hdd" className="icon"/>

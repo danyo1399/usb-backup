@@ -6,7 +6,7 @@ const html = globals.html
 const { useState } = globals.preactHooks
 
 export default function Test () {
-  const files = useApiData([], () => getFilesByDeviceIdAsync('7b1b2e4850cfd62b3a422769fd3abf02'))
+  const { data: files } = useApiData([], () => getFilesByDeviceIdAsync('7b1b2e4850cfd62b3a422769fd3abf02'))
   const tree = useFileTree(files)
   const [path, setPath] = useState('/')
 

@@ -9,20 +9,19 @@ import {
   scanDevicesAsync,
   updateBackupDeviceAsync,
   updateSourceDeviceAsync,
-  createRemoveBackupDuplicatesJobAsync
+  createRemoveBackupDuplicatesJobAsync,
+  deviceInfo$
 } from '../../api/index.js'
 
 import StartBackupDevicesJobDialog from './components/StartBackupDevicesJobDialog.js'
-import { useToast, ActionBar, useConfirm } from '../../components/Index.js'
-import { useFetching } from '../../hooks.js'
+import { useToast, ActionBar, useConfirm, useDialog } from '../../components/index.js'
+import { useApiData, useFetching, useObservableState } from '../../hooks.js'
 import StartScanDevicesJobDialog from './components/StartScanDevicesJobDialog.js'
 import constants from '../../constants.js'
-import { html, route, useEffect, useState } from '../../globals.js'
-import { useDialog } from '../../components/index.js'
+import { html, route, useState } from '../../globals.js'
 
 export default function Devices ({ variant }) {
   const { addToast } = useToast()
-  const [devices, setDevices] = useState([])
   const { doFetch } = useFetching()
   const { prompt } = useConfirm()
   const { showDialog } = useDialog()
@@ -34,9 +33,29 @@ export default function Devices ({ variant }) {
   const createDevice = isSourceDeviceView ? createSourceDeviceAsync : createBackupDeviceAsync
   const updateDevice = isSourceDeviceView ? updateSourceDeviceAsync : updateBackupDeviceAsync
 
+  const { data: devices, mutate: mutateDevicesAsync } = useApiData([], deviceQuery)
+  const deviceInfoMap = useObservableState(deviceInfo$) || {}
   const [selectedDevicesMap, setSelectedDevicesMap] = useState({})
+
+  const deviceInfoList = Object.values(deviceInfoMap).filter(i => devices.some(d => d.id === i.id))
   const anyDevicesSelected = Object.values(selectedDevicesMap).some(selected => selected)
+  const allOnlineDevicesSelected = deviceInfoList.filter(x => x.isOnline).every(x => selectedDevicesMap[x.id])
   const selectedDevices = devices.filter(d => selectedDevicesMap[d.id])
+
+  function selectAll () {
+    if (allOnlineDevicesSelected) {
+      setSelectedDevicesMap({})
+      return
+    }
+    const selectedDevices = deviceInfoList.filter(di => di.isOnline)
+    setSelectedDevicesMap(sd => {
+      sd = { ...sd }
+      for (const d of selectedDevices) {
+        sd[d.id] = true
+      }
+      return sd
+    })
+  }
 
   function toggleSelectedDevice (id) {
     setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
@@ -63,18 +82,9 @@ export default function Devices ({ variant }) {
 
   const label = isSourceDeviceView ? 'Source Device' : 'Backup Device'
 
-  async function loadDevicesAsync () {
-    const devices = await deviceQuery()
-    setDevices(devices)
-  }
-
-  useEffect(() => {
-    loadDevicesAsync()
-  }, [])
-
   function onManageDevice (device) {
     const title = device ? 'Edit Device' : 'Create Device'
-    showDialog(ManageDeviceDialog, { title, showCloseButton: true, props: { createDevice, updateDevice, loadDevices: loadDevicesAsync, device } })
+    showDialog(ManageDeviceDialog, { title, showCloseButton: true, props: { createDevice, updateDevice, loadDevices: mutateDevicesAsync, device } })
   }
 
   function viewFiles (device) {
@@ -86,7 +96,7 @@ export default function Devices ({ variant }) {
       await removeDevice(device)
       // we need to set it here too else the toast wont work
 
-      loadDevicesAsync()
+      mutateDevicesAsync()
       addToast({
         header: 'Success',
         body: 'Device deleted successfully',
@@ -145,11 +155,13 @@ export default function Devices ({ variant }) {
         <${DevicesTable}
             devices=${devices}
             variant=${variant}
+            allSelected=${allOnlineDevicesSelected}
+            selectAll=${selectAll}
             selected=${selectedDevicesMap}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
             editDevice=${onManageDevice}
-            loadDevices=${loadDevicesAsync}
+            loadDevices=${mutateDevicesAsync}
             viewFiles=${viewFiles}
         />
     `

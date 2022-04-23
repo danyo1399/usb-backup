@@ -16,7 +16,7 @@ import { getFilesByDeviceIdAsync, restoreBackupFilesToSourceRequestAsync } from 
 export default function ViewFiles ({ deviceId }) {
   const styles = css``
 
-  const files = useApiData([], getFilesByDeviceIdAsync, deviceId)
+  const { data: files } = useApiData([], getFilesByDeviceIdAsync, deviceId)
   const [path, setPath] = useState('/')
   const tree = useFileTree(files)
   const node = tree[path]

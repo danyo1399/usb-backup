@@ -6,7 +6,7 @@ import { FileTable } from './FileTable.js'
 export function RemovedTab () {
   const styles = css`
   `
-  const data = useApiData(null, reportFilesOnBackupWithNoSourceAsync)
+  const { data } = useApiData(null, reportFilesOnBackupWithNoSourceAsync)
 
   return html`
   <div class=${styles}>

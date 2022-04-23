@@ -20,7 +20,7 @@ export function DuplicatesTab () {
   `
 
   const [filter, setFilter] = useState('source')
-  const data = useApiData(null, filter === 'backup' ? reportDuplicateFilesOnBackupDevicesAsync : reportDuplicateFilesOnSourceDevicesAsync)
+  const { data } = useApiData(null, filter === 'backup' ? reportDuplicateFilesOnBackupDevicesAsync : reportDuplicateFilesOnSourceDevicesAsync)
 
   return html`
   <div class=${styles}>

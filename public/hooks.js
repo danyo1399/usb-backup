@@ -259,9 +259,9 @@ export function usePagination (items, itemsPerPage) {
 export function useApiData (defaultValue, apiFn, ...args) {
   const [data, setData] = useState(defaultValue)
   const loadingKeyRef = useRef(null)
-  useEffect(() => {
-    (async () => {
-      /*
+
+  const mutate = useCallback(async () => {
+    /*
       covers scenario where final user selection is not shown to user
         - select a
         - loading a
@@ -270,16 +270,18 @@ export function useApiData (defaultValue, apiFn, ...args) {
         - b loaded show b
         - a loaded show a
       */
-      const loadingKey = loadingKeyRef.current = newIdNumber()
-      setData(defaultValue)
-      const response = await apiFn(...args)
-      if (loadingKeyRef.current === loadingKey) {
-        setData(response)
-      }
-    })()
+    const loadingKey = loadingKeyRef.current = newIdNumber()
+    setData(defaultValue)
+    const response = await apiFn(...args)
+    if (loadingKeyRef.current === loadingKey) {
+      setData(response)
+    }
   }, [apiFn, ...args])
+  useEffect(() => {
+    mutate()
+  }, [mutate])
 
-  return data
+  return { data, mutate }
 }
 
 export function useObservableState (observable$, defaultValue) {

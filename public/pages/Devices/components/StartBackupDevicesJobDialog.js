@@ -17,7 +17,7 @@ export default function StartBackupDevicesJobDialog ({
   const unknownError = error && !hasInvalidPathError
 
   const deviceInfo = useObservableState(deviceInfo$) || {}
-  const backupDevices = useApiData([], getBackupDevicesAsync).filter(dev => deviceInfo[dev.id]?.isOnline)
+  const { data: backupDevices } = useApiData([], getBackupDevicesAsync).filter(dev => deviceInfo[dev.id]?.isOnline)
 
   async function _createJob () {
     await doFetch(async () => {
