@@ -21,6 +21,8 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
                         <th scope="col">Description</th>
                         <th scope="col">Path</th>
                         <th scope="col">Available</th>
+                        <th scope="col">Used</th>
+                        <th scope="col">Orphan</th>
                         <th scope="col">Last Scanned</th>
                         ${variant === 'source' && html`<th scope="col">Last Backup</th>`}
                     </tr>
@@ -40,6 +42,8 @@ export default function DevicesTable ({ devices, variant, selected, toggleSelect
                                 <td>${dev.description}</td>
                                 <td>${dev.path}</td>
                                 <td>${bytesToSize(deviceInfo[dev.id]?.freeSpace)}</td>
+                                <td>${bytesToSize(dev.usedSize)}</td>
+                                <td>${bytesToSize(dev.orphanSize)}</td>
                                 <td>${dateString(dev.lastScanDate)}</td>
                                 ${variant === 'source' && html`<td>${dateString(dev.lastBackupDate)}</td>`}
                                 <td>

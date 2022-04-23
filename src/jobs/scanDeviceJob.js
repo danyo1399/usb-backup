@@ -14,7 +14,7 @@ const {
 
 } = require('../repo')
 const fs = require('fs-extra')
-const { deviceName, isDeviceOnlineAsync, isMetafile, writeDeviceMetaFileAsync } = require('../device')
+const { deviceName, isDeviceOnlineAsync, isMetafile, writeDeviceMetaFileAsync, updateDeviceStatsAsync } = require('../device')
 const { getFileRelativePath, joinPaths } = require('../path')
 const path = require('path')
 const { hashFileAsync } = require('../crypto')
@@ -94,7 +94,11 @@ const scanDevices = exports.scanDevices = async function (log, deviceIds, getIsA
       await deleteFileAsync(id)
     }
 
+    log.debug('Updating last scan date')
     await updateDeviceScanDateAsync(deviceId)
+    log.debug('Updating device stats')
+    await updateDeviceStatsAsync()
+    log.debug('Writing metadata file')
     await writeDeviceMetaFileAsync(device)
   }
 }

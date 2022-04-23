@@ -5,7 +5,7 @@ const {
 
 } = require('../repo')
 const fs = require('fs-extra')
-const { assertDeviceOnlineAsync } = require('../device')
+const { assertDeviceOnlineAsync, updateDeviceStatsAsync } = require('../device')
 const { appendFilePathToPath } = require('../path')
 
 // There can be duplicates on backup devices in cases where we are importing an existing usb
@@ -35,6 +35,9 @@ module.exports.createRemoveBackupDuplicatesJobAsync = async (...backupDeviceIds)
         hashMap[file.hash] = true
       }
     }
+
+    log.debug('Updating device stats')
+    await updateDeviceStatsAsync()
   }
 
   async function abort () {

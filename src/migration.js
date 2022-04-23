@@ -90,6 +90,12 @@ create index idx_files_relativePath_mtimeMs
     alter table devices add freeSpace INTEGER;
     alter table devices add totalSpace INTEGER;
     `)
+  },
+  async function migration004 () {
+    await execAsync(`
+    alter table devices add orphanSize INTEGER;
+    alter table devices add usedSize INTEGER;
+    `)
   }
 ]
 

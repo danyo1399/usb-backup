@@ -10,6 +10,38 @@ Reports
 ==================================================================================
 */
 
+exports.reportSizeTotalsByDeviceAsync = async () => {
+  return await db.allAsync(`
+  with deviceTotals as (
+    select d.id, IfNull(sum(f.size), 0) usedSize
+    from devices d left join files f on d.id = f.deviceId
+    where f.deleted = 0
+    group by d.id
+)
+select
+         d.id,
+         d.name,
+         dt.usedSize,
+         IfNull(sum(f.size),0) as orphanSize
+  from
+      devices d inner join deviceTotals dt on
+          d.id = dt.id
+      left join files f on
+          d.id = f.deviceId
+          and f.deleted = 0
+          and not exists (
+          select 1
+          from
+               files f2
+          where
+            f.hash = f2.hash and
+            ((f2.deviceType = 'backup' and f.deviceType = 'source') or (f2.deviceType = 'source' and f.deviceType = 'backup') ) and
+            f2.deleted = 0)
+  group by
+  d.id, d.name;
+  `)
+}
+
 exports.reportFilesOnBackupWithNoSourceAsync = async () => {
   const files = await db.allAsync(`
   select
@@ -26,7 +58,7 @@ exports.reportFilesOnBackupWithNoSourceAsync = async () => {
   order by
       b.addDate desc
   `)
-  return files.filter(x => isIgnoredFile(x.relativePath) === false)
+  return files
 }
 
 exports.reportFilesOnSourceWithNoBackupAsync = async () => {
@@ -70,6 +102,12 @@ exports.reportDuplicateFilesOnDeviceTypeAsync = async (deviceType) => {
 devices
 ======================================================================================
 */
+
+exports.updateSizeStats = async (id, usedSize, orphanSize) => {
+  await db.runAsync(`
+  update devices set usedSize = ?, orphanSize = ? where id = ?
+  `, usedSize, orphanSize, id)
+}
 
 // Updates device from device info device query
 exports.updateDeviceInfo = async (id, freeSpace, totalSpace, path) => {

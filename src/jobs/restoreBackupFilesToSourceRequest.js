@@ -4,7 +4,7 @@ const {
   getFilesByHashAndDeviceTypeAsync
 
 } = require('../repo')
-const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
+const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync, updateDeviceStatsAsync } = require('../device')
 const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
 const { joinPaths: joinPath, endsWithPathSeparator, joinPaths, basename } = require('../path')
@@ -44,6 +44,9 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
         await createFileAsync(sourceDevice, newPath, { hash: hash })
       }
     }
+
+    log.debug('Updating device stats')
+    await updateDeviceStatsAsync()
 
     await writeDeviceMetaFileAsync(sourceDevice)
   }

@@ -41,7 +41,7 @@ exports.ReportFile = new GraphQLObjectType({
 
 exports.SourceDevice = new GraphQLObjectType({
   name: 'SourceDevice',
-  fields: () => ({
+  fields: {
     id: {
       type: new GraphQLNonNull(GraphQLID)
     },
@@ -60,13 +60,19 @@ exports.SourceDevice = new GraphQLObjectType({
     lastScanDate: {
       type: GraphQLFloat
     },
+    orphanSize: {
+      type: GraphQLFloat
+    },
+    usedSize: {
+      type: GraphQLFloat
+    },
     lastBackupDate: {
       type: GraphQLFloat
     },
     addDate: {
       type: GraphQLFloat
     }
-  })
+  }
 })
 
 exports.BackupDevice = new GraphQLObjectType({
@@ -88,6 +94,12 @@ exports.BackupDevice = new GraphQLObjectType({
       type: this.DeviceType
     },
     lastScanDate: {
+      type: GraphQLFloat
+    },
+    orphanSize: {
+      type: GraphQLFloat
+    },
+    usedSize: {
       type: GraphQLFloat
     },
     addDate: {

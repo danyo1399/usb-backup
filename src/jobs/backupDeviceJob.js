@@ -3,7 +3,7 @@ const checkDiskSpace = require('check-disk-space').default
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
 } = require('../repo')
-const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync } = require('../device')
+const { assertDeviceOnlineAsync, writeDeviceMetaFileAsync, updateDeviceStatsAsync } = require('../device')
 const { scanDevices } = require('./scanDeviceJob')
 const { ensureFilePathExistsAsync, appendFilePathToPath, joinPaths, basename } = require('../path')
 const { createFileAsync, copyFileAsync } = require('../file')
@@ -63,6 +63,9 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
       } else {
         log.error(`Not all files were backed up: ${pendingFilesAfterBackup.length} files remaining`)
       }
+
+      log.debug('Updating device stats')
+      await updateDeviceStatsAsync()
 
       log.debug('Writing backup metafile')
       await writeDeviceMetaFileAsync(context.backupDevice)

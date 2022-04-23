@@ -30,7 +30,7 @@ export async function getSourceDevicesAsync () {
     query: `
             query {
                 sourceDevices {
-                id, name, description, path, lastScanDate, lastBackupDate, deviceType
+                id, name, description, path, lastScanDate, lastBackupDate, deviceType, usedSize, orphanSize
                 }
             }
         `
@@ -146,7 +146,7 @@ export async function getBackupDevicesAsync () {
     query: `
                 query {
                     backupDevices {
-                    id, name, description, path, lastScanDate, deviceType
+                    id, name, description, path, lastScanDate, deviceType, orphanSize, usedSize
                     }
                 }
             `

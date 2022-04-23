@@ -1,7 +1,7 @@
 const _path = require('path')
 const fs = require('fs-extra')
 const { defaultLogger } = require('./logging')
-const { getDeviceByIdAsync, addDeviceAsync, updateDeviceAsync, getFilesByDeviceAsync, deleteDeviceAsync } = require('./repo')
+const { getDeviceByIdAsync, addDeviceAsync, updateDeviceAsync, getFilesByDeviceAsync, deleteDeviceAsync, reportSizeTotalsByDeviceAsync, updateSizeStats } = require('./repo')
 const { newId } = require('./utils')
 const { raiseError, errorCodes } = require('./errors')
 const { joinPaths } = require('./path')
@@ -30,6 +30,14 @@ exports.assertDeviceOnlineAsync = async (deviceId, { deviceType } = {}) => {
     throw new Error(`Device offline: ${this.deviceName(device)}`)
   }
   return device
+}
+
+exports.updateDeviceStatsAsync = async () => {
+  const stats = await reportSizeTotalsByDeviceAsync()
+  for (const { id, usedSize, orphanSize } of stats) {
+    defaultLogger.info('Updating stats for device', { id, usedSize, orphanSize })
+    await updateSizeStats(id, usedSize, orphanSize)
+  }
 }
 
 exports.getDeviceIdForPathAsync = async (path) => {
