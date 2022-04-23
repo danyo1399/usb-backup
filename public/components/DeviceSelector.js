@@ -14,6 +14,12 @@ export function useDeviceSelector (type, includeOffline = false) {
   if (!includeOffline) {
     devices = devices.filter(x => deviceInfos[x.id].isOnline)
   }
+  devices.sort((x, y) => {
+    if (x.name < y.name) return -1
+    if (x.name > y.name) return 1
+    return 0
+  })
+
   const [selectedDeviceId, setSelectedDeviceId] = useState()
 
   const selectedDevice = devices.find(x => x.id === selectedDeviceId)
