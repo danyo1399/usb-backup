@@ -23,7 +23,7 @@ export function useDeviceSelector (type, { includeOffline, includeAllOption } = 
   const [selectedDeviceId, setSelectedDeviceId] = useState()
 
   const selectedDevice = devices.find(x => x.id === selectedDeviceId)
-  return { selectedDevice, selectorProps: { devices, selectedDeviceId, setSelectedDeviceId, includeAllOption} }
+  return { selectedDevice, selectorProps: { devices, selectedDeviceId, setSelectedDeviceId, includeAllOption } }
 }
 
 export function DeviceSelector ({ devices, selectedDeviceId, includeAllOption, setSelectedDeviceId, id, label }) {
