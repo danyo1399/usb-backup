@@ -1,4 +1,5 @@
 const { isCustomError } = require('../errors')
+const { defaultLogger } = require('../logging')
 
 exports.toGraphQlEnum = function toGraphQlEnum (obj) {
   return Object.keys(obj).reduce(
@@ -10,7 +11,7 @@ exports.toGraphQlEnum = function toGraphQlEnum (obj) {
 }
 
 exports.toGraphqlErrorSection = (error) => {
-  console.error(error)
+  defaultLogger.error('graphql error', error)
   return isCustomError(error)
     ? { error }
     : {
