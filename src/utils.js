@@ -4,6 +4,11 @@ const crypto = require('crypto')
  Common Utils
  =======================================================================================
 */
+
+exports.noop = function () {
+
+}
+
 const curry = exports.curry = function (func) {
   return function curried (...args) {
     if (args.length >= func.length) {
