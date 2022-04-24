@@ -34,22 +34,22 @@ function createJobLogger (state) {
   return createLogger({
     debug (message, ...context) {
       log.push({ index: index++, timestamp: Date.now(), type: logLevels.debug, message, context })
-      console.debug(message, ...context)
+      // console.debug(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     info (message, ...context) {
       log.push({ index: index++, timestamp: Date.now(), type: logLevels.info, message, context })
-      console.info(message, ...context)
+      // console.info(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     warn (message, ...context) {
       log.push({ index: index++, timestamp: Date.now(), type: logLevels.warn, message, context })
-      console.warn(message, ...context)
+      // console.warn(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     },
     error (message, ...context) {
       log.push({ index: index++, timestamp: Date.now(), type: logLevels.error, message, context })
-      console.error(message, ...context)
+      // console.error(message, ...context)
       jobEmitter.emit(JOB_EVENTS.logAdded, id)
     }
   })
