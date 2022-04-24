@@ -33,6 +33,46 @@ export function useFormControl (defaultValue) {
   return { attributes, value, setValue, dirty, touched, reset }
 }
 
+export function useItemSelector (items, keyFn = x => x.id) {
+  const [selections, setSelections] = useState({})
+
+  function select (...keys) {
+    setSelections(state => keys.reduce((prev, curr) => ({ ...prev, [curr]: true }), state))
+  }
+
+  function toggle (key) {
+    setSelections(state => ({ ...state, [key]: !state[key] }))
+  }
+
+  function clear () {
+    setSelections({})
+  }
+
+  function unSelect (key) {
+    setSelections(state => ({ ...state, [key]: false }))
+  }
+
+  function selectAll () {
+    setSelections(() => items.reduce((prev, curr) => ({ ...prev, [keyFn(curr)]: true }), {}))
+  }
+
+  function selectByCriteria (criteria) {
+    for (const item of items) {
+      if (criteria(item)) {
+        select(keyFn(item))
+      }
+    }
+  }
+
+  function isSelected (key) {
+    return !!selections[key]
+  }
+  const selectedItems = items.filter(item => selections[keyFn(item)])
+  const someSelected = selectedItems.length > 0
+
+  return { selectedItems, select, toggle, clear, unSelect, selectAll, someSelected, isSelected, selectByCriteria }
+}
+
 export function useRowSelector () {
   const shift = useKeyDownMonitor('Shift')
   const control = useKeyDownMonitor('Control')

@@ -4,7 +4,7 @@ import { useObservableState } from '../../../hooks.js'
 import { deviceInfo$ } from '../../../api/index.js'
 import { ActionsTableButton, Checkbox } from '../../../components/index.js'
 
-export default function DevicesTable ({ devices, variant, selected, selectAll, allSelected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
+export default function DevicesTable ({ devices, variant, isSelected, selectAll, allSelected, toggleSelected, deleteDevice, editDevice, viewFiles }) {
   if (devices.length === 0) {
     return null
   }
@@ -33,7 +33,7 @@ export default function DevicesTable ({ devices, variant, selected, selectAll, a
                             <tr>
                                 <td >
                                 <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="cb-${dev.id}" checked=${!!selected[dev.id]} onChange=${() => toggleSelected(dev.id)} />
+                                <input class="form-check-input" type="checkbox" id="cb-${dev.id}" checked=${isSelected(dev.id)} onChange=${() => toggleSelected(dev.id)} />
                                 <label class="form-check-label" for="cb-${dev.id}"></label>
                                 </div>
                                 </td>

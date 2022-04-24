@@ -15,10 +15,10 @@ import {
 
 import StartBackupDevicesJobDialog from './components/StartBackupDevicesJobDialog.js'
 import { useToast, ActionBar, useConfirm, useDialog } from '../../components/index.js'
-import { useApiData, useFetching, useObservableState } from '../../hooks.js'
+import { useApiData, useFetching, useItemSelector, useObservableState } from '../../hooks.js'
 import StartScanDevicesJobDialog from './components/StartScanDevicesJobDialog.js'
 import constants from '../../constants.js'
-import { html, route, useState } from '../../globals.js'
+import { html, route } from '../../globals.js'
 
 export default function Devices ({ variant }) {
   const { addToast } = useToast()
@@ -35,30 +35,26 @@ export default function Devices ({ variant }) {
 
   const { data: devices, mutate: mutateDevicesAsync } = useApiData([], deviceQuery)
   const deviceInfoMap = useObservableState(deviceInfo$) || {}
-  const [selectedDevicesMap, setSelectedDevicesMap] = useState({})
+
+  const {
+    someSelected: anyDevicesSelected,
+    clear: clearSelectedDevices,
+    selectedItems: selectedDevices,
+    isSelected,
+    select,
+    toggle: toggleSelectedDevice
+  } = useItemSelector(devices, x => x.id)
 
   const deviceInfoList = Object.values(deviceInfoMap).filter(i => devices.some(d => d.id === i.id))
-  const anyDevicesSelected = Object.values(selectedDevicesMap).some(selected => selected)
-  const allOnlineDevicesSelected = deviceInfoList.filter(x => x.isOnline).every(x => selectedDevicesMap[x.id])
-  const selectedDevices = devices.filter(d => selectedDevicesMap[d.id])
+  const allOnlineDevicesSelected = deviceInfoList.filter(x => x.isOnline).every(x => isSelected(x.id))
 
   function selectAll () {
     if (allOnlineDevicesSelected) {
-      setSelectedDevicesMap({})
+      clearSelectedDevices()
       return
     }
-    const selectedDevices = deviceInfoList.filter(di => di.isOnline)
-    setSelectedDevicesMap(sd => {
-      sd = { ...sd }
-      for (const d of selectedDevices) {
-        sd[d.id] = true
-      }
-      return sd
-    })
-  }
-
-  function toggleSelectedDevice (id) {
-    setSelectedDevicesMap(x => ({ ...x, [id]: !x[id] }))
+    const selectedIds = deviceInfoList.filter(di => di.isOnline).map(x => x.id)
+    select(...selectedIds)
   }
 
   async function onScanDevicesJob () {
@@ -77,7 +73,7 @@ export default function Devices ({ variant }) {
   async function createScanDevicesJobAsync (useFullScan) {
     await scanDevicesAsync(selectedDevices.map(x => x.id), useFullScan)
     addToast({ header: 'Job Enqueued', body: 'Scan Devices job successfully enqueued', type: 'success' })
-    setSelectedDevicesMap({})
+    clearSelectedDevices()
   }
 
   const label = isSourceDeviceView ? 'Source Device' : 'Backup Device'
@@ -157,7 +153,7 @@ export default function Devices ({ variant }) {
             variant=${variant}
             allSelected=${allOnlineDevicesSelected}
             selectAll=${selectAll}
-            selected=${selectedDevicesMap}
+            isSelected=${isSelected}
             toggleSelected=${toggleSelectedDevice}
             deleteDevice=${onDeleteDevice}
             editDevice=${onManageDevice}
