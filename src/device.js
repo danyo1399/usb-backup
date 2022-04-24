@@ -35,7 +35,6 @@ exports.assertDeviceOnlineAsync = async (deviceId, { deviceType } = {}) => {
 exports.updateDeviceStatsAsync = async () => {
   const stats = await reportSizeTotalsByDeviceAsync()
   for (const { id, usedSize, orphanSize } of stats) {
-    defaultLogger.info('Updating stats for device', { id, usedSize, orphanSize })
     await updateSizeStats(id, usedSize, orphanSize)
   }
 }

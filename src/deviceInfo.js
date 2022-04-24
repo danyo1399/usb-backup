@@ -63,7 +63,6 @@ const createDeviceInfoService = exports._createDeviceInfoService = () => (
       this.devices = devices.map(device => {
         let deviceInfo = updatedDeviceInfos.find(x => x.id === device.id)
         if (!deviceInfo) {
-          defaultLogger.info('Device not online. Sending last known info', device)
           deviceInfo = sendUpdate({ ...device, isOnline: false })
         }
 
