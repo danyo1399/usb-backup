@@ -46,7 +46,8 @@ export default function Devices ({ variant }) {
   } = useItemSelector(devices, x => x.id)
 
   const deviceInfoList = Object.values(deviceInfoMap).filter(i => devices.some(d => d.id === i.id))
-  const allOnlineDevicesSelected = deviceInfoList.filter(x => x.isOnline).every(x => isSelected(x.id))
+  const onlineDevices = deviceInfoList.filter(x => x.isOnline)
+  const allOnlineDevicesSelected = onlineDevices.length > 0 && onlineDevices.every(x => isSelected(x.id))
 
   function selectAll () {
     if (allOnlineDevicesSelected) {
@@ -90,7 +91,6 @@ export default function Devices ({ variant }) {
   async function deleteDevice (device) {
     await doFetch(async () => {
       await removeDevice(device)
-      // we need to set it here too else the toast wont work
 
       mutateDevicesAsync()
       addToast({
