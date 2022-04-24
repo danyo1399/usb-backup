@@ -2,7 +2,7 @@ import { useDevices, useObservableState, useId } from '../hooks.js'
 import { css, html, useState } from '../globals.js'
 import { deviceInfo$ } from '../api/devices.js'
 
-export function useDeviceSelector (type, includeOffline = false) {
+export function useDeviceSelector (type, { includeOffline, includeAllOption } = { }) {
   const deviceCollections = useDevices()
   const deviceInfos = useObservableState(deviceInfo$, {})
   let devices = type === 'source'
@@ -23,10 +23,10 @@ export function useDeviceSelector (type, includeOffline = false) {
   const [selectedDeviceId, setSelectedDeviceId] = useState()
 
   const selectedDevice = devices.find(x => x.id === selectedDeviceId)
-  return { selectedDevice, selectorProps: { devices, selectedDeviceId, setSelectedDeviceId } }
+  return { selectedDevice, selectorProps: { devices, selectedDeviceId, setSelectedDeviceId, includeAllOption} }
 }
 
-export function DeviceSelector ({ devices, selectedDeviceId, setSelectedDeviceId, id, label }) {
+export function DeviceSelector ({ devices, selectedDeviceId, includeAllOption, setSelectedDeviceId, id, label }) {
   const styles = css``
   id = useId('device-selector', id)
 
@@ -35,7 +35,8 @@ export function DeviceSelector ({ devices, selectedDeviceId, setSelectedDeviceId
       <div class=${styles}>
       <label for=${id} class="form-label">${label}</label>
       <select required id=${id} value=${selectedDeviceId} onChange=${e => setSelectedDeviceId(e.target.value)} class="form-select" aria-label=${label}>
-      ${!selectedDeviceId && html`<option disabled selected value> -- select an option -- </option>`}
+      ${!selectedDeviceId && !includeAllOption && html`<option disabled selected value> -- select an option -- </option>`}
+      ${includeAllOption && html`<option value> -- All -- </option>`}
       ${devices.map(x => html`<option selected=${selectedDeviceId === x.id} value=${x.id}>${x.name} - ${x.description}</option>`)}
       </select>
       </div>

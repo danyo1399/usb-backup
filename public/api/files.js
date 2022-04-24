@@ -23,7 +23,7 @@ export async function reportFilesOnSourceWithNoBackupAsync (deviceId) {
     query: `
             query {
               reportFilesOnSourceWithNoBackupAsync {
-                id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
+                deviceId, id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
                 }
             }
         `
@@ -36,7 +36,7 @@ export async function reportFilesOnBackupWithNoSourceAsync (deviceId) {
     query: `
             query {
               reportFilesOnBackupWithNoSourceAsync {
-                id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
+                deviceId, id, hash, size, relativePath, mtimeMs, deviceName, birthtimeMs, addDate, editDate, devicePath
                 }
             }
         `

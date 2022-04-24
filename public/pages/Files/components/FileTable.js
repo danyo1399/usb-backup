@@ -3,7 +3,7 @@ import { PaginationButtons } from '../../../components/PaginationButtons.js'
 import { css, html } from '../../../globals.js'
 import { usePagination } from '../../../hooks.js'
 
-export function FileTable ({ data }) {
+export function FileTable ({ className, data }) {
   const styles = css`
   .path-cell {
     overflow-wrap: anywhere;
@@ -14,7 +14,7 @@ export function FileTable ({ data }) {
 
   if (!data) return html`Loading...`
   return html`
-  <table className="table ${styles}">
+  <table className="table ${className} ${styles}">
   <thead>
     <tr>
       <td>Device</td>
