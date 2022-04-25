@@ -50,7 +50,7 @@ async function fileTreeWalkerAsync (rootDir, callback, logger = defaultLogger) {
             }
           } else if (stat.isFile()) {
             if (isIgnoredFile(fullPath)) {
-              logger.warn(`Ignoring file ${fullPath}`)
+              logger.info(`Ignoring file ${fullPath}`)
             } else {
               try {
                 await callback(null, { filename: fullPath, stat, path: subpath, abort })
