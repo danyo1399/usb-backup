@@ -21,7 +21,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
     const sourceDevice = await assertDeviceOnlineAsync(sourceDeviceId, { deviceType: 'source' })
 
     try {
-          // remove any leading slashes
+      // remove any leading slashes
       sourcePaths = sourcePaths.map(x => x.replaceAll('\\', '/')).map(p => p.startsWith('/') ? p.substr(1) : p)
       for (const path of sourcePaths) {
         if (_abort) break
