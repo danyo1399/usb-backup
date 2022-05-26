@@ -42,6 +42,9 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
           }
           const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
           log.info(`copied file from ${sourcePath} to ${newPath}`)
+          if (hash !== file.hash) {
+            log.error(`File hash has changed. Has the file been corrupted?. Stored hash ${file.hash}, copied file hash ${file.hash}`)
+          }
           await createFileAsync(sourceDevice, newPath, { hash: hash })
         }
       }
