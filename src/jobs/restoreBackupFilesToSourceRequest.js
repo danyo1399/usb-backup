@@ -37,13 +37,13 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
             continue
           }
           if (existingFile) {
-            log.warn(`Skipping file as another file with the same hash exists on a source device. ${sourcePath}, ${file.hash}`)
+            log.debug(`Skipping file as another file with the same hash exists on a source device. ${sourcePath}, ${file.hash}`)
             continue
           }
           const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
           log.info(`copied file from ${sourcePath} to ${newPath}`)
           if (hash !== file.hash) {
-            log.error(`File hash has changed. Has the file been corrupted?. Stored hash ${file.hash}, copied file hash ${file.hash}`)
+            log.error(`File hash has changed. Has the file been corrupted?. Stored hash ${file.hash}, copied file hash ${hash}`)
           }
           await createFileAsync(sourceDevice, newPath, { hash: hash })
         }
