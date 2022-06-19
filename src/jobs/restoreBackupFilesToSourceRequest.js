@@ -1,4 +1,4 @@
-const { newIdNumber } = require('../utils')
+const { newIdNumber, retryOnError } = require('../utils')
 const {
   findFilesByPathAsync,
   getFilesByHashAndDeviceTypeAsync
@@ -9,6 +9,7 @@ const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
 const { joinPaths: joinPath, endsWithPathSeparator, joinPaths, basename } = require('../path')
 
+const copyFileWithRetry = retryOnError(copyFileAsync)
 exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceDeviceId, copyToRelativePath, sourcePaths) => {
   const description = 'Copy files from backup device'
   const name = 'copyFromBackupDevice'
@@ -40,7 +41,7 @@ exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceD
             log.debug(`Skipping file as another file with the same hash exists on a source device. ${sourcePath}, ${file.hash}`)
             continue
           }
-          const { hash, path: newPath } = await copyFileAsync(sourcePath, targetPath, { overwrite: true })
+          const { hash, path: newPath } = await copyFileWithRetry(sourcePath, targetPath, { overwrite: true })
           log.info(`copied file from ${sourcePath} to ${newPath}`)
           if (hash !== file.hash) {
             log.error(`File hash has changed. Has the file been corrupted?. Stored hash ${file.hash}, copied file hash ${hash}`)

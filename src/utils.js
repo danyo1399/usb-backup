@@ -4,6 +4,21 @@ const crypto = require('crypto')
  Common Utils
  =======================================================================================
 */
+function sleepAsync (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+exports.retryOnError = function (fnAsync, times = 5) {
+  return async (...args) => {
+    for (let i = 0; ; i++) {
+      try {
+        return await fnAsync(...args)
+      } catch (error) {
+        if (i === times) throw error
+        await sleepAsync(5000)
+      }
+    }
+  }
+}
 
 exports.noop = function () {
 
