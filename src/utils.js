@@ -7,7 +7,8 @@ const crypto = require('crypto')
 function sleepAsync (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
-exports.retryOnError = function (fnAsync, times = 5) {
+
+exports.createDurableAsyncFunction = function (fnAsync, times = 5) {
   return async (...args) => {
     for (let i = 0; ; i++) {
       try {

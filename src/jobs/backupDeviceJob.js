@@ -1,4 +1,4 @@
-const { newIdNumber } = require('../utils')
+const { newIdNumber, createDurableAsyncFunction } = require('../utils')
 const checkDiskSpace = require('check-disk-space').default
 const {
   getDeviceByIdAsync, getSourceFilesToBackupAsync, updateLastBackupDate
@@ -83,6 +83,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
     }
   }
 
+  const durableCopyFileAsync = createDurableAsyncFunction(copyFileAsync, 5)
   async function backupFile (log, context) {
     const sourceFilename = joinPaths(context.sourceDevice.path, context.sourceFile.relativePath)
     const targetFilename = appendFilePathToPath(sourceFilename, context.backupDevice.path)
@@ -90,7 +91,7 @@ exports.createBackupDevicesJobAsync = async (sourceDeviceIds, backupDeviceId) =>
 
     log.info(`Copying file to backup device ${sourceFilename} -> ${targetFilename}`)
 
-    const { hash: backupHash, basename: newBaseName } = await copyFileAsync(sourceFilename, targetFilename, { appendSuffix: true })
+    const { hash: backupHash, basename: newBaseName } = await durableCopyFileAsync(sourceFilename, targetFilename, { appendSuffix: true })
 
     context.freeSpace -= context.sourceFile.size
 

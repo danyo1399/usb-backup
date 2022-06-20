@@ -1,4 +1,4 @@
-const { newIdNumber, retryOnError } = require('../utils')
+const { newIdNumber, createDurableAsyncFunction } = require('../utils')
 const {
   findFilesByPathAsync,
   getFilesByHashAndDeviceTypeAsync
@@ -9,7 +9,7 @@ const { copyFileAsync, createFileAsync } = require('../file')
 const fs = require('fs-extra')
 const { joinPaths: joinPath, endsWithPathSeparator, joinPaths, basename } = require('../path')
 
-const copyFileWithRetry = retryOnError(copyFileAsync)
+const copyFileWithRetry = createDurableAsyncFunction(copyFileAsync)
 exports.createRestoreBackupFilesToSourceRequest = async (backupDeviceId, sourceDeviceId, copyToRelativePath, sourcePaths) => {
   const description = 'Copy files from backup device'
   const name = 'copyFromBackupDevice'
